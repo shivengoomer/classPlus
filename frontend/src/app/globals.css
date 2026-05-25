@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #EFEFEF;
+  --foreground: #111111;
+
+  --veda-bg: #EFEFEF;
+  --veda-sidebar: #FFFFFF;
+  --veda-card: #FFFFFF;
+  --veda-card-border: #E5E7EB;
+  --veda-text-primary: #111111;
+  --veda-text-secondary: #6B7280;
+  --veda-text-hint: #9CA3AF;
+  --veda-btn-primary: #1A1A1A;
+  --veda-orange: #F97316;
+  --veda-orange-red: #EF4444;
+  --veda-nav-active-bg: #F3F4F6;
+  --veda-progress: #1A1A1A;
+  --veda-dark-banner: #1A1A1A;
+}
+
+body {
+  color: var(--veda-text-primary);
+  background: var(--veda-bg);
+  font-family: var(--font-inter), sans-serif;
+  overflow-x: hidden;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
