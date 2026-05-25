@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Download, Loader2, Check } from 'lucide-react';
+import { FileDown, Loader2, Check } from 'lucide-react';
 import { exportAssignmentPDF } from '@/lib/api';
 
 interface DarkBannerProps {
@@ -50,14 +50,14 @@ export function DarkBanner({ assignmentId, aiMessage }: DarkBannerProps) {
       <button
         onClick={handleDownload}
         disabled={isDownloading}
-        className="flex items-center justify-center gap-2 border border-white hover:bg-white hover:text-veda-btn-primary disabled:bg-transparent disabled:text-gray-400 disabled:border-gray-500 rounded-full px-5 py-2.5 text-sm font-semibold transition-all flex-shrink-0 active:scale-95 self-stretch md:self-auto"
+        className="flex items-center justify-center gap-2 bg-white text-veda-btn-primary hover:bg-gray-100 disabled:bg-gray-200 disabled:text-gray-400 rounded-full px-5 py-2.5 text-sm font-bold transition-all flex-shrink-0 active:scale-95 self-stretch md:self-auto shadow-sm"
       >
         {isDownloading ? (
-          <Loader2 className="w-4 h-4 animate-spin" />
+          <Loader2 className="w-4 h-4 animate-spin text-veda-btn-primary" />
         ) : downloadSuccess ? (
-          <Check className="w-4 h-4 text-green-400" />
+          <Check className="w-4 h-4 text-green-600" />
         ) : (
-          <Download className="w-4 h-4" />
+          <FileDown className="w-4 h-4 text-veda-btn-primary" />
         )}
         
         {/* Hide text on mobile, show only icon */}

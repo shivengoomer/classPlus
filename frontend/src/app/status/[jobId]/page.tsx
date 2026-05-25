@@ -62,7 +62,7 @@ export default function JobStatusPage() {
   };
 
   return (
-    <AppShell title="Generation Status" backPath="/assignments">
+    <AppShell>
       <div className="flex flex-col items-center justify-center min-h-[60vh] max-w-md mx-auto text-center px-4">
         
         {/* Animated Visual Box */}

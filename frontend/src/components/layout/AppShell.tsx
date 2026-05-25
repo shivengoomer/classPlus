@@ -11,11 +11,9 @@ import Link from 'next/link';
 
 interface AppShellProps {
   children: React.ReactNode;
-  title?: string;
-  backPath?: string;
 }
 
-export function AppShell({ children, title, backPath }: AppShellProps) {
+export function AppShell({ children }: AppShellProps) {
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -38,8 +36,6 @@ export function AppShell({ children, title, backPath }: AppShellProps) {
       {/* Main Content Area */}
       <div className="flex flex-col flex-1 h-full min-w-0 relative">
         <TopBar 
-          title={title} 
-          backPath={backPath} 
           onMenuToggle={() => setMobileMenuOpen(true)} 
         />
         

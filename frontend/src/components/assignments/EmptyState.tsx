@@ -11,28 +11,49 @@ export function EmptyState() {
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
       {/* Custom Inline SVG Illustration: Document + Magnifying Glass + Red X */}
-      <div className="relative mb-6">
+      <div className="relative mb-6 flex items-center justify-center">
         <svg
-          width="120"
-          height="120"
-          viewBox="0 0 120 120"
+          width="260"
+          height="180"
+          viewBox="0 0 260 180"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
           className="mx-auto"
         >
+          {/* Curved swish decoration line */}
+          <path d="M55 75C43 65 35 85 47 95C59 105 65 85 55 75Z" stroke="#475569" strokeWidth="2" strokeLinecap="round" />
+
           {/* Document Sheet */}
-          <rect x="25" y="15" width="55" height="75" rx="8" fill="white" stroke="#E5E7EB" strokeWidth="3" />
-          <line x1="37" y1="33" x2="68" y2="33" stroke="#F3F4F6" strokeWidth="3" strokeLinecap="round" />
-          <line x1="37" y1="45" x2="60" y2="45" stroke="#F3F4F6" strokeWidth="3" strokeLinecap="round" />
-          <line x1="37" y1="57" x2="52" y2="57" stroke="#F3F4F6" strokeWidth="3" strokeLinecap="round" />
-          
+          <rect x="90" y="35" width="70" height="96" rx="8" fill="white" stroke="#E5E7EB" strokeWidth="2" />
+          {/* Header dark line block inside document */}
+          <rect x="102" y="50" width="22" height="6" rx="1.5" fill="#1E293B" />
+          {/* Horizontal body lines */}
+          <rect x="102" y="65" width="46" height="4" rx="1" fill="#E5E7EB" />
+          <rect x="102" y="77" width="46" height="4" rx="1" fill="#E5E7EB" />
+          <rect x="102" y="89" width="46" height="4" rx="1" fill="#E5E7EB" />
+          <rect x="102" y="101" width="30" height="4" rx="1" fill="#E5E7EB" />
+
+          {/* Decorative Sparkle (Sparkle star) on bottom-left */}
+          <path d="M100 145L102 150L107 152L102 154L100 159L98 154L93 152L98 150L100 145Z" fill="#1D4ED8" />
+
+          {/* Top-Right Badge Container */}
+          <rect x="170" y="45" width="36" height="24" rx="6" fill="white" stroke="#E5E7EB" strokeWidth="2" />
+          <circle cx="180" cy="57" r="3" fill="#A7F3D0" />
+          <circle cx="193" cy="57" r="3" fill="#D1D5DB" />
+
+          {/* Decorative blue dot on the right */}
+          <circle cx="210" cy="120" r="4" fill="#1D4ED8" />
+
           {/* Magnifying Glass */}
-          <circle cx="70" cy="75" r="20" fill="white" stroke="#6B7280" strokeWidth="3" />
-          <line x1="84" y1="89" x2="98" y2="103" stroke="#6B7280" strokeWidth="4" strokeLinecap="round" />
-          
-          {/* Red X inside Magnifying Glass */}
-          <path d="M64 69L76 81" stroke="#EF4444" strokeWidth="3" strokeLinecap="round" />
-          <path d="M76 69L64 81" stroke="#EF4444" strokeWidth="3" strokeLinecap="round" />
+          {/* Handle */}
+          <line x1="178" y1="133" x2="200" y2="155" stroke="#C4B5FD" strokeWidth="6" strokeLinecap="round" />
+          <line x1="178" y1="133" x2="200" y2="155" stroke="#8B5CF6" strokeWidth="3" strokeLinecap="round" />
+          {/* Lens Frame */}
+          <circle cx="155" cy="105" r="28" fill="white" stroke="#C4B5FD" strokeWidth="4" />
+          <circle cx="155" cy="105" r="28" fill="#F5F3FF" opacity="0.4" />
+          {/* Red X */}
+          <path d="M145 95L165 115" stroke="#EF4444" strokeWidth="5" strokeLinecap="round" />
+          <path d="M165 95L145 115" stroke="#EF4444" strokeWidth="5" strokeLinecap="round" />
         </svg>
       </div>
 
@@ -49,7 +70,7 @@ export function EmptyState() {
       {/* CTA Button */}
       <PillButton
         variant="primary"
-        icon={<PlusIcon className="w-4 h-4" />}
+        icon={<PlusIcon className="w-4 h-4 text-white" />}
         onClick={() => router.push('/create')}
       >
         Create Your First Assignment

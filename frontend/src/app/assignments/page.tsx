@@ -30,7 +30,7 @@ export default function AssignmentsPage() {
   }, [setAssignments]);
 
   return (
-    <AppShell title="Assignments">
+    <AppShell>
       {loading ? (
         // Premium Skeleton Loader
         <div className="w-full max-w-6xl mx-auto flex flex-col gap-6">

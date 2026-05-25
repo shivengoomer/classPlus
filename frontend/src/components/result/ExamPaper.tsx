@@ -38,15 +38,15 @@ export function ExamPaper({ assignment }: ExamPaperProps) {
       style={{ minHeight: '297mm' }} // Simulates A4 height proportion
     >
       
-      {/* Centered Exam Header */}
-      <div className="flex flex-col items-center text-center gap-1 border-b-2 border-black pb-4">
-        <h2 className="text-[22px] font-bold tracking-tight text-black leading-tight uppercase">
+      <div className="flex flex-col items-center text-center gap-1.5 border-b-2 border-black pb-4">
+        <h2 className="text-[22px] font-bold tracking-tight text-black leading-tight">
           {result.schoolName || 'Delhi Public School, Sector-4, Bokaro'}
         </h2>
-        <div className="flex flex-col sm:flex-row items-center sm:gap-6 text-[14px] text-gray-800 font-medium mt-1">
-          <span>Subject: {result.subject}</span>
-          <span className="hidden sm:inline">•</span>
-          <span>Class: {result.grade} Grade</span>
+        <div className="text-[14px] text-black font-semibold mt-0.5">
+          Subject: {result.subject}
+        </div>
+        <div className="text-[14px] text-black font-semibold">
+          Class: {result.grade}
         </div>
       </div>
 

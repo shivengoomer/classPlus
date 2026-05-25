@@ -41,10 +41,7 @@ export default function ResultPage() {
   }, [assignmentId, setCurrentAssignment]);
 
   return (
-    <AppShell 
-      title={assignment ? assignment.title : 'View Assignment'} 
-      backPath="/assignments"
-    >
+    <AppShell>
       {loading ? (
         // Premium Document Skeleton Loader
         <div className="w-full max-w-4xl mx-auto flex flex-col gap-6">

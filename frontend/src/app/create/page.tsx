@@ -7,7 +7,7 @@ import { CreateAssignmentForm } from '@/components/create/CreateAssignmentForm';
 
 export default function CreateAssignmentPage() {
   return (
-    <AppShell title="Create Assignment" backPath="/assignments">
+    <AppShell>
       <CreateAssignmentForm />
     </AppShell>
   );

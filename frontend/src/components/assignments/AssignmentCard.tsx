@@ -71,8 +71,7 @@ export function AssignmentCard({ assignment }: AssignmentCardProps) {
       {/* Top row: Title & Action menu */}
       <div className="flex items-start justify-between gap-4">
         <div className="flex flex-col gap-1 min-w-0">
-          {/* Title (15px, bold) */}
-          <h4 className="text-[15px] font-bold text-veda-text-primary truncate">
+          <h4 className="text-[15px] font-bold text-veda-text-primary truncate underline underline-offset-[5px] decoration-[1.5px] decoration-gray-950 group-hover:decoration-black">
             {assignment.title}
           </h4>
           
@@ -103,11 +102,11 @@ export function AssignmentCard({ assignment }: AssignmentCardProps) {
       {/* Bottom row: Assigned Date & Due Date */}
       <div className="flex items-center justify-between border-t border-gray-100 pt-4 mt-4 text-[13px] text-veda-text-secondary">
         <div>
-          <span className="font-bold text-veda-text-primary">Assigned on: </span>
+          <span className="font-bold text-veda-text-primary">Assigned on : </span>
           <span className="font-normal">{assignedDate}</span>
         </div>
         <div>
-          <span className="font-bold text-veda-text-primary">Due: </span>
+          <span className="font-bold text-veda-text-primary">Due : </span>
           <span className="font-normal">{dueDate}</span>
         </div>
       </div>
