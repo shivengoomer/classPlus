@@ -35,10 +35,10 @@ export function PillButton({
         className={`${baseStyles} ${variantStyles} ${className}`}
         style={{
           border: '2px solid transparent',
-          backgroundImage: 'linear-gradient(#1a1a1a, #1a1a1a), linear-gradient(135deg, #F97316, #EF4444)',
+          backgroundImage: 'linear-gradient(#303030, #303030), linear-gradient(135deg, #FF6B00, #FF3D00)',
           backgroundOrigin: 'border-box',
           backgroundClip: 'padding-box, border-box',
-          boxShadow: '0 0 10px rgba(249, 115, 22, 0.15)',
+          boxShadow: '0 4px 14px rgba(255, 107, 0, 0.25)',
         }}
         {...props}
       >
