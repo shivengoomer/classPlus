@@ -18,12 +18,12 @@ export function AppShell({ children }: AppShellProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const mobileDrawerItems = [
-    { label: 'Home', path: '#', icon: <Home className="w-5 h-5" /> },
-    { label: 'My Groups', path: '#', icon: <Users className="w-5 h-5" /> },
+    { label: 'Home', path: '/home', icon: <Home className="w-5 h-5" /> },
+    { label: 'My Groups', path: '/groups', icon: <Users className="w-5 h-5" /> },
     { label: 'Assignments', path: '/assignments', icon: <ClipboardList className="w-5 h-5" /> },
-    { label: "AI Teacher's Toolkit", path: '#', icon: <Cpu className="w-5 h-5" /> },
-    { label: 'My Library', path: '#', icon: <BookOpen className="w-5 h-5" /> },
-    { label: 'Settings', path: '#', icon: <Settings className="w-5 h-5" /> },
+    { label: "AI Teacher's Toolkit", path: '/toolkit', icon: <Cpu className="w-5 h-5" /> },
+    { label: 'My Library', path: '/library', icon: <BookOpen className="w-5 h-5" /> },
+    { label: 'Settings', path: '/settings', icon: <Settings className="w-5 h-5" /> },
   ];
 
   return (
