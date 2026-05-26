@@ -11,7 +11,8 @@ import { log, logError } from '../utils/logger';
 // GET /api/library — list all items
 export async function listItems(req: Request, res: Response) {
   try {
-    const items = await LibraryItem.find().sort({ createdAt: -1 });
+    const userId = (req as any).auth?.userId;
+    const items = await LibraryItem.find({ userId }).sort({ createdAt: -1 });
     return res.json(items);
   } catch (error) {
     logError('Failed to list library items', error);
@@ -73,15 +74,17 @@ export async function uploadItem(req: Request, res: Response) {
       url = `/uploads/${req.file.filename}`;
     }
 
+    const userId = (req as any).auth?.userId;
     const item = await LibraryItem.create({
       name: originalname,
       type,
       size: formattedSize,
       category: category || 'Reference Materials',
       url,
+      userId,
     });
 
-    log(`Library item uploaded and saved: ${item._id}`);
+    log(`Library item uploaded and saved: ${item._id} for user ${userId}`);
     return res.status(201).json(item);
   } catch (error) {
     logError('Failed to upload library item', error);
@@ -97,13 +100,15 @@ export async function createFolder(req: Request, res: Response) {
       return res.status(400).json({ error: 'Name and category are required' });
     }
 
+    const userId = (req as any).auth?.userId;
     const item = await LibraryItem.create({
       name,
       type: 'folder',
       category,
+      userId,
     });
 
-    log(`Library folder created: ${item._id}`);
+    log(`Library folder created: ${item._id} for user ${userId}`);
     return res.status(201).json(item);
   } catch (error) {
     logError('Failed to create library folder', error);
@@ -114,11 +119,12 @@ export async function createFolder(req: Request, res: Response) {
 // DELETE /api/library/:id — delete a library item
 export async function deleteItem(req: Request, res: Response) {
   try {
-    const item = await LibraryItem.findByIdAndDelete(req.params.id);
+    const userId = (req as any).auth?.userId;
+    const item = await LibraryItem.findOneAndDelete({ _id: req.params.id, userId });
     if (!item) {
       return res.status(404).json({ error: 'Library item not found' });
     }
-    log(`Library item deleted: ${req.params.id}`);
+    log(`Library item deleted: ${req.params.id} for user ${userId}`);
     return res.json({ message: 'Deleted successfully' });
   } catch (error) {
     logError('Failed to delete library item', error);

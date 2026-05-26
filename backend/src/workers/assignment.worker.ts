@@ -3,8 +3,12 @@
 // processes jobs from the BullMQ queue one at a time
 
 import { Worker, Job } from 'bullmq';
+import path from 'path';
+import fs from 'fs';
 import { getRedisOptions } from '../config/redis';
 import { Assignment } from '../models/assignment.model';
+import { Notification } from '../models/notification.model';
+import { LibraryItem } from '../models/library.model';
 import { parseFile, parseFileFromUrl } from '../services/parser.service';
 import { generateWithAI } from '../services/ai.service';
 import { generatePDF } from '../services/pdf.service';
@@ -57,6 +61,81 @@ async function processAssignment(job: Job<JobData>) {
       } catch (err) {
         logError('Failed to parse uploaded file, continuing without it', err);
         // don't fail the whole job if file parsing fails
+      }
+
+      // Add the uploaded reference material to the library!
+      try {
+        const filename = path.basename(assignment.filePath);
+        const originalName = filename.replace(/^\d+-/, '');
+        const ext = originalName.split('.').pop()?.toLowerCase();
+        const type = ext === 'pdf' ? 'pdf' : 'doc';
+        
+        let formattedSize = '0 KB';
+        try {
+          const stats = fs.statSync(assignment.filePath);
+          const size = stats.size;
+          if (size >= 1024 * 1024) {
+            formattedSize = `${(size / (1024 * 1024)).toFixed(1)} MB`;
+          } else {
+            formattedSize = `${(size / 1024).toFixed(0)} KB`;
+          }
+        } catch (sizeErr) {
+          logError('Failed to get file size for upload', sizeErr);
+        }
+
+        let refUrl: string | undefined;
+
+        if (env.UPLOADTHING_TOKEN) {
+          try {
+            log(`Uploading reference material ${originalName} to UploadThing...`);
+            const fileBuffer = fs.readFileSync(assignment.filePath);
+            const file = new UTFile([fileBuffer], originalName, { type: type === 'pdf' ? 'application/pdf' : 'application/msword' } as any);
+            const utapi = new UTApi({ token: env.UPLOADTHING_TOKEN });
+            const uploadRes = await utapi.uploadFiles([file]);
+            const resData = Array.isArray(uploadRes) ? uploadRes[0] : uploadRes;
+
+            if (resData && resData.data && resData.data.url) {
+              refUrl = resData.data.url;
+              log(`Reference file uploaded successfully to UploadThing: ${refUrl}`);
+            } else if (resData && (resData as any).url) {
+              refUrl = (resData as any).url;
+              log(`Reference file uploaded successfully to UploadThing (fallback): ${refUrl}`);
+            }
+          } catch (uploadErr) {
+            logError('Failed to upload reference file to UploadThing, using local fallback', uploadErr);
+          }
+        }
+
+        if (!refUrl) {
+          refUrl = `/uploads/${filename}`;
+        }
+
+        // Save reference file as a library item
+        const refItem = await LibraryItem.create({
+          name: originalName,
+          type,
+          size: formattedSize,
+          category: 'Reference Materials',
+          url: refUrl,
+        });
+        log(`Reference material saved as library item: ${refItem._id}`);
+
+        // Update assignment's fileUrl to the uploaded/local URL
+        assignment.fileUrl = refUrl;
+
+        // Clean up local file if we uploaded it to the cloud
+        if (env.UPLOADTHING_TOKEN && refUrl.startsWith('http')) {
+          try {
+            fs.unlinkSync(assignment.filePath);
+            assignment.filePath = undefined;
+            log(`Cleaned up local reference file: ${filename}`);
+          } catch (cleanupErr) {
+            logError('Failed to delete local reference file', cleanupErr);
+          }
+        }
+        await assignment.save();
+      } catch (libErr) {
+        logError('Failed to save uploaded file to library', libErr);
       }
     } else if (assignment.fileUrl) {
       broadcastToJob(jobId, {
@@ -152,54 +231,95 @@ async function processAssignment(job: Job<JobData>) {
     };
 
     // step 5.5: Generate PDF and upload to UploadThing if token is provided
-    if (env.UPLOADTHING_TOKEN) {
-      try {
-        broadcastToJob(jobId, {
-          type: 'job:progress',
-          progress: 92,
-          status: 'processing',
-          message: 'Uploading generated PDF paper to UploadThing...',
-        });
+    let pdfBuffer: Buffer | undefined;
+    try {
+      log('Generating PDF buffer for the final paper...');
+      pdfBuffer = await generatePDF({
+        schoolName: assignment.result.schoolName,
+        subject: assignment.result.subject,
+        grade: assignment.result.grade,
+        timeAllowed: assignment.result.timeAllowed,
+        totalMarks: assignment.result.totalMarks,
+        sections: assignment.result.sections,
+        answerKey: assignment.result.answerKey,
+      });
 
-        log('Generating PDF buffer for UploadThing upload...');
-        const pdfBuffer = await generatePDF({
-          schoolName: assignment.result.schoolName,
-          subject: assignment.result.subject,
-          grade: assignment.result.grade,
-          timeAllowed: assignment.result.timeAllowed,
-          totalMarks: assignment.result.totalMarks,
-          sections: assignment.result.sections,
-          answerKey: assignment.result.answerKey,
-        });
+      if (pdfBuffer && env.UPLOADTHING_TOKEN) {
+        try {
+          broadcastToJob(jobId, {
+            type: 'job:progress',
+            progress: 92,
+            status: 'processing',
+            message: 'Uploading generated PDF paper to UploadThing...',
+          });
 
-        const fileName = `${assignment.title.replace(/[^a-zA-Z0-9]/g, '_')}_paper.pdf`;
-        const file = new UTFile([pdfBuffer], fileName, { type: 'application/pdf' } as any);
+          const fileName = `${assignment.title.replace(/[^a-zA-Z0-9]/g, '_')}_paper.pdf`;
+          const file = new UTFile([pdfBuffer], fileName, { type: 'application/pdf' } as any);
 
-        log(`Uploading ${fileName} to UploadThing...`);
-        const utapi = new UTApi({ token: env.UPLOADTHING_TOKEN });
-        const uploadRes = await utapi.uploadFiles([file]);
-        const resData = Array.isArray(uploadRes) ? uploadRes[0] : uploadRes;
+          log(`Uploading ${fileName} to UploadThing...`);
+          const utapi = new UTApi({ token: env.UPLOADTHING_TOKEN });
+          const uploadRes = await utapi.uploadFiles([file]);
+          const resData = Array.isArray(uploadRes) ? uploadRes[0] : uploadRes;
 
-        if (resData && resData.data && resData.data.url) {
-          assignment.pdfUrl = resData.data.url;
-          log(`PDF uploaded successfully: ${resData.data.url}`);
-        } else if (resData && (resData as any).url) {
-          assignment.pdfUrl = (resData as any).url;
-          log(`PDF uploaded successfully (direct url fallback): ${(resData as any).url}`);
-        } else if (resData && resData.error) {
-          logError('UploadThing upload returned error structure', resData.error);
-        } else {
-          logError('UploadThing returned unexpected response structure', uploadRes);
+          if (resData && resData.data && resData.data.url) {
+            assignment.pdfUrl = resData.data.url;
+            log(`PDF uploaded successfully: ${resData.data.url}`);
+          } else if (resData && (resData as any).url) {
+            assignment.pdfUrl = (resData as any).url;
+            log(`PDF uploaded successfully (direct url fallback): ${(resData as any).url}`);
+          } else if (resData && resData.error) {
+            logError('UploadThing upload returned error structure', resData.error);
+          } else {
+            logError('UploadThing returned unexpected response structure', uploadRes);
+          }
+        } catch (uploadErr) {
+          logError('Failed to upload PDF to UploadThing', uploadErr);
         }
-      } catch (uploadErr) {
-        logError('Failed to generate or upload PDF to UploadThing, continuing', uploadErr);
       }
-    } else {
-      log('No UPLOADTHING_TOKEN found in environment. Skipping PDF auto-upload.');
+    } catch (pdfErr) {
+      logError('Failed to generate PDF buffer', pdfErr);
     }
 
     assignment.status = 'done';
     await assignment.save();
+
+    // step 5.55: Save generated PDF as a library item under 'Exports'
+    try {
+      const exportUrl = assignment.pdfUrl || `http://localhost:4000/api/assignments/${assignment._id}/export-pdf`;
+      let pdfSizeStr = '1.2 MB';
+      if (pdfBuffer) {
+        const size = pdfBuffer.length;
+        if (size >= 1024 * 1024) {
+          pdfSizeStr = `${(size / (1024 * 1024)).toFixed(1)} MB`;
+        } else {
+          pdfSizeStr = `${(size / 1024).toFixed(0)} KB`;
+        }
+      }
+
+      const exportItem = await LibraryItem.create({
+        name: `${assignment.title} (Export).pdf`,
+        type: 'pdf',
+        size: pdfSizeStr,
+        category: 'Exports',
+        url: exportUrl,
+      });
+      log(`Generated assignment saved to library: ${exportItem._id}`);
+    } catch (libErr) {
+      logError('Failed to save generated assignment to library', libErr);
+    }
+
+    // step 5.6: create notification
+    try {
+      await Notification.create({
+        title: 'Assignment Ready!',
+        message: `Your assignment "${assignment.title}" for ${assignment.subject} (Grade ${assignment.grade}) has been generated successfully.`,
+        type: 'success',
+        link: `/result/${assignmentId}`,
+        read: false,
+      });
+    } catch (notifErr) {
+      logError('Failed to create success notification', notifErr);
+    }
 
     log(`Job ${jobId} completed — paper generated with ${aiResult.sections.length} sections`);
 
@@ -217,7 +337,16 @@ async function processAssignment(job: Job<JobData>) {
 
     // update assignment status to failed
     try {
-      await Assignment.findByIdAndUpdate(assignmentId, { status: 'failed' });
+      const failedAssignment = await Assignment.findByIdAndUpdate(assignmentId, { status: 'failed' }, { new: true });
+      if (failedAssignment) {
+        await Notification.create({
+          title: 'Generation Failed',
+          message: `We encountered an error while generating "${failedAssignment.title}". Please try again.`,
+          type: 'error',
+          link: '/create',
+          read: false,
+        });
+      }
     } catch {
       // if this fails too, not much we can do
     }

@@ -222,7 +222,7 @@ export default function LibraryPage() {
         </div>
 
         {/* Files Directory Grid */}
-        <div className="bg-white border border-veda-card-border rounded-xl shadow-sm overflow-hidden flex flex-col font-sans relative min-h-[300px]">
+        <div className="bg-white border border-veda-card-border rounded-xl shadow-sm overflow-hidden flex flex-col font-sans relative">
           
           {loading && (
             <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-10 flex items-center justify-center">
@@ -230,13 +230,11 @@ export default function LibraryPage() {
             </div>
           )}
 
-          <div className="p-4 border-b border-veda-card-border bg-gray-50 flex justify-between items-center text-xs font-bold text-veda-text-secondary uppercase tracking-wider">
+          <div className="p-4 border-b border-veda-card-border bg-gray-50 grid grid-cols-[1fr_auto] sm:grid-cols-[1fr_96px_auto] md:grid-cols-[1fr_96px_96px_96px] gap-4 items-center text-xs font-bold text-veda-text-secondary uppercase tracking-wider">
             <span>Name</span>
-            <div className="flex items-center gap-16 md:gap-24 mr-4 md:mr-16">
-              <span className="hidden sm:inline-block w-24">Type</span>
-              <span className="hidden md:inline-block w-24">Size</span>
-              <span className="w-24 text-right">Actions</span>
-            </div>
+            <span className="hidden sm:inline-block w-24">Type</span>
+            <span className="hidden md:inline-block w-24">Size</span>
+            <span className="w-24 text-right pr-4">Actions</span>
           </div>
 
           <div className="flex flex-col divide-y divide-gray-100">
@@ -244,7 +242,7 @@ export default function LibraryPage() {
               filteredItems.map((item) => (
                 <div 
                   key={item._id}
-                  className="p-4 flex justify-between items-center hover:bg-gray-50/50 transition-colors text-xs text-veda-text-primary"
+                  className="p-4 grid grid-cols-[1fr_auto] sm:grid-cols-[1fr_96px_auto] md:grid-cols-[1fr_96px_96px_96px] gap-4 items-center hover:bg-gray-50/50 transition-colors text-xs text-veda-text-primary"
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     <div className="w-8 h-8 rounded-lg bg-orange-50 text-veda-orange flex items-center justify-center flex-shrink-0">
@@ -267,39 +265,41 @@ export default function LibraryPage() {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-16 md:gap-24 mr-4 md:mr-16 font-sans text-xs">
-                    <span className="hidden sm:inline-block w-24 text-gray-500 capitalize">
-                      {item.type}
-                    </span>
-                    <span className="hidden md:inline-block w-24 text-gray-400">
-                      {item.size || '--'}
-                    </span>
-                    
-                    {/* Action buttons */}
-                    <div className="flex items-center justify-end gap-3 w-24">
-                      {item.type !== 'folder' && (
-                        <button 
-                          onClick={() => handleDownload(item)}
-                          className="p-1 rounded text-indigo-600 hover:bg-indigo-50 transition-colors"
-                          title="Download document"
-                        >
-                          <Download className="w-4 h-4" />
-                        </button>
-                      )}
+                  <span className="hidden sm:inline-block w-24 text-gray-500 capitalize">
+                    {item.type}
+                  </span>
+                  <span className="hidden md:inline-block w-24 text-gray-400">
+                    {item.size || '--'}
+                  </span>
+                  
+                  {/* Action buttons */}
+                  <div className="flex items-center justify-end gap-3 w-24 pr-4">
+                    {item.type !== 'folder' && (
                       <button 
-                        onClick={() => handleDelete(item._id)}
-                        className="p-1 rounded text-red-600 hover:bg-red-50 transition-colors"
-                        title="Delete asset"
+                        onClick={() => handleDownload(item)}
+                        className="p-1 rounded text-indigo-600 hover:bg-indigo-50 transition-colors"
+                        title="Download document"
                       >
-                        <Trash className="w-4 h-4" />
+                        <Download className="w-4 h-4" />
                       </button>
-                    </div>
+                    )}
+                    <button 
+                      onClick={() => handleDelete(item._id)}
+                      className="p-1 rounded text-red-600 hover:bg-red-50 transition-colors"
+                      title="Delete asset"
+                    >
+                      <Trash className="w-4 h-4" />
+                    </button>
                   </div>
                 </div>
               ))
             ) : (
-              <div className="p-12 text-center text-xs text-veda-text-secondary">
-                No items in your library match the filters or search parameters.
+              <div className="p-16 text-center text-xs text-veda-text-secondary flex flex-col items-center justify-center gap-3 bg-gray-50/20">
+                <Folder className="w-8 h-8 text-gray-300" />
+                <div className="flex flex-col gap-0.5">
+                  <span className="font-bold text-gray-500">No items found</span>
+                  <span className="text-gray-400 text-[11px]">No items in your library match the filters or search parameters.</span>
+                </div>
               </div>
             )}
           </div>

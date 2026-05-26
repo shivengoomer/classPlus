@@ -36,7 +36,7 @@ export function ToastContainer() {
                 <Info className="w-5 h-5" />
               </div>
             )}
-            <span className="text-xs font-bold text-gray-800 font-sans leading-tight">
+            <span className="text-xs font-bold text-gray-800 font-sans leading-tight break-words whitespace-normal overflow-hidden">
               {toast.message}
             </span>
           </div>

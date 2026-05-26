@@ -5,8 +5,10 @@ import React, { useState } from 'react';
 import { AppShell } from '@/components/layout/AppShell';
 import { PillButton } from '@/components/shared/PillButton';
 import { Settings, User, School, Sparkles } from 'lucide-react';
+import { useToastStore } from '@/store/toastStore';
 
 export default function SettingsPage() {
+  const { addToast } = useToastStore();
   const [profile, setProfile] = useState({
     name: 'John Doe',
     email: 'john.doe@dpsbokaro.edu.in',
@@ -26,7 +28,7 @@ export default function SettingsPage() {
   });
 
   const handleSave = (section: string) => {
-    alert(`Successfully saved ${section} configuration settings.`);
+    addToast(`Successfully saved ${section} configuration settings.`, 'success');
   };
 
   return (

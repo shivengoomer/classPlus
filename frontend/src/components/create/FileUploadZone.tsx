@@ -133,7 +133,16 @@ export function FileUploadZone({
 
   return (
     <div className="flex flex-col gap-2 w-full">
-      <label className="text-sm font-semibold text-[#303030] font-sans">
+      <label 
+        style={{
+          color: '#303030',
+          fontFamily: '"Bricolage Grotesque", sans-serif',
+          fontSize: '16px',
+          fontWeight: 700,
+          lineHeight: '140%',
+          letterSpacing: '-0.64px',
+        }}
+      >
         Source Materials
       </label>
       
@@ -192,60 +201,73 @@ export function FileUploadZone({
           onDragOver={handleDrag}
           onDragLeave={handleDrag}
           onDrop={handleDrop}
-          className={`flex flex-col items-center justify-center pl-[32px] pr-[32px] pt-[24px] pb-[24px] bg-[#F6F6F6] rounded-[24px] transition-all cursor-pointer ${
+          className={`flex flex-col items-center justify-center p-6 md:p-8 bg-white transition-all cursor-pointer border-[1.75px] border-dashed border-black/20 rounded-[24px] gap-4 self-stretch ${
             isDragActive 
-              ? 'bg-[#EAEAEA]' 
-              : 'hover:bg-[#F2F2F2]'
+              ? 'bg-gray-50 border-black/40' 
+              : 'hover:bg-gray-50/50'
           }`}
-          style={{ 
-            outline: '1.75px rgba(0, 0, 0, 0.20) solid', 
-            outlineOffset: '-1.75px' 
-          }}
           onClick={onButtonClick}
         >
           <input
             ref={fileInputRef}
             type="file"
             className="hidden"
-            accept=".pdf,.doc,.docx"
+            accept="image/jpeg,image/png,application/pdf"
             onChange={handleChange}
           />
           
-          {/* Custom White Icon box */}
-          <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-sm border border-gray-150 text-[#1E1E1E] mb-4">
-            <div className="w-6 h-6 relative flex items-center justify-center">
-              <div 
-                className="w-[22px] h-[18px] absolute"
-                style={{ 
-                  outline: '2.50px #1E1E1E solid', 
-                  outlineOffset: '-1.25px' 
-                }} 
-              />
-            </div>
+          {/* Upload Icon */}
+          <div className="text-black/40">
+            <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20 28.3334V11.6667M20 11.6667L13.3333 18.3334M20 11.6667L26.6667 18.3334" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M33.3333 33.3334H6.66667" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
           </div>
 
-          <p className="text-[16px] font-medium text-center text-[#303030] leading-tight mb-1 font-sans">
-            Choose a file or drag & drop it here
-          </p>
-          <p className="text-[14px] text-center text-[#A9A9A9] mb-4 font-sans">
-            PDF, DOC, DOCX up to 10MB
-          </p>
+          <div className="flex flex-col items-center gap-1">
+            <p 
+              style={{
+                color: '#303030',
+                fontFamily: '"Bricolage Grotesque", sans-serif',
+                fontSize: '16px',
+                fontWeight: 600,
+                lineHeight: '140%',
+                letterSpacing: '-0.64px',
+                textAlign: 'center'
+              }}
+            >
+              Choose a file or drag & drop it here
+            </p>
+            <p 
+              style={{
+                color: 'rgba(94, 94, 94, 0.80)',
+                fontFamily: '"Bricolage Grotesque", sans-serif',
+                fontSize: '14px',
+                fontWeight: 400,
+                lineHeight: '140%',
+                letterSpacing: '-0.56px',
+                textAlign: 'center'
+              }}
+            >
+              JPEG, PNG, upto 10MB
+            </p>
+          </div>
 
-          <div className="flex flex-wrap justify-center gap-2 mt-1">
+          <div className="flex items-center gap-3">
             <button
               type="button"
               onClick={onButtonClick}
-              className="px-5 py-2 text-xs font-semibold text-[#303030] bg-white rounded-[48px] shadow-sm hover:bg-gray-50 active:scale-95 transition-all font-sans border border-gray-150"
+              className="px-6 py-2 text-sm font-bold text-[#303030] bg-white rounded-full border border-black/10 shadow-sm hover:bg-gray-50 active:scale-95 transition-all font-sans"
             >
               Browse Files
             </button>
             <button
               type="button"
               onClick={handleToggleLibrary}
-              className="px-5 py-2 text-xs font-semibold text-white bg-[#181818] rounded-[48px] shadow-sm hover:bg-black active:scale-95 transition-all font-sans flex items-center gap-1.5"
+              className="px-6 py-2 text-sm font-bold text-white bg-[#181818] rounded-full shadow-sm hover:bg-black active:scale-95 transition-all font-sans flex items-center gap-1.5"
             >
-              <BookOpen className="w-3.5 h-3.5" />
-              <span>Select from Library</span>
+              <BookOpen className="w-4 h-4" />
+              <span>Library</span>
             </button>
           </div>
         </div>
@@ -428,8 +450,19 @@ export function FileUploadZone({
         </div>
       )}
       
-      <span className="text-[14px] font-medium text-[#303030]/60 mt-1 pl-1 text-center font-sans">
-        Upload a file or choose one from your UploadThing library assets
+      <span 
+        style={{
+          color: 'rgba(94, 94, 94, 0.55)',
+          fontFamily: '"Bricolage Grotesque", sans-serif',
+          fontSize: '14px',
+          fontWeight: 400,
+          lineHeight: '140%',
+          letterSpacing: '-0.56px',
+          textAlign: 'center',
+          marginTop: '4px'
+        }}
+      >
+        Upload images of your preferred document/image
       </span>
     </div>
   );

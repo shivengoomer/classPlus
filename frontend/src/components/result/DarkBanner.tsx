@@ -4,6 +4,7 @@
 import React, { useState } from 'react';
 import { FileDown, Loader2, Check } from 'lucide-react';
 import { exportAssignmentPDF } from '@/lib/api';
+import { useToastStore } from '@/store/toastStore';
 
 interface DarkBannerProps {
   assignmentId: string;
@@ -14,6 +15,7 @@ interface DarkBannerProps {
 export function DarkBanner({ assignmentId, aiMessage, pdfUrl }: DarkBannerProps) {
   const [isDownloading, setIsDownloading] = useState(false);
   const [downloadSuccess, setDownloadSuccess] = useState(false);
+  const { addToast } = useToastStore();
 
   const handleDownload = async () => {
     setIsDownloading(true);
@@ -39,7 +41,7 @@ export function DarkBanner({ assignmentId, aiMessage, pdfUrl }: DarkBannerProps)
       setTimeout(() => setDownloadSuccess(false), 2000);
     } catch (err) {
       console.error('Failed to export PDF:', err);
-      alert('Error exporting PDF paper. Please try again.');
+      addToast('Error exporting PDF paper. Please try again.', 'error');
     } finally {
       setIsDownloading(false);
     }
@@ -47,10 +49,21 @@ export function DarkBanner({ assignmentId, aiMessage, pdfUrl }: DarkBannerProps)
 
   return (
     <div 
-      className="w-full bg-[#181818]/85 backdrop-blur-md text-white p-8 rounded-[32px] flex flex-col items-start gap-6 shadow-lg border border-white/5"
+      style={{
+        display: 'flex',
+        padding: '24px 32px',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: '24px',
+        alignSelf: 'stretch',
+        borderRadius: '32px',
+        background: 'rgba(24, 24, 24, 0.80)',
+      }}
+      className="backdrop-blur-md text-white shadow-lg border border-white/5"
     >
       {/* AI Message */}
-      <p className="text-[20px] font-bold leading-8 text-white font-sans max-w-4xl">
+      <p className="text-[20px] font-bold leading-8 text-white font-sans max-w-4xl text-center">
         {aiMessage}
       </p>
 

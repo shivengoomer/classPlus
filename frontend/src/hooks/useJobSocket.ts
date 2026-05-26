@@ -2,13 +2,11 @@
 import { useEffect, useRef } from 'react';
 import { useJobStore } from '@/store/jobStore';
 import { useAssignmentStore } from '@/store/assignmentStore';
-import { simulateJobCompletion } from '@/lib/api';
 
 export function useJobSocket(jobId: string | null) {
   const setStatus = useJobStore((state) => state.setStatus);
   const setProgress = useJobStore((state) => state.setProgress);
   const setDone = useJobStore((state) => state.setDone);
-  const addAssignment = useAssignmentStore((state) => state.addAssignment);
   const setAssignments = useAssignmentStore((state) => state.setAssignments);
 
   const socketRef = useRef<WebSocket | null>(null);
@@ -20,19 +18,11 @@ export function useJobSocket(jobId: string | null) {
     if (!jobId) return;
     const currentJobId: string = jobId;
 
-    let isSimulated = false;
-
     // Reset store for the new job
     useJobStore.getState().reset();
     useJobStore.getState().setJobId(currentJobId);
 
     function connect() {
-      // If we are simulating because websocket failed or we are in mock mode
-      if (currentJobId.startsWith('job-')) {
-        runSimulation();
-        return;
-      }
-
       try {
         const ws = new WebSocket('ws://localhost:4000');
         socketRef.current = ws;
@@ -65,11 +55,14 @@ export function useJobSocket(jobId: string | null) {
                 setStatus('done');
                 setProgress(100, 'Done!');
                 setDone(data.assignmentId);
-                // Refresh list
+                // Refresh list and notifications from backend
                 import('@/lib/api').then((api) => {
                   api.listAssignments().then((list) => {
                     setAssignments(list);
                   });
+                });
+                import('@/store/notificationStore').then((store) => {
+                  store.useNotificationStore.getState().fetchNotifications();
                 });
                 break;
               case 'job:failed':
@@ -83,7 +76,7 @@ export function useJobSocket(jobId: string | null) {
         };
 
         ws.onerror = (err) => {
-          console.warn('WebSocket error, falling back to retry/simulation:', err);
+          console.warn('WebSocket error:', err);
           ws.close();
         };
 
@@ -94,40 +87,16 @@ export function useJobSocket(jobId: string | null) {
             retryCountRef.current += 1;
             timeoutRef.current = setTimeout(connect, delay);
           } else {
-            console.log('Max WebSocket retries reached. Falling back to local simulation.');
-            runSimulation();
+            console.log('Max WebSocket retries reached. Connection failed.');
+            setStatus('failed');
+            setProgress(0, 'Unable to establish real-time connection with server.');
           }
         };
       } catch (err) {
         console.error('Error establishing WebSocket:', err);
-        runSimulation();
+        setStatus('failed');
+        setProgress(0, 'Failed to connect to real-time update socket.');
       }
-    }
-
-    function runSimulation() {
-      if (isSimulated) return;
-      isSimulated = true;
-      console.log('Starting client-side job simulation...');
-      
-      simulateJobCompletion(
-        currentJobId, 
-        (progress, msg, status) => {
-          setStatus(status as 'idle' | 'queued' | 'processing' | 'done' | 'failed');
-          setProgress(progress, msg);
-        },
-        (completedAssignment) => {
-          // Update global assignment store
-          const currentList = useAssignmentStore.getState().assignments;
-          const exists = currentList.some(a => a._id === completedAssignment._id);
-          if (exists) {
-            const updated = currentList.map(a => a._id === completedAssignment._id ? completedAssignment : a);
-            setAssignments(updated);
-          } else {
-            addAssignment(completedAssignment);
-          }
-          setDone(completedAssignment._id);
-        }
-      );
     }
 
     connect();
@@ -140,5 +109,5 @@ export function useJobSocket(jobId: string | null) {
         clearTimeout(timeoutRef.current);
       }
     };
-  }, [jobId, setStatus, setProgress, setDone, addAssignment, setAssignments]);
+  }, [jobId, setStatus, setProgress, setDone, setAssignments]);
 }

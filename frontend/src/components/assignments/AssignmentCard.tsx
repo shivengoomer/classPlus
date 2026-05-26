@@ -65,7 +65,17 @@ export function AssignmentCard({ assignment }: AssignmentCardProps) {
   return (
     <div 
       onClick={handleView}
-      className="bg-white rounded-[24px] p-6 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer flex flex-col justify-between h-[162px] relative group"
+      className="bg-white rounded-[24px] shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer relative group"
+      style={{
+        display: 'flex',
+        padding: '24px',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'flex-start',
+        gap: '48px',
+        flex: '1 0 0',
+        alignSelf: 'stretch'
+      }}
     >
       {/* Top Row: Title, Metadata & Action menu */}
       <div className="flex items-start justify-between gap-4 w-full">
@@ -98,7 +108,7 @@ export function AssignmentCard({ assignment }: AssignmentCardProps) {
       </div>
 
       {/* Bottom Row: Assigned Date & Due Date */}
-      <div className="flex items-center justify-between w-full border-t border-gray-150 pt-4 mt-2">
+      <div className="flex items-center justify-between w-full">
         <div className="flex items-center gap-1 text-[14px] md:text-[16px] text-[#303030]">
           <span className="font-extrabold">Assigned on</span>
           <span className="text-gray-400 font-medium">: {assignedDate}</span>

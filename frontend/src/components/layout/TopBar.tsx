@@ -1,11 +1,13 @@
 // src/components/layout/TopBar.tsx
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Bell, ChevronDown, Menu, ArrowLeft, LayoutGrid, Sparkle } from 'lucide-react';
 import { Badge } from '../shared/Badge';
+import { useNotificationStore } from '@/store/notificationStore';
+import { NotificationPanel } from './NotificationPanel';
 
 interface TopBarProps {
   onMenuToggle?: () => void;
@@ -15,11 +17,21 @@ export function TopBar({ onMenuToggle }: TopBarProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [showUserDropdown, setShowUserDropdown] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+
+  const { unreadCount, fetchNotifications } = useNotificationStore();
+
+  useEffect(() => {
+    fetchNotifications();
+    // Poll for notifications every 30 seconds
+    const interval = setInterval(fetchNotifications, 30000);
+    return () => clearInterval(interval);
+  }, [fetchNotifications]);
 
   // Check if we are in the Create flow to display "Create New" with Sparkle icon
   const isCreateFlow = pathname.includes('/create') || pathname.includes('/status') || pathname.includes('/result');
   const titleText = isCreateFlow ? 'Create New' : 'Assignment';
-  
+
   // Back navigation path helper
   const handleBack = () => {
     if (pathname === '/assignments') {
@@ -30,8 +42,20 @@ export function TopBar({ onMenuToggle }: TopBarProps) {
   };
 
   return (
-    <header className="flex w-full md:w-[1100px] h-[56px] pl-[24px] pr-[12px] py-0 items-center justify-between gap-[10px] rounded-[16px] bg-white/75 border border-veda-card-border flex-shrink-0 z-30 shadow-sm">
-      
+    <header 
+      className="flex items-center justify-between rounded-[16px] bg-white/75 border border-veda-card-border z-30 shadow-sm mx-auto"
+      style={{
+        display: 'flex',
+        width: '100%',
+        maxWidth: '1100px',
+        height: '56px',
+        padding: '0px 12px 0px 24px',
+        alignItems: 'center',
+        gap: '10px',
+        flexShrink: 0,
+      }}
+    >
+
       {/* Left Title Area (Circular back button + Icon + Title) */}
       <div className="flex items-center gap-3">
         {/* Circular Back Button (Figma Match) */}
@@ -58,11 +82,26 @@ export function TopBar({ onMenuToggle }: TopBarProps) {
       {/* Right Side Icons & Profile */}
       <div className="flex items-center gap-4">
         {/* Notification Bell */}
-        <button className="relative p-2 rounded-full hover:bg-gray-150 transition-colors text-gray-600">
-          <Bell className="w-5 h-5" />
-          {/* Red notification dot */}
-          <Badge dot className="absolute top-1.5 right-1.5" />
-        </button>
+        <div className="relative">
+          <button 
+            onClick={() => setShowNotifications(!showNotifications)}
+            className={`relative p-2 rounded-full transition-colors text-gray-600 ${showNotifications ? 'bg-gray-150' : 'hover:bg-gray-150'}`}
+          >
+            <Bell className="w-5 h-5" />
+            {/* Red notification dot */}
+            {unreadCount > 0 && (
+              <Badge 
+                count={unreadCount} 
+                className="absolute -top-0.5 -right-0.5" 
+              />
+            )}
+          </button>
+
+          {showNotifications && (
+            <NotificationPanel onClose={() => setShowNotifications(false)} />
+          )}
+        </div>
+
 
         {/* Desktop Profile Dropdown */}
         <div className="hidden md:block relative">
@@ -93,7 +132,7 @@ export function TopBar({ onMenuToggle }: TopBarProps) {
           {/* Simple Dropdown Menu */}
           {showUserDropdown && (
             <div className="absolute right-0 mt-2 w-48 bg-white border border-veda-card-border rounded-xl shadow-lg py-2 z-50">
-              <Link href="#" className="block px-4 py-2 text-sm text-veda-text-primary hover:bg-gray-50">My Profile</Link>
+              <Link href="/settings" className="block px-4 py-2 text-sm text-veda-text-primary hover:bg-gray-50">My Profile</Link>
               <Link href="#" className="block px-4 py-2 text-sm text-veda-text-primary hover:bg-gray-50">Billing</Link>
               <div className="border-t border-veda-card-border my-1"></div>
               <Link href="#" className="block px-4 py-2 text-sm text-veda-orange-red hover:bg-gray-50 font-medium">Log out</Link>

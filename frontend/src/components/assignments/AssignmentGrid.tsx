@@ -145,7 +145,7 @@ export function AssignmentGrid({ assignments }: AssignmentGridProps) {
       )}
 
       {/* Bottom Sticky Action Bar (Desktop only, when assignments exist) */}
-      <div className="hidden md:flex fixed bottom-6 left-[304px] right-0 items-center justify-center pointer-events-none z-10">
+      <div className="hidden md:flex fixed bottom-6 left-[254px] right-0 items-center justify-center pointer-events-none z-10">
         <div className="pointer-events-auto">
           <PillButton
             variant="primary"

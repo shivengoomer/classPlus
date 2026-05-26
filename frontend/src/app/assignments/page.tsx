@@ -45,15 +45,28 @@ export default function AssignmentsPage() {
           {/* 2-column Grid Skeletons */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="bg-white border border-veda-card-border rounded-xl p-5 shadow-sm min-h-[140px] flex flex-col justify-between">
-                <div className="flex justify-between items-start">
+              <div 
+                key={i} 
+                className="bg-white rounded-[24px] shadow-sm"
+                style={{
+                  display: 'flex',
+                  padding: '24px',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  alignItems: 'flex-start',
+                  gap: '48px',
+                  flex: '1 0 0',
+                  alignSelf: 'stretch'
+                }}
+              >
+                <div className="flex justify-between items-start w-full">
                   <div className="flex flex-col gap-2 w-3/4">
                     <div className="h-5 bg-gray-200 rounded w-full animate-pulse" />
                     <div className="h-4 bg-gray-150 rounded w-1/3 animate-pulse" />
                   </div>
                   <div className="h-6 w-6 bg-gray-200 rounded-full animate-pulse" />
                 </div>
-                <div className="flex justify-between items-center border-t border-gray-100 pt-4 mt-4">
+                <div className="flex justify-between items-center w-full">
                   <div className="h-4 bg-gray-200 rounded w-1/3 animate-pulse" />
                   <div className="h-4 bg-gray-200 rounded w-1/4 animate-pulse" />
                 </div>

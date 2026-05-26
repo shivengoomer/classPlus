@@ -7,6 +7,8 @@ import { TopBar } from './TopBar';
 import { MobileBottomNav } from './MobileBottomNav';
 import { X, Home, Users, ClipboardList, Cpu, BookOpen, Settings } from 'lucide-react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -14,6 +16,7 @@ interface AppShellProps {
 
 export function AppShell({ children }: AppShellProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
 
   const mobileDrawerItems = [
     { label: 'Home', path: '/home', icon: <Home className="w-5 h-5" /> },
@@ -25,21 +28,29 @@ export function AppShell({ children }: AppShellProps) {
   ];
 
   return (
-    <div className="flex h-screen bg-veda-bg text-veda-text-primary overflow-hidden font-sans">
+    <div className="flex h-screen bg-veda-bg text-veda-text-primary overflow-auto font-sans">
       {/* Desktop Sidebar (Hidden on Mobile) */}
-      <div className="hidden md:flex h-full items-center pl-5 flex-shrink-0">
+      <div className="hidden md:flex h-full items-start pt-5 pl-5 flex-shrink-0">
         <Sidebar />
       </div>
 
-      {/* Main Content Area */}
-      <div className="flex flex-col flex-1 h-full min-w-0 p-4 md:p-5 gap-4 md:gap-5 overflow-hidden">
+      <div className="flex flex-col flex-1 h-full min-w-0 p-4 md:p-5 gap-4 md:gap-5">
         <TopBar 
           onMenuToggle={() => setMobileMenuOpen(true)} 
         />
         
-        <main className="flex-1 overflow-y-auto no-scrollbar">
-          {children}
-        </main>
+        <AnimatePresence mode="wait">
+          <motion.main 
+            key={pathname}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.5, ease: 'easeOut' }}
+            className="flex-1 overflow-y-auto no-scrollbar"
+          >
+            {children}
+          </motion.main>
+        </AnimatePresence>
 
         {/* Mobile Bottom Navigation (Hidden on Desktop) */}
         <MobileBottomNav />
@@ -50,7 +61,31 @@ export function AppShell({ children }: AppShellProps) {
             <div className="absolute right-0 top-0 bottom-0 w-64 bg-white p-6 shadow-2xl flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between border-b border-veda-card-border pb-4 mb-4">
-                  <span className="font-bold text-lg">Menu</span>
+                  <div className="flex items-center gap-2">
+                    <div 
+                      style={{
+                        width: '32px',
+                        height: '32px',
+                        borderRadius: '8px',
+                        background: 'url(/logo.png) lightgray -8.481px -13.209px / 290.139% 162.5% no-repeat, linear-gradient(180deg, #E56820 0%, #D45E3E 100%)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0
+                      }}
+                    />
+                    <span 
+                      style={{
+                        color: '#303030',
+                        fontFamily: '"Bricolage Grotesque", sans-serif',
+                        fontSize: '20px',
+                        fontWeight: 700,
+                        letterSpacing: '-1.2px',
+                      }}
+                    >
+                      VedaAI
+                    </span>
+                  </div>
                   <button 
                     onClick={() => setMobileMenuOpen(false)}
                     className="p-1 rounded hover:bg-gray-100"

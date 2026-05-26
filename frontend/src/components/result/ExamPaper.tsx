@@ -34,8 +34,18 @@ export function ExamPaper({ assignment }: ExamPaperProps) {
 
   return (
     <div 
-      className="bg-white rounded-[32px] shadow-sm p-8 md:p-12 w-full max-w-4xl mx-auto flex flex-col gap-6 text-[#303030] font-sans relative"
-      style={{ minHeight: '297mm' }} // Simulates A4 height proportion
+      style={{
+        display: 'flex',
+        height: '1465px',
+        padding: '32px',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: '24px',
+        alignSelf: 'stretch',
+        borderRadius: '32px',
+        background: '#FFF',
+      }}
+      className="bg-white shadow-sm text-[#303030] font-sans relative overflow-y-auto no-scrollbar"
     >
       
       {/* Figma Title Header block */}

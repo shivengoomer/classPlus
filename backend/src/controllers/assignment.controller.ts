@@ -43,6 +43,7 @@ export async function createAssignment(req: Request, res: Response) {
     }
 
     // save assignment before queue starts
+    const userId = (req as any).auth?.userId;
     const assignment = await Assignment.create({
       title,
       subject,
@@ -55,9 +56,10 @@ export async function createAssignment(req: Request, res: Response) {
       fileUrl,
       status: 'pending',
       jobId,
+      userId,
     });
 
-    log(`Assignment created: ${assignment._id} with jobId: ${jobId}`);
+    log(`Assignment created: ${assignment._id} with jobId: ${jobId} for user ${userId}`);
 
     // add to queue for background processing
     await addAssignmentJob(assignment._id.toString(), jobId);
@@ -83,7 +85,8 @@ export async function createAssignment(req: Request, res: Response) {
 // GET /api/assignments — list all assignments
 export async function listAssignments(req: Request, res: Response) {
   try {
-    const assignments = await Assignment.find().sort({ createdAt: -1 });
+    const userId = (req as any).auth?.userId;
+    const assignments = await Assignment.find({ userId }).sort({ createdAt: -1 });
     return res.json(assignments);
   } catch (error) {
     logError('Failed to list assignments', error);
@@ -94,7 +97,8 @@ export async function listAssignments(req: Request, res: Response) {
 // GET /api/assignments/:id — get a single assignment
 export async function getAssignment(req: Request, res: Response) {
   try {
-    const assignment = await Assignment.findById(req.params.id);
+    const userId = (req as any).auth?.userId;
+    const assignment = await Assignment.findOne({ _id: req.params.id, userId });
     if (!assignment) {
       return res.status(404).json({ error: 'Assignment not found' });
     }
@@ -108,11 +112,12 @@ export async function getAssignment(req: Request, res: Response) {
 // DELETE /api/assignments/:id — delete an assignment
 export async function deleteAssignment(req: Request, res: Response) {
   try {
-    const assignment = await Assignment.findByIdAndDelete(req.params.id);
+    const userId = (req as any).auth?.userId;
+    const assignment = await Assignment.findOneAndDelete({ _id: req.params.id, userId });
     if (!assignment) {
       return res.status(404).json({ error: 'Assignment not found' });
     }
-    log(`Assignment deleted: ${req.params.id}`);
+    log(`Assignment deleted: ${req.params.id} for user ${userId}`);
     return res.json({ message: 'Deleted successfully' });
   } catch (error) {
     logError('Failed to delete assignment', error);
@@ -123,7 +128,8 @@ export async function deleteAssignment(req: Request, res: Response) {
 // POST /api/assignments/:id/regenerate — regenerate paper for existing assignment
 export async function regenerateAssignment(req: Request, res: Response) {
   try {
-    const assignment = await Assignment.findById(req.params.id);
+    const userId = (req as any).auth?.userId;
+    const assignment = await Assignment.findOne({ _id: req.params.id, userId });
     if (!assignment) {
       return res.status(404).json({ error: 'Assignment not found' });
     }
@@ -137,7 +143,7 @@ export async function regenerateAssignment(req: Request, res: Response) {
     assignment.result = undefined;
     await assignment.save();
 
-    log(`Regenerating assignment: ${assignment._id} with new jobId: ${jobId}`);
+    log(`Regenerating assignment: ${assignment._id} with new jobId: ${jobId} for user ${userId}`);
 
     // queue the new job
     await addAssignmentJob(assignment._id.toString(), jobId);

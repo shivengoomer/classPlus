@@ -120,6 +120,7 @@ export default function GroupsPage() {
                     return (
                       <div 
                         key={g.id}
+                        onClick={() => setSelectedGroup(g)}
                         className={`bg-white border rounded-xl p-5 shadow-sm transition-all cursor-pointer flex flex-col justify-between gap-6 hover:scale-[1.01] ${
                           isSelected 
                             ? 'border-veda-orange ring-1 ring-veda-orange shadow-md' 

@@ -22,10 +22,9 @@ export function QuestionTypeTable({
 }: QuestionTypeTableProps) {
   return (
     <div className="flex flex-col gap-3 w-full">
-      {/* Table Header Labels (Visible on Desktop only, aligned with columns) */}
-      <div className="hidden md:flex items-center justify-between w-full text-[16px] font-bold text-[#303030] font-sans pr-[28px] pb-1 border-b border-gray-150/50">
-        <span className="w-[443px]">Question Type</span>
-        <div className="w-[216px] flex justify-between px-1">
+      {/* Table Header Labels */}
+      <div className="hidden md:flex items-center justify-end w-full text-[14px] font-bold text-[#303030] font-sans pr-0 pb-1 border-b border-gray-150/50">
+        <div className="w-[216px] flex justify-between">
           <span className="w-[100px] text-center">No. of Questions</span>
           <span className="w-[100px] text-center">Marks</span>
         </div>
@@ -46,14 +45,14 @@ export function QuestionTypeTable({
       </div>
 
       {/* Add Button matching Figma spec */}
-      <div className="flex justify-start mt-2 pl-1">
+      <div className="flex justify-start mt-2">
         <button
           type="button"
           onClick={onAddRow}
-          className="flex items-center gap-2 text-[14px] font-bold text-[#303030] hover:opacity-85 active:scale-95 transition-all font-sans"
+          className="flex items-center gap-3 text-[16px] font-bold text-[#303030] hover:opacity-85 active:scale-95 transition-all font-sans"
         >
-          <div className="w-8 h-8 bg-[#2B2B2B] rounded-full flex items-center justify-center text-white flex-shrink-0 shadow-sm">
-            <Plus className="w-4 h-4 stroke-[2.5]" />
+          <div className="w-10 h-10 bg-[#181818] rounded-full flex items-center justify-center text-white flex-shrink-0 shadow-sm">
+            <Plus className="w-5 h-5 stroke-[3]" />
           </div>
           <span>Add Question Type</span>
         </button>

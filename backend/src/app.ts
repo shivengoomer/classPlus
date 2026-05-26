@@ -5,12 +5,13 @@ import express from 'express';
 import cors from 'cors';
 import assignmentRoutes from './routes/assignment.routes';
 import libraryRoutes from './routes/library.routes';
+import notificationRoutes from './routes/notification.routes';
 
 const app = express();
 
 // middleware
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:3001'], // Next.js dev server
+  origin: true, // Allow all origins dynamically in development
   credentials: true,
 }));
 app.use(express.json());
@@ -26,6 +27,9 @@ app.use('/api/assignments', assignmentRoutes);
 
 // library routes under /api/library
 app.use('/api/library', libraryRoutes);
+
+// notification routes under /api/notifications
+app.use('/api/notifications', notificationRoutes);
 
 // global error handler
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

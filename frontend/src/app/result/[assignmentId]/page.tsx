@@ -96,7 +96,17 @@ export default function ResultPage() {
         </div>
       ) : (
         // Content Loaded State
-        <div className="flex flex-col gap-6">
+        <div 
+          style={{ 
+            display: 'flex', 
+            width: '1100px', 
+            padding: '20px', 
+            flexDirection: 'column', 
+            alignItems: 'center', 
+            gap: '12px',
+            margin: '0 auto' 
+          }}
+        >
           {/* AI Response Message Banner */}
           {assignment.result && (
             <DarkBanner 

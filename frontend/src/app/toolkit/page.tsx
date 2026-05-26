@@ -137,12 +137,16 @@ export default function ToolkitPage() {
                         {/* Weight Controller */}
                         <div className="flex items-center gap-3 bg-white border border-veda-card-border rounded-lg px-2 py-1 shadow-sm">
                           <button 
+                            type="button"
+                            onClick={() => handleWeightChange(c.id, -5)}
                             className="p-1 rounded text-gray-500 hover:bg-gray-100 hover:text-veda-text-primary"
                           >
                             <Minus className="w-3.5 h-3.5" />
                           </button>
                           <span className="text-xs font-bold text-veda-text-primary w-8 text-center">{c.weight}%</span>
                           <button 
+                            type="button"
+                            onClick={() => handleWeightChange(c.id, 5)}
                             className="p-1 rounded text-gray-500 hover:bg-gray-100 hover:text-veda-text-primary"
                           >
                             <Plus className="w-3.5 h-3.5" />
@@ -151,6 +155,8 @@ export default function ToolkitPage() {
 
                         {/* Remove Button */}
                         <button 
+                          type="button"
+                          onClick={() => handleRemoveCriterion(c.id)}
                           className="text-xs text-red-600 font-bold hover:underline"
                         >
                           Remove
@@ -177,12 +183,16 @@ export default function ToolkitPage() {
                       <span className="text-[11px] text-gray-500">Weighting:</span>
                       <div className="flex items-center gap-2">
                         <button 
+                          type="button"
+                          onClick={() => setNewCritWeight(Math.max(5, newCritWeight - 5))}
                           className="p-0.5 rounded text-gray-500 hover:bg-gray-250"
                         >
                           <Minus className="w-3 h-3" />
                         </button>
                         <span className="text-xs font-bold text-veda-text-primary">{newCritWeight}%</span>
                         <button 
+                          type="button"
+                          onClick={() => setNewCritWeight(Math.min(100, newCritWeight + 5))}
                           className="p-0.5 rounded text-gray-500 hover:bg-gray-250"
                         >
                           <Plus className="w-3 h-3" />
@@ -201,7 +211,7 @@ export default function ToolkitPage() {
                     <PillButton
                       variant="primary"
                       className="text-xs !py-2"
-                      onClick={() => {}}
+                      onClick={handleAddCriterion}
                     >
                       Add Criterion
                     </PillButton>

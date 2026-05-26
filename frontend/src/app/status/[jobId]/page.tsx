@@ -9,6 +9,7 @@ import { useJobSocket } from '@/hooks/useJobSocket';
 import { regenerateAssignment } from '@/lib/api';
 import { AlertCircle, Sparkles, CheckCircle2 } from 'lucide-react';
 import { PillButton } from '@/components/shared/PillButton';
+import { useToastStore } from '@/store/toastStore';
 
 export default function JobStatusPage() {
   const params = useParams();
@@ -21,6 +22,7 @@ export default function JobStatusPage() {
   // Read job details from Zustand
   const { status, progress, message, assignmentId } = useJobStore();
   const [retrying, setRetrying] = useState(false);
+  const { addToast } = useToastStore();
 
   // Auto-redirect to the result page on 'done'
   useEffect(() => {
@@ -45,7 +47,7 @@ export default function JobStatusPage() {
       router.push(`/status/${res.jobId}`);
     } catch (e) {
       console.error(e);
-      alert('Failed to restart generation. Redirecting to create form.');
+      addToast('Failed to restart generation. Redirecting to create form.', 'error');
       router.push('/create');
     } finally {
       setRetrying(false);
