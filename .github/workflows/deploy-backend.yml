@@ -1,0 +1,86 @@
+name: Deploy Backend to Azure App Service
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'backend/**'
+      - '.github/workflows/deploy-backend.yml'
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '20.x'
+  WORKING_DIR: './backend'
+
+jobs:
+  build:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ${{ env.WORKING_DIR }}
+        run: npm ci
+
+      - name: Build TypeScript
+        working-directory: ${{ env.WORKING_DIR }}
+        run: npm run build
+
+      # Zip only what's needed for production: dist/ + node_modules + package.json
+      - name: Package build artifact
+        working-directory: ${{ env.WORKING_DIR }}
+        run: |
+          zip -r ../backend-deploy.zip \
+            dist/ \
+            node_modules/ \
+            package.json \
+            package-lock.json \
+            -x "node_modules/.cache/*" \
+            -x "*.test.*" \
+            -x "src/*"
+
+      - name: Upload artifact for deployment
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-build
+          path: backend-deploy.zip
+          retention-days: 1
+
+  deploy:
+    name: Deploy to Azure
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: production
+      url: ${{ steps.deploy.outputs.webapp-url }}
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-build
+
+      - name: Unzip artifact
+        run: unzip backend-deploy.zip -d backend-dist
+
+      - name: Deploy to Azure App Service
+        id: deploy
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: backend-dist
+
+      - name: Print deployed URL
+        run: echo "✅ Deployed to ${{ steps.deploy.outputs.webapp-url }}"
