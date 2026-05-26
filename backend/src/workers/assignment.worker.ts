@@ -1,0 +1,265 @@
+// src/workers/assignment.worker.ts
+// worker handles heavy AI generation in background
+// processes jobs from the BullMQ queue one at a time
+
+import { Worker, Job } from 'bullmq';
+import { getRedisOptions } from '../config/redis';
+import { Assignment } from '../models/assignment.model';
+import { parseFile, parseFileFromUrl } from '../services/parser.service';
+import { generateWithAI } from '../services/ai.service';
+import { generatePDF } from '../services/pdf.service';
+import { env } from '../config/env';
+import { UTApi, UTFile } from 'uploadthing/server';
+import { buildPrompt } from '../utils/promptBuilder';
+import { broadcastToJob } from '../websocket/socket';
+import { log, logError } from '../utils/logger';
+
+interface JobData {
+  assignmentId: string;
+  jobId: string;
+}
+
+async function processAssignment(job: Job<JobData>) {
+  const { assignmentId, jobId } = job.data;
+  log(`Worker processing job ${jobId} for assignment ${assignmentId}`);
+
+  try {
+    // step 1: update status to processing
+    const assignment = await Assignment.findById(assignmentId);
+    if (!assignment) {
+      throw new Error(`Assignment ${assignmentId} not found`);
+    }
+
+    assignment.status = 'processing';
+    await assignment.save();
+
+    // frontend listens to this for live loader updates
+    broadcastToJob(jobId, {
+      type: 'job:progress',
+      progress: 10,
+      status: 'queued',
+      message: 'Queued in generation pipeline...',
+    });
+
+    // step 2: parse uploaded file if exists
+    let fileContent = '';
+
+    if (assignment.filePath) {
+      broadcastToJob(jobId, {
+        type: 'job:progress',
+        progress: 25,
+        status: 'processing',
+        message: 'Parsing uploaded file...',
+      });
+
+      try {
+        fileContent = await parseFile(assignment.filePath);
+      } catch (err) {
+        logError('Failed to parse uploaded file, continuing without it', err);
+        // don't fail the whole job if file parsing fails
+      }
+    } else if (assignment.fileUrl) {
+      broadcastToJob(jobId, {
+        type: 'job:progress',
+        progress: 25,
+        status: 'processing',
+        message: 'Fetching and parsing reference file...',
+      });
+
+      try {
+        fileContent = await parseFileFromUrl(assignment.fileUrl);
+      } catch (err) {
+        logError('Failed to fetch file from URL, continuing without it', err);
+      }
+    }
+
+    // step 3: build the AI prompt
+    broadcastToJob(jobId, {
+      type: 'job:progress',
+      progress: 40,
+      status: 'processing',
+      message: 'Building structured prompt...',
+    });
+
+    const prompt = buildPrompt({
+      title: assignment.title,
+      subject: assignment.subject,
+      grade: assignment.grade,
+      questionRows: assignment.questionRows,
+      additionalInstructions: assignment.additionalInstructions,
+      fileContent: fileContent || undefined,
+    });
+
+    // step 4: call AI
+    broadcastToJob(jobId, {
+      type: 'job:progress',
+      progress: 50,
+      status: 'processing',
+      message: 'Consulting AI model for CBSE/NCERT curriculum alignment...',
+    });
+
+    const aiResult = await generateWithAI(prompt);
+
+    // step 5: validate and save result
+    broadcastToJob(jobId, {
+      type: 'job:progress',
+      progress: 85,
+      status: 'processing',
+      message: 'Structuring sections and finalizing paper...',
+    });
+
+    // make sure the result has the expected fields
+    if (!aiResult.sections || !Array.isArray(aiResult.sections)) {
+      throw new Error('AI response missing sections array');
+    }
+
+    // Sanitize and normalize sections, questions, types, and difficulty to match Mongoose schema enums
+    const sanitizedSections = aiResult.sections.map((section: any, sIdx: number) => {
+      const sId = section.id || `sec-${sIdx}-${Date.now()}`;
+      return {
+        id: sId,
+        label: section.label || `Section ${String.fromCharCode(65 + sIdx)}`,
+        title: section.title || 'Questions',
+        instruction: section.instruction || 'Answer all questions.',
+        totalMarks: typeof section.totalMarks === 'number' ? section.totalMarks : 0,
+        questions: (section.questions || []).map((q: any, qIdx: number) => {
+          return {
+            id: q.id || `q-${sId}-${qIdx}-${Date.now()}`,
+            text: q.text || '',
+            type: normalizeQuestionType(q.type || 'short'),
+            difficulty: ['easy', 'moderate', 'challenging'].includes(q.difficulty?.toLowerCase())
+              ? q.difficulty.toLowerCase()
+              : 'moderate',
+            marks: typeof q.marks === 'number' ? q.marks : 1,
+            options: Array.isArray(q.options) ? q.options : [],
+            answer: q.answer || '',
+          };
+        }),
+      };
+    });
+
+    // save assignment before marking done
+    assignment.result = {
+      aiMessage: aiResult.aiMessage || `Here is your ${assignment.subject} paper for Grade ${assignment.grade}.`,
+      schoolName: aiResult.schoolName || 'Delhi Public School, Bokaro',
+      subject: aiResult.subject || assignment.subject,
+      grade: aiResult.grade || assignment.grade,
+      timeAllowed: aiResult.timeAllowed || '45 minutes',
+      totalMarks: aiResult.totalMarks || assignment.totalMarks,
+      sections: sanitizedSections,
+      answerKey: aiResult.answerKey || [],
+      generatedAt: aiResult.generatedAt || new Date().toISOString(),
+    };
+
+    // step 5.5: Generate PDF and upload to UploadThing if token is provided
+    if (env.UPLOADTHING_TOKEN) {
+      try {
+        broadcastToJob(jobId, {
+          type: 'job:progress',
+          progress: 92,
+          status: 'processing',
+          message: 'Uploading generated PDF paper to UploadThing...',
+        });
+
+        log('Generating PDF buffer for UploadThing upload...');
+        const pdfBuffer = await generatePDF({
+          schoolName: assignment.result.schoolName,
+          subject: assignment.result.subject,
+          grade: assignment.result.grade,
+          timeAllowed: assignment.result.timeAllowed,
+          totalMarks: assignment.result.totalMarks,
+          sections: assignment.result.sections,
+          answerKey: assignment.result.answerKey,
+        });
+
+        const fileName = `${assignment.title.replace(/[^a-zA-Z0-9]/g, '_')}_paper.pdf`;
+        const file = new UTFile([pdfBuffer], fileName, { type: 'application/pdf' } as any);
+
+        log(`Uploading ${fileName} to UploadThing...`);
+        const utapi = new UTApi({ token: env.UPLOADTHING_TOKEN });
+        const uploadRes = await utapi.uploadFiles([file]);
+        const resData = Array.isArray(uploadRes) ? uploadRes[0] : uploadRes;
+
+        if (resData && resData.data && resData.data.url) {
+          assignment.pdfUrl = resData.data.url;
+          log(`PDF uploaded successfully: ${resData.data.url}`);
+        } else if (resData && (resData as any).url) {
+          assignment.pdfUrl = (resData as any).url;
+          log(`PDF uploaded successfully (direct url fallback): ${(resData as any).url}`);
+        } else if (resData && resData.error) {
+          logError('UploadThing upload returned error structure', resData.error);
+        } else {
+          logError('UploadThing returned unexpected response structure', uploadRes);
+        }
+      } catch (uploadErr) {
+        logError('Failed to generate or upload PDF to UploadThing, continuing', uploadErr);
+      }
+    } else {
+      log('No UPLOADTHING_TOKEN found in environment. Skipping PDF auto-upload.');
+    }
+
+    assignment.status = 'done';
+    await assignment.save();
+
+    log(`Job ${jobId} completed — paper generated with ${aiResult.sections.length} sections`);
+
+    // step 6: tell the frontend we're done
+    broadcastToJob(jobId, {
+      type: 'job:done',
+      progress: 100,
+      status: 'done',
+      message: 'Finished! Loading paper preview...',
+      assignmentId: assignmentId,
+      pdfUrl: assignment.pdfUrl,
+    });
+  } catch (error: any) {
+    logError(`Job ${jobId} failed`, error);
+
+    // update assignment status to failed
+    try {
+      await Assignment.findByIdAndUpdate(assignmentId, { status: 'failed' });
+    } catch {
+      // if this fails too, not much we can do
+    }
+
+    // tell the frontend it failed
+    broadcastToJob(jobId, {
+      type: 'job:failed',
+      status: 'failed',
+      error: error.message || 'Failed to generate assignment',
+    });
+
+    throw error; // re-throw so BullMQ marks the job as failed
+  }
+}
+
+export function startWorker() {
+  const connection = getRedisOptions();
+
+  const worker = new Worker('assignment-generation', processAssignment, {
+    connection,
+    concurrency: 1, // process one job at a time
+  });
+
+  worker.on('completed', (job) => {
+    log(`Job ${job.id} completed successfully`);
+  });
+
+  worker.on('failed', (job, err) => {
+    logError(`Job ${job?.id} failed`, err);
+  });
+
+  log('Assignment worker started and listening for jobs');
+
+  return worker;
+}
+
+function normalizeQuestionType(type: string): 'mcq' | 'short' | 'long' | 'truefalse' | 'fillblank' {
+  const t = type.toLowerCase().replace(/[^a-z]/g, '');
+  if (t === 'mcq' || t === 'multiplechoice' || t === 'multiplechoicequestions') return 'mcq';
+  if (t === 'short' || t === 'shortanswer' || t === 'shortanswerquestions') return 'short';
+  if (t === 'long' || t === 'longanswer' || t === 'longanswerquestions') return 'long';
+  if (t === 'truefalse' || t === 'tf' || t === 'trueorfalse') return 'truefalse';
+  if (t === 'fillblank' || t === 'fillinblank' || t === 'fillintheblank' || t === 'fillintheblanks' || t === 'blank') return 'fillblank';
+  return 'short'; // default fallback
+}
