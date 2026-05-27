@@ -97,15 +97,7 @@ export default function ResultPage() {
       ) : (
         // Content Loaded State
         <div 
-          style={{ 
-            display: 'flex', 
-            width: '1100px', 
-            padding: '20px', 
-            flexDirection: 'column', 
-            alignItems: 'center', 
-            gap: '12px',
-            margin: '0 auto' 
-          }}
+          className="flex flex-col items-center mx-auto w-full max-w-[373px] md:max-w-[1100px] p-[9px] md:p-[20px] gap-[10px] md:gap-[12px] rounded-[40px] md:rounded-none bg-white md:bg-transparent shadow-sm md:shadow-none"
         >
           {/* AI Response Message Banner */}
           {assignment.result && (

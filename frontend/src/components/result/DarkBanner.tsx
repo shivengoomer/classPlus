@@ -49,21 +49,10 @@ export function DarkBanner({ assignmentId, aiMessage, pdfUrl }: DarkBannerProps)
 
   return (
     <div 
-      style={{
-        display: 'flex',
-        padding: '24px 32px',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        gap: '24px',
-        alignSelf: 'stretch',
-        borderRadius: '32px',
-        background: 'rgba(24, 24, 24, 0.80)',
-      }}
-      className="backdrop-blur-md text-white shadow-lg border border-white/5"
+      className="flex flex-col justify-center items-start md:items-center gap-4 md:gap-6 self-stretch rounded-[24px] md:rounded-[32px] bg-[#303030] md:bg-black/80 text-white shadow-lg border border-white/5 p-5 md:p-8"
     >
       {/* AI Message */}
-      <p className="text-[20px] font-bold leading-8 text-white font-sans max-w-4xl text-center">
+      <p className="text-[14px] md:text-[20px] font-bold leading-relaxed md:leading-8 text-white font-sans max-w-4xl text-left md:text-center">
         {aiMessage}
       </p>
 
@@ -71,16 +60,16 @@ export function DarkBanner({ assignmentId, aiMessage, pdfUrl }: DarkBannerProps)
       <button
         onClick={handleDownload}
         disabled={isDownloading}
-        className="flex items-center justify-center gap-2 bg-white text-[#303030] hover:bg-gray-100 disabled:bg-gray-200 disabled:text-gray-400 rounded-full px-6 h-[44px] text-[16px] font-semibold transition-all flex-shrink-0 active:scale-95 shadow-sm"
+        className="flex items-center justify-center bg-white/10 md:bg-white text-white md:text-[#303030] hover:bg-white/20 md:hover:bg-gray-100 disabled:bg-gray-200 disabled:text-gray-400 rounded-full w-10 md:w-auto h-10 md:h-[44px] md:px-6 text-[16px] font-semibold transition-all flex-shrink-0 active:scale-95 shadow-sm"
       >
         {isDownloading ? (
-          <Loader2 className="w-5 h-5 animate-spin text-[#303030]" />
+          <Loader2 className="w-5 h-5 animate-spin" />
         ) : downloadSuccess ? (
-          <Check className="w-5 h-5 text-green-600" />
+          <Check className="w-5 h-5 text-green-500 md:text-green-600" />
         ) : (
-          <FileDown className="w-5 h-5 text-[#303030]" />
+          <FileDown className="w-5 h-5" />
         )}
-        <span>
+        <span className="hidden md:inline ml-2">
           {isDownloading ? 'Downloading...' : downloadSuccess ? 'Downloaded' : 'Download as PDF'}
         </span>
       </button>

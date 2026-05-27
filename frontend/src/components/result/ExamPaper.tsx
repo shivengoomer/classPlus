@@ -34,18 +34,7 @@ export function ExamPaper({ assignment }: ExamPaperProps) {
 
   return (
     <div 
-      style={{
-        display: 'flex',
-        height: '1465px',
-        padding: '32px',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: '24px',
-        alignSelf: 'stretch',
-        borderRadius: '32px',
-        background: '#FFF',
-      }}
-      className="bg-white shadow-sm text-[#303030] font-sans relative overflow-y-auto no-scrollbar"
+      className="flex flex-col items-center self-stretch bg-[#F6F6F6] md:bg-white shadow-none md:shadow-md text-[#303030] font-sans relative overflow-y-auto no-scrollbar h-auto md:min-h-[1465px] p-4 md:p-8 gap-6 md:gap-6 rounded-[24px] md:rounded-[32px] w-full"
     >
       
       {/* Figma Title Header block */}
