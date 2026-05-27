@@ -12,10 +12,17 @@ export const redisConnection = {
 // helper to parse the redis URL into host/port for BullMQ
 export function getRedisOptions() {
   const url = new URL(env.REDIS_URL);
-  return {
+  const options: any = {
     host: url.hostname,
     port: parseInt(url.port || '6379', 10),
     password: url.password || undefined,
     maxRetriesPerRequest: null,
   };
+
+  // Upstash and other production Redis hosts using rediss:// require TLS configuration
+  if (url.protocol === 'rediss:') {
+    options.tls = {};
+  }
+
+  return options;
 }
