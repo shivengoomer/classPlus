@@ -1,7 +1,7 @@
 // src/lib/api.ts
 import { Assignment, CreateAssignmentDTO } from '@/types/assignment';
 
-const BASE_URL = 'http://localhost:4000/api';
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
 
 let globalToken: string | null = null;
 

@@ -24,7 +24,8 @@ export function useJobSocket(jobId: string | null) {
 
     function connect() {
       try {
-        const ws = new WebSocket('ws://localhost:4000');
+        const wsUrl = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:4000';
+        const ws = new WebSocket(wsUrl);
         socketRef.current = ws;
 
         ws.onopen = () => {

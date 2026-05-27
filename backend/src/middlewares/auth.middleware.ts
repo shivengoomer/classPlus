@@ -60,31 +60,40 @@ export async function syncUserMiddleware(req: Request, res: Response, next: Next
         }
         
         // Create user in DB
-        user = await User.create({
-          clerkId,
-          email,
-          firstName,
-          lastName,
-          imageUrl,
-        });
-        console.log(`👤 Synced new user to DB: ${user.email} (${user.clerkId})`);
-        
-        // Claim seeded/unowned records for this user (First login claim)
-        console.log(`🔑 Claiming unowned seeded records for ${user.email}...`);
-        const assignRes = await Assignment.updateMany(
-          { $or: [{ userId: { $exists: false } }, { userId: 'user_tester' }, { userId: '' }] },
-          { userId: clerkId }
-        );
-        const libRes = await LibraryItem.updateMany(
-          { $or: [{ userId: { $exists: false } }, { userId: 'user_tester' }, { userId: '' }] },
-          { userId: clerkId }
-        );
-        const notifRes = await Notification.updateMany(
-          { $or: [{ userId: { $exists: false } }, { userId: 'user_tester' }, { userId: '' }] },
-          { userId: clerkId }
-        );
-        
-        console.log(`✅ Claimed ${assignRes.modifiedCount} assignments, ${libRes.modifiedCount} library items, and ${notifRes.modifiedCount} notifications.`);
+        try {
+          user = await User.create({
+            clerkId,
+            email,
+            firstName,
+            lastName,
+            imageUrl,
+          });
+          console.log(`👤 Synced new user to DB: ${user.email} (${user.clerkId})`);
+          
+          // Claim seeded/unowned records for this user (First login claim)
+          console.log(`🔑 Claiming unowned seeded records for ${user.email}...`);
+          const assignRes = await Assignment.updateMany(
+            { $or: [{ userId: { $exists: false } }, { userId: 'user_tester' }, { userId: '' }] },
+            { userId: clerkId }
+          );
+          const libRes = await LibraryItem.updateMany(
+            { $or: [{ userId: { $exists: false } }, { userId: 'user_tester' }, { userId: '' }] },
+            { userId: clerkId }
+          );
+          const notifRes = await Notification.updateMany(
+            { $or: [{ userId: { $exists: false } }, { userId: 'user_tester' }, { userId: '' }] },
+            { userId: clerkId }
+          );
+          
+          console.log(`✅ Claimed ${assignRes.modifiedCount} assignments, ${libRes.modifiedCount} library items, and ${notifRes.modifiedCount} notifications.`);
+        } catch (createErr: any) {
+          if (createErr.code === 11000) {
+            console.log(`👤 User with clerkId ${clerkId} was created concurrently. Fetching existing user.`);
+            user = await User.findOne({ clerkId });
+          } else {
+            throw createErr;
+          }
+        }
       } else {
         // User already exists, check and sync any changes from Clerk
         if (env.CLERK_SECRET_KEY && env.CLERK_PUBLISHABLE_KEY && clerkId !== 'user_tester') {
