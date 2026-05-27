@@ -58,6 +58,13 @@ export default function LibraryPage() {
     // Reset input value to allow uploading the same file again if desired
     e.target.value = '';
 
+    // Size limit check: 10MB = 10 * 1024 * 1024 bytes
+    const maxSizeBytes = 10 * 1024 * 1024;
+    if (file.size > maxSizeBytes) {
+      addToast('File size exceeds the 10MB limit.', 'error');
+      return;
+    }
+
     setPendingFile(file);
     setUploadCategoryMode('existing');
     setCustomCategoryName('');
