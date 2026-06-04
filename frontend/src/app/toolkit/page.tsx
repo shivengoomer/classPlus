@@ -81,9 +81,10 @@ export default function ToolkitPage() {
 
   return (
     <AppShell>
-      <div className="relative w-full max-w-6xl mx-auto min-h-[550px]">
-        {/* Blurry original content */}
-        <div className="blur-[5px] select-none pointer-events-none opacity-40 flex flex-col gap-6 pb-16">
+      <div className="w-full max-w-6xl mx-auto flex flex-col gap-6 pb-16 px-[2px] relative z-10">
+        <div className="relative w-full min-h-[550px]">
+          {/* Blurry original content */}
+          <div className="blur-[5px] select-none pointer-events-none opacity-40 flex flex-col gap-6">
           {/* Page Header */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex flex-col gap-1">
@@ -287,6 +288,7 @@ export default function ToolkitPage() {
           </div>
         </div>
       </div>
-    </AppShell>
+    </div>
+  </AppShell>
   );
 }

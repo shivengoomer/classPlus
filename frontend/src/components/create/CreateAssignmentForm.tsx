@@ -204,7 +204,7 @@ export function CreateAssignmentForm() {
           Basic information about your assignment
         </p>
       </div>
-      <div className="w-full max-w-[810px] mx-auto flex flex-col gap-8 pb-16 relative z-10">
+      <div className="w-full max-w-[810px] mx-auto flex flex-col gap-6 pb-16 px-[2px] relative z-10">
 
         {/* Page Header (Desktop vs Mobile Figma match) */}
         <div className="md:flex flex-col gap-1 hidden pl-2">

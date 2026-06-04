@@ -66,7 +66,7 @@ export default function BillingPage() {
       name: 'Free Trial',
       price: '$0',
       period: 'forever',
-      description: 'Test VedaAI capabilities with mock elements.',
+      description: 'Test ClassPilot capabilities with mock elements.',
       features: [
         'Up to 10 total assignments',
         'Standard generation speed',
@@ -117,7 +117,7 @@ export default function BillingPage() {
 
   return (
     <AppShell>
-      <div className="w-full max-w-4xl mx-auto flex flex-col gap-6 pb-16">
+      <div className="w-full max-w-6xl mx-auto flex flex-col gap-6 pb-16 px-[2px] relative z-10">
         
         {/* Page Header */}
         <div className="flex flex-col gap-1">
@@ -126,7 +126,7 @@ export default function BillingPage() {
             <span>Billing & Subscription</span>
           </h2>
           <p className="text-[13px] text-veda-text-secondary">
-            Manage your VedaAI subscription plan, track your assignment usage limits, and view pricing options.
+            Manage your ClassPilot subscription plan, track your assignment usage limits, and view pricing options.
           </p>
         </div>
 

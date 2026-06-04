@@ -23,7 +23,7 @@ export function DarkBanner({ assignmentId, aiMessage, assignmentTitle }: DarkBan
     try {
       const fileName = assignmentTitle 
         ? `${assignmentTitle.replace(/[^a-zA-Z0-9]/g, '_')}_paper.pdf`
-        : `VedaAI_Assessment_${assignmentId}.pdf`;
+        : `ClassPilot_Assessment_${assignmentId}.pdf`;
 
       // Always generate on-the-fly from the backend API so it reflects any user settings updates (e.g. school name) dynamically
       const blob = await exportAssignmentPDF(assignmentId);

@@ -148,19 +148,23 @@ export default function ResultPage() {
           </div>
 
           {/* Main Content Area based on View Mode */}
-          <div className="w-full flex justify-center items-center py-4 overflow-hidden min-h-[450px]">
+          <div className="w-full flex justify-center items-center py-6 overflow-hidden min-h-[600px] md:min-h-[640px]">
             {viewMode === 'desktop' && (
               <ExamPaper assignment={assignment} />
             )}
             {viewMode === 'laptop' && (
-              <LaptopFrame>
-                <ExamPaper assignment={assignment} />
-              </LaptopFrame>
+              <div className="scale-110 sm:scale-125 md:scale-135 lg:scale-145 transition-all duration-300 origin-center">
+                <LaptopFrame>
+                  <ExamPaper assignment={assignment} />
+                </LaptopFrame>
+              </div>
             )}
             {viewMode === 'phone' && (
-              <PhoneFrame>
-                <ExamPaper assignment={assignment} />
-              </PhoneFrame>
+              <div className="scale-105 sm:scale-110 md:scale-115 lg:scale-120 transition-all duration-300 origin-center">
+                <PhoneFrame>
+                  <ExamPaper assignment={assignment} />
+                </PhoneFrame>
+              </div>
             )}
           </div>
         </div>

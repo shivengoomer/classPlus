@@ -1,4 +1,4 @@
-# 🖥️ VedaAI Frontend Interface — Next.js App Router Client
+# 🖥️ ClassPilot Frontend Interface — Next.js App Router Client
 
 [![Next.js](https://img.shields.io/badge/Framework-Next.js%2014-black?style=for-the-badge&logo=nextdotjs)](https://nextjs.org/)
 [![Tailwind CSS](https://img.shields.io/badge/CSS-Tailwind-blue?style=for-the-badge&logo=tailwindcss)](https://tailwindcss.com/)
@@ -6,7 +6,7 @@
 [![Zustand](https://img.shields.io/badge/State-Zustand-orange?style=for-the-badge)](https://github.com/pmndrs/zustand)
 [![Clerk](https://img.shields.io/badge/Auth-Clerk-purple?style=for-the-badge)](https://clerk.com/)
 
-This is the web-client portal for **VedaAI**. Built using Next.js 14, it delivers a highly interactive, fluid, and responsive dashboard experience for educators. The interface connects to our backend API to orchestrate multi-step form creation, handle syllabus uploads, display real-time creation updates via WebSockets, and trigger PDF exports.
+This is the web-client portal for **ClassPilot**. Built using Next.js 14, it delivers a highly interactive, fluid, and responsive dashboard experience for educators. The interface connects to our backend API to orchestrate multi-step form creation, handle syllabus uploads, display real-time creation updates via WebSockets, and trigger PDF exports.
 
 ---
 
@@ -50,11 +50,11 @@ We decouple page components from side-effects by using Zustand stores located in
 
 ## 📱 Mobile Responsive Engineering (Fixes & Workarounds)
 
-A key engineering goal for VedaAI was providing a flawless mobile experience. We implemented custom solutions to address common Next.js/mobile issues:
+A key engineering goal for ClassPilot was providing a flawless mobile experience. We implemented custom solutions to address common Next.js/mobile issues:
 
 ### 1. The Double Scroll Conflict
 *   **Problem**: In mobile browsers (especially iOS Safari), nested scrolls create layout bugs where floating footers block buttons, and pages fail to scroll to the bottom.
-*   **Solution**: Modified [AppShell.tsx](file:///Users/shivengoomer/Documents/Shiven/Coding/Internship/vedaAI/frontend/src/components/layout/AppShell.tsx) to set the root viewport height to `h-screen overflow-hidden`. The page content is placed inside a single scrollable container (`motion.main`) styled with `pb-36` bottom padding. This lets the user scroll past the sticky mobile bottom navigation.
+*   **Solution**: Modified [AppShell.tsx](file:///Users/shivengoomer/Documents/Shiven/Coding/Internship/ClassPilot/frontend/src/components/layout/AppShell.tsx) to set the root viewport height to `h-screen overflow-hidden`. The page content is placed inside a single scrollable container (`motion.main`) styled with `pb-36` bottom padding. This lets the user scroll past the sticky mobile bottom navigation.
 
 ### 2. Slow/Frozen Touch Clicks
 *   **Problem**: Navigating steps inside form pages felt sluggish on mobile devices, often ignoring clicks on buttons.

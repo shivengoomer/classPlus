@@ -18,8 +18,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "VedaAI - AI Assessment Creator (By Shiven Goomer)",
-  description: "Create and grade premium assessments with the power of VedaAI.",
+  title: "ClassPilot - AI Assessment Creator (By Shiven Goomer)",
+  description: "Create and grade premium assessments with the power of ClassPilot.",
   icons: {
     icon: '/logo.png',
   },

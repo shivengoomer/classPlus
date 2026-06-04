@@ -4,6 +4,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import { Plus } from 'lucide-react';
 
 export function MobileBottomNav() {
   const pathname = usePathname();
@@ -43,61 +44,56 @@ export function MobileBottomNav() {
 
   const tabs = [
     { label: 'Home', path: '/home', icon: homeIcon },
-    { 
-      label: 'Assignments', 
-      path: '/assignments', 
-      icon: assignmentsIcon
-    },
+    { label: 'Assessments', path: '/assignments', icon: assignmentsIcon },
+    { label: 'Create', path: '/create', icon: null, isCenter: true },
+    { label: 'Toolkit', path: '/toolkit', icon: toolkitIcon },
     { label: 'Library', path: '/library', icon: libraryIcon },
-    { label: 'AI Toolkit', path: '/toolkit', icon: toolkitIcon },
   ];
 
-  const showFab = pathname === '/assignments';
-
   return (
-    <div className="md:hidden fixed bottom-4 left-4 right-4 z-40 flex flex-col gap-3">
-      {/* Floating Action Button (FAB) */}
-      {showFab && (
-        <div className="flex justify-end pr-1">
-          <button
-            onClick={() => router.push('/create')}
-            className="w-12 h-12 bg-white rounded-full flex items-center justify-center transition-all hover:scale-105 active:scale-95 shadow-lg border border-gray-150"
-            style={{ boxShadow: '0px 32px 48px rgba(0, 0, 0, 0.20), 0px 16px 48px rgba(0, 0, 0, 0.12)' }}
-          >
-            <div className="w-5 h-5 relative">
-              <div className="w-[15px] h-[1.67px] left-[2.5px] top-[9.17px] absolute bg-[#FF5623]" />
-              <div className="w-[15px] h-[1.67px] left-[10.83px] top-[2.5px] absolute origin-top-left rotate-90 bg-[#FF5623]" />
-            </div>
-          </button>
-        </div>
-      )}
-
+    <div className="md:hidden fixed bottom-4 left-4 right-4 z-40 flex flex-col gap-2.5">
       {/* Floating Bottom Navigation Bar */}
       <nav 
-        className="h-[72px] px-6 bg-[#181818] rounded-[24px] flex items-center justify-between w-full"
-        style={{ boxShadow: '0px 32px 48px rgba(0, 0, 0, 0.20), 0px 16px 48px rgba(0, 0, 0, 0.12)' }}
+        className="h-[66px] px-3 bg-white/90 backdrop-blur-lg border border-slate-200/50 rounded-full flex items-center justify-between w-full shadow-[0_8px_32px_rgba(0,0,0,0.08)] relative"
       >
         {tabs.map((tab, idx) => {
+          if (tab.isCenter) {
+            return (
+              <div key={idx} className="relative flex flex-col items-center justify-center w-14 h-full">
+                <Link
+                  href="/create"
+                  className="absolute -top-5 w-12 h-12 rounded-full bg-slate-950 text-white flex items-center justify-center shadow-[0_4px_16px_rgba(0,0,0,0.25)] border border-slate-800 hover:bg-slate-900 active:scale-95 hover:scale-105 transition-all cursor-pointer"
+                >
+                  <Plus className="w-5.5 h-5.5 stroke-[2.5]" />
+                </Link>
+                <span 
+                  className="text-[9px] font-black tracking-tight text-slate-400 mt-7 select-none"
+                  style={{ 
+                    fontFamily: 'var(--font-inter), sans-serif'
+                  }}
+                >
+                  Create
+                </span>
+              </div>
+            );
+          }
+
           const isActive = pathname === tab.path || (tab.path !== '/home' && pathname.startsWith(tab.path));
           
           return (
             <Link
               key={idx}
               href={tab.path}
-              className="flex flex-col items-center justify-center gap-1 w-16 text-center"
+              className="flex flex-col items-center justify-center gap-1 w-14 text-center transition-all"
             >
-              <div className="relative">
-                {/* Custom SVG icon */}
-                <div style={{ opacity: isActive ? 1 : 0.25, color: 'white' }}>
-                  {tab.icon}
-                </div>
-
+              <div className={`transition-all duration-200 ${isActive ? 'text-orange-600 scale-105' : 'text-slate-400 hover:text-slate-600'}`}>
+                {tab.icon}
               </div>
               <span 
-                className="text-[12px] font-semibold tracking-tight truncate w-full"
+                className="text-[9px] font-black tracking-tight truncate w-full transition-all text-center"
                 style={{ 
-                  color: isActive ? 'white' : 'rgba(255, 255, 255, 0.25)', 
-                  fontFamily: 'var(--font-bricolage), sans-serif'
+                  color: isActive ? '#EA580C' : '#94A3B8', // Orange-600 vs Slate-400
+                  fontFamily: 'var(--font-inter), sans-serif'
                 }}
               >
                 {tab.label}

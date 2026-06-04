@@ -98,7 +98,7 @@ export default function SettingsPage() {
 
   return (
     <AppShell>
-      <div className="w-full max-w-4xl mx-auto flex flex-col gap-6 pb-16">
+      <div className="w-full max-w-6xl mx-auto flex flex-col gap-6 pb-16 px-[2px] relative z-10">
         
         {/* Page Header */}
         <div className="flex flex-col gap-1">

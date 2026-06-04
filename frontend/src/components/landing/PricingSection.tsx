@@ -78,7 +78,7 @@ export default function PricingSection() {
             {billingPeriod === 'monthly' && (
               <motion.div 
                 layoutId="activeBillingLight"
-                className="absolute inset-0 bg-gradient-to-r from-orange-500 to-amber-500 rounded-full z-0" 
+                className="absolute inset-0 bg-slate-900 rounded-full z-0" 
                 transition={{ type: 'spring', stiffness: 300, damping: 25 }}
               />
             )}
@@ -93,7 +93,7 @@ export default function PricingSection() {
             {billingPeriod === 'annual' && (
               <motion.div 
                 layoutId="activeBillingLight"
-                className="absolute inset-0 bg-gradient-to-r from-orange-500 to-amber-500 rounded-full z-0"
+                className="absolute inset-0 bg-slate-900 rounded-full z-0"
                 transition={{ type: 'spring', stiffness: 300, damping: 25 }}
               />
             )}

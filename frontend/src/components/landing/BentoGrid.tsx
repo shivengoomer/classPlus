@@ -102,15 +102,15 @@ export default function BentoGrid() {
         </div>
 
         {/* Card 2: Automatic Grading Engine (Col Span 1) */}
-        <div className="rounded-3xl bg-white/60 backdrop-blur-md border border-slate-200/80 p-6 md:p-8 flex flex-col justify-between hover:border-purple-500/30 shadow-md shadow-slate-100/50 transition-all group relative overflow-hidden">
-          <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-purple-500/5 rounded-full blur-3xl group-hover:bg-purple-500/10 transition-all" />
+        <div className="rounded-3xl bg-white/60 backdrop-blur-md border border-slate-200/80 p-6 md:p-8 flex flex-col justify-between hover:border-orange-500/30 shadow-md shadow-slate-100/50 transition-all group relative overflow-hidden">
+          <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-orange-500/5 rounded-full blur-3xl group-hover:bg-orange-500/10 transition-all" />
 
           <div className="flex flex-col gap-4 relative z-10">
-            <div className="p-3 rounded-2xl bg-purple-500/10 border border-purple-500/20 text-purple-600 self-start">
+            <div className="p-3 rounded-2xl bg-orange-500/10 border border-orange-500/20 text-orange-600 self-start">
               <Zap className="w-6 h-6" />
             </div>
             <div className="mt-4">
-              <h3 className="text-xl font-bold text-slate-900 group-hover:text-purple-600 transition-colors">
+              <h3 className="text-xl font-bold text-slate-900 group-hover:text-orange-600 transition-colors">
                 Instant Auto-Grading
               </h3>
               <p className="text-slate-500 text-xs md:text-sm mt-2 leading-relaxed">
@@ -123,11 +123,11 @@ export default function BentoGrid() {
           <div className="mt-8 rounded-2xl bg-[#F8FAFC] border border-slate-200 p-4 flex flex-col gap-3 relative z-10">
             <div className="flex items-center justify-between border-b border-slate-200 pb-2">
               <span className="text-[9px] text-slate-400 font-bold">Grading Progress</span>
-              <span className="text-[9px] font-bold text-purple-600">78% Complete</span>
+              <span className="text-[9px] font-bold text-orange-600">78% Complete</span>
             </div>
-            <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
+            <div className="w-full bg-slate-100 border border-slate-200/50 h-2.5 rounded-full p-0.5 overflow-hidden shadow-inner">
               <motion.div 
-                className="bg-gradient-to-r from-purple-500 to-pink-500 h-full"
+                className="bg-gradient-to-r from-orange-500 to-amber-500 h-full rounded-full"
                 animate={{ width: `${gradingProgress}%` }}
                 transition={{ duration: 1.5, repeat: Infinity, repeatType: 'reverse' }}
               />
@@ -210,28 +210,28 @@ export default function BentoGrid() {
               <div>
                 <div className="flex justify-between text-[8px] text-slate-500 mb-1">
                   <span>Chemical Bonding</span>
-                  <span className="text-slate-700 font-bold">88% Mastery</span>
+                  <span className="text-slate-750 font-bold">88% Mastery</span>
                 </div>
-                <div className="w-full bg-slate-200 h-1 rounded-full overflow-hidden">
-                  <div className="bg-orange-500 h-full w-[88%]" />
+                <div className="w-full bg-slate-100 border border-slate-200/50 h-2 rounded-full p-0.5 overflow-hidden shadow-inner">
+                  <div className="bg-gradient-to-r from-orange-500 to-amber-500 h-full rounded-full w-[88%]" />
                 </div>
               </div>
               <div>
                 <div className="flex justify-between text-[8px] text-slate-500 mb-1">
                   <span>Force & Friction</span>
-                  <span className="text-slate-700 font-bold">64% Mastery (Action Required)</span>
+                  <span className="text-slate-750 font-bold">64% Mastery (Action Required)</span>
                 </div>
-                <div className="w-full bg-slate-200 h-1 rounded-full overflow-hidden">
-                  <div className="bg-amber-500 h-full w-[64%]" />
+                <div className="w-full bg-slate-100 border border-slate-200/50 h-2 rounded-full p-0.5 overflow-hidden shadow-inner">
+                  <div className="bg-gradient-to-r from-orange-500 to-amber-500 h-full rounded-full w-[64%]" />
                 </div>
               </div>
               <div>
                 <div className="flex justify-between text-[8px] text-slate-500 mb-1">
                   <span>Algebraic Identities</span>
-                  <span className="text-slate-700 font-bold">92% Mastery</span>
+                  <span className="text-slate-750 font-bold">92% Mastery</span>
                 </div>
-                <div className="w-full bg-slate-200 h-1 rounded-full overflow-hidden">
-                  <div className="bg-purple-500 h-full w-[92%]" />
+                <div className="w-full bg-slate-100 border border-slate-200/50 h-2 rounded-full p-0.5 overflow-hidden shadow-inner">
+                  <div className="bg-gradient-to-r from-orange-500 to-amber-500 h-full rounded-full w-[92%]" />
                 </div>
               </div>
             </div>

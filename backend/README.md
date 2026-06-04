@@ -1,4 +1,4 @@
-# ⚙️ VedaAI Backend Engine — REST API, WS Gateway & Async Worker
+# ⚙️ ClassPilot Backend Engine — REST API, WS Gateway & Async Worker
 
 [![Express](https://img.shields.io/badge/API-Express.js-lightgrey?style=for-the-badge&logo=express)](https://expressjs.com/)
 [![MongoDB](https://img.shields.io/badge/Database-MongoDB-green?style=for-the-badge&logo=mongodb)](https://www.mongodb.com/)
@@ -6,7 +6,7 @@
 [![TypeScript](https://img.shields.io/badge/Language-TypeScript-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
 [![Groq](https://img.shields.io/badge/AI-Groq%20API-orange?style=for-the-badge)](https://groq.com/)
 
-This is the core service engine for **VedaAI**. It handles REST routing, secure user sessions via Clerk, background processing queues with BullMQ + Redis, text extraction from uploaded files, structured assessment generation via LLMs, real-time WebSocket notifications, and high-fidelity PDF rendering.
+This is the core service engine for **ClassPilot**. It handles REST routing, secure user sessions via Clerk, background processing queues with BullMQ + Redis, text extraction from uploaded files, structured assessment generation via LLMs, real-time WebSocket notifications, and high-fidelity PDF rendering.
 
 ---
 
@@ -26,7 +26,7 @@ This is the core service engine for **VedaAI**. It handles REST routing, secure 
 
 ## 🏗️ Architecture Deep Dive: Asynchronous Processing Pipeline
 
-When a user creates a new assignment, Groq prompt completions can take up to 45 seconds. VedaAI handles this asynchronously via BullMQ:
+When a user creates a new assignment, Groq prompt completions can take up to 45 seconds. ClassPilot handles this asynchronously via BullMQ:
 
 ```
 [Client POST /api/assignments]
@@ -58,17 +58,17 @@ When a user creates a new assignment, Groq prompt completions can take up to 45 
 
 ## 📂 Key Codebase Directories
 
-*   [src/workers/assignment.worker.ts](file:///Users/shivengoomer/Documents/Shiven/Coding/Internship/vedaAI/backend/src/workers/assignment.worker.ts): Background queue listener. Fetches the assignment, extracts syllabus document texts (if provided), designs context-rich prompts, queries the Groq API, parses the JSON response, saves the compiled questions/answers to MongoDB, and signals completion.
-*   [src/services/ai.service.ts](file:///Users/shivengoomer/Documents/Shiven/Coding/Internship/vedaAI/backend/src/services/ai.service.ts): Integrates with Groq Cloud. Houses structured prompting formats and enforces strict JSON output.
-*   [src/services/parser.service.ts](file:///Users/shivengoomer/Documents/Shiven/Coding/Internship/vedaAI/backend/src/services/parser.service.ts): Parses uploaded assets into clean plain text. Supports `.pdf` (via `pdf-parse`) and `.docx` (via `mammoth`).
-*   [src/services/pdf.service.ts](file:///Users/shivengoomer/Documents/Shiven/Coding/Internship/vedaAI/backend/src/services/pdf.service.ts): Compiles assignment questions and user profile data (e.g., School Name, CBSE Code) into printable PDF exam papers using PDFKit.
-*   [src/websocket/server.ts](file:///Users/shivengoomer/Documents/Shiven/Coding/Internship/vedaAI/backend/src/websocket/server.ts): Manages active WebSocket connections. Maps connection clients with their respective generation jobs to push status updates (`pending` ➡️ `processing` ➡️ `completed` / `failed`).
+*   [src/workers/assignment.worker.ts](file:///Users/shivengoomer/Documents/Shiven/Coding/Internship/ClassPilot/backend/src/workers/assignment.worker.ts): Background queue listener. Fetches the assignment, extracts syllabus document texts (if provided), designs context-rich prompts, queries the Groq API, parses the JSON response, saves the compiled questions/answers to MongoDB, and signals completion.
+*   [src/services/ai.service.ts](file:///Users/shivengoomer/Documents/Shiven/Coding/Internship/ClassPilot/backend/src/services/ai.service.ts): Integrates with Groq Cloud. Houses structured prompting formats and enforces strict JSON output.
+*   [src/services/parser.service.ts](file:///Users/shivengoomer/Documents/Shiven/Coding/Internship/ClassPilot/backend/src/services/parser.service.ts): Parses uploaded assets into clean plain text. Supports `.pdf` (via `pdf-parse`) and `.docx` (via `mammoth`).
+*   [src/services/pdf.service.ts](file:///Users/shivengoomer/Documents/Shiven/Coding/Internship/ClassPilot/backend/src/services/pdf.service.ts): Compiles assignment questions and user profile data (e.g., School Name, CBSE Code) into printable PDF exam papers using PDFKit.
+*   [src/websocket/server.ts](file:///Users/shivengoomer/Documents/Shiven/Coding/Internship/ClassPilot/backend/src/websocket/server.ts): Manages active WebSocket connections. Maps connection clients with their respective generation jobs to push status updates (`pending` ➡️ `processing` ➡️ `completed` / `failed`).
 
 ---
 
 ## 🍃 MongoDB Mongoose Schemas
 
-### 1. `Assignment` ([assignment.model.ts](file:///Users/shivengoomer/Documents/Shiven/Coding/Internship/vedaAI/backend/src/models/assignment.model.ts))
+### 1. `Assignment` ([assignment.model.ts](file:///Users/shivengoomer/Documents/Shiven/Coding/Internship/ClassPilot/backend/src/models/assignment.model.ts))
 Keeps records of generated assessments:
 *   `title` (String): Assignment name.
 *   `grade` (String): Target level (e.g., Class X).
@@ -79,7 +79,7 @@ Keeps records of generated assessments:
 *   `answerKey` (Array): Ideal answers corresponding to the questions.
 *   `createdBy` (String): Clerk User ID string.
 
-### 2. `LibraryItem` ([library.model.ts](file:///Users/shivengoomer/Documents/Shiven/Coding/Internship/vedaAI/backend/src/models/library.model.ts))
+### 2. `LibraryItem` ([library.model.ts](file:///Users/shivengoomer/Documents/Shiven/Coding/Internship/ClassPilot/backend/src/models/library.model.ts))
 Tracks referenced documents uploaded by the user:
 *   `name` (String): Filename.
 *   `path` (String): Relative filesystem location.
@@ -88,7 +88,7 @@ Tracks referenced documents uploaded by the user:
 *   `category` (String): Syllabus, Notes, Textbook, etc.
 *   `createdBy` (String): Clerk User ID.
 
-### 3. `User` ([user.model.ts](file:///Users/shivengoomer/Documents/Shiven/Coding/Internship/vedaAI/backend/src/models/user.model.ts))
+### 3. `User` ([user.model.ts](file:///Users/shivengoomer/Documents/Shiven/Coding/Internship/ClassPilot/backend/src/models/user.model.ts))
 Stores profile details used to brand the generated assessment PDFs:
 *   `clerkId` (String): Primary ID matching Clerk credentials.
 *   `schoolName` (String): Custom name displayed in exam headers.
@@ -136,7 +136,7 @@ All routes except `/api/assignments/:id/download` require a bearer authenticatio
 Create a `.env` file inside the `backend` directory:
 ```env
 PORT=4000
-MONGODB_URI=mongodb+srv://<dbuser>:<dbpassword>@<dbcluster>.mongodb.net/vedaai?retryWrites=true&w=majority
+MONGODB_URI=mongodb+srv://<dbuser>:<dbpassword>@<dbcluster>.mongodb.net/ClassPilot?retryWrites=true&w=majority
 REDIS_URL=redis://localhost:6379
 GROQ_API_KEY=gsk_your_groq_api_key_here
 ```

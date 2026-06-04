@@ -55,10 +55,10 @@ export default function LandingPage() {
           {/* Smooth linear fade to background at the bottom */}
           <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-[#F3F4F6] via-[#F3F4F6]/70 to-transparent" />
         </div>
-        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center min-h-[calc(100vh-180px)] relative z-10">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center min-h-[calc(100vh-180px)] relative z-10">
           
           {/* Hero Left Side: Content */}
-          <div className="flex flex-col gap-6 md:gap-8 text-left relative">
+          <div className="lg:col-span-5 flex flex-col gap-6 md:gap-8 text-left relative">
             
             {/* Animated Glow Backdrop Behind Left Side */}
             <div className="absolute top-[20%] left-[-10%] w-[60%] h-[60%] bg-orange-500/5 rounded-full blur-[80px] pointer-events-none" />
@@ -177,7 +177,7 @@ export default function LandingPage() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, ease: 'easeOut', delay: 0.2 }}
-            className="w-full relative flex items-center justify-center"
+            className="hidden lg:flex lg:col-span-7 relative items-center justify-center"
           >
             <DeviceShowcase />
           </motion.div>

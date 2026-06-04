@@ -1,4 +1,4 @@
-# 🌟 VedaAI — Enterprise-Grade AI-Powered Assessment Suite
+# 🌟 ClassPilot — Enterprise-Grade AI-Powered Assessment Suite
 
 [![Next.js](https://img.shields.io/badge/Frontend-Next.js%2014-black?style=for-the-badge&logo=nextdotjs)](https://nextjs.org/)
 [![Express](https://img.shields.io/badge/Backend-Express.js-lightgrey?style=for-the-badge&logo=express)](https://expressjs.com/)
@@ -8,13 +8,13 @@
 [![Clerk](https://img.shields.io/badge/Auth-Clerk-purple?style=for-the-badge)](https://clerk.com/)
 [![Groq](https://img.shields.io/badge/AI-Groq%20API-orange?style=for-the-badge)](https://groq.com/)
 
-**VedaAI** is a premium, curriculum-aligned, and intelligent assessment generation suite designed for modern educators and academic institutions. It empowers teachers to transform syllabus guidelines, chapters, textbook PDFs, or Word documents into fully structured exam papers, worksheets, and quizzes within seconds—complete with professional formatting, marking schemes, and answer keys.
+**ClassPilot** is a premium, curriculum-aligned, and intelligent assessment generation suite designed for modern educators and academic institutions. It empowers teachers to transform syllabus guidelines, chapters, textbook PDFs, or Word documents into fully structured exam papers, worksheets, and quizzes within seconds—complete with professional formatting, marking schemes, and answer keys.
 
 ---
 
 ## 🏗️ Architecture & Asynchronous Data Flow
 
-VedaAI is architected around a decoupled, queue-backed, event-driven pattern. Heavy LLM reasoning and file parsing operations are offloaded to an asynchronous worker pool, ensuring the Express API gateway remains responsive under load.
+ClassPilot is architected around a decoupled, queue-backed, event-driven pattern. Heavy LLM reasoning and file parsing operations are offloaded to an asynchronous worker pool, ensuring the Express API gateway remains responsive under load.
 
 ```mermaid
 sequenceDiagram
@@ -67,7 +67,7 @@ sequenceDiagram
 The monorepo structure separating the client and service layers is detailed below:
 
 ```
-vedaAI/
+ClassPilot/
 ├── backend/                       # Express REST API, WS Server & Asynchronous Worker
 │   ├── src/
 │   │   ├── config/                # Mongoose, Redis, Groq & Clerk SDK clients
@@ -112,7 +112,7 @@ Create the configuration files in their respective folders before booting the se
 
 ```env
 PORT=4000
-MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/vedaai?retryWrites=true&w=majority
+MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/ClassPilot?retryWrites=true&w=majority
 REDIS_URL=redis://localhost:6379
 GROQ_API_KEY=gsk_your_groq_api_key_here
 ```
@@ -148,8 +148,8 @@ NEXT_PUBLIC_WS_URL=ws://localhost:4000
 
 1.  **Clone the project**:
     ```bash
-    git clone https://github.com/shivengoomer/vedaAI-assigment.git
-    cd vedaAI
+    git clone https://github.com/shivengoomer/ClassPilot-assigment.git
+    cd ClassPilot
     ```
 
 2.  **Spin Up the Backend**:
