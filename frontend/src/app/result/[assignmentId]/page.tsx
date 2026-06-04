@@ -9,7 +9,8 @@ import { ExamPaper } from '@/components/result/ExamPaper';
 import { getAssignment } from '@/lib/api';
 import { Assignment } from '@/types/assignment';
 import { useAssignmentStore } from '@/store/assignmentStore';
-import { FileText, ChevronRight } from 'lucide-react';
+import { FileText, ChevronRight, Monitor, Laptop, Smartphone } from 'lucide-react';
+import { PhoneFrame, LaptopFrame } from '@/components/shared/DeviceFrames';
 
 export default function ResultPage() {
   const params = useParams();
@@ -19,6 +20,7 @@ export default function ResultPage() {
   const [assignment, setAssignment] = useState<Assignment | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<'desktop' | 'laptop' | 'phone'>('desktop');
   const setCurrentAssignment = useAssignmentStore((state) => state.setCurrentAssignment);
 
   useEffect(() => {
@@ -97,7 +99,7 @@ export default function ResultPage() {
       ) : (
         // Content Loaded State
         <div 
-          className="flex flex-col items-center mx-auto w-full bg-[var(--Background-bg-dark,#5E5E5E)] p-5 md:p-[24px] gap-3 md:gap-4 rounded-[32px] md:rounded-[40px] md:max-w-[1100px] shadow-md"
+          className="flex flex-col items-center mx-auto w-full bg-[var(--Background-bg-dark,#5E5E5E)] p-5 md:p-[24px] gap-3 md:gap-6 rounded-[32px] md:rounded-[40px] md:max-w-[1100px] shadow-md"
         >
           {/* AI Response Message Banner */}
           {assignment.result && (
@@ -108,8 +110,59 @@ export default function ResultPage() {
             />
           )}
 
-          {/* Clean Printable Exam Paper Sheet */}
-          <ExamPaper assignment={assignment} />
+          {/* Device Preview Switcher (Desktop, Laptop, Phone) */}
+          <div className="flex items-center bg-[#1A1A1A]/80 backdrop-blur-md p-1 rounded-full gap-1 border border-white/5 shadow-inner">
+            <button
+              onClick={() => setViewMode('desktop')}
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs md:text-sm font-semibold transition-all ${
+                viewMode === 'desktop'
+                  ? 'bg-white text-[#1A1A1A] shadow-md scale-105'
+                  : 'text-white/60 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <Monitor className="w-3.5 h-3.5" />
+              <span>Printable Sheet</span>
+            </button>
+            <button
+              onClick={() => setViewMode('laptop')}
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs md:text-sm font-semibold transition-all ${
+                viewMode === 'laptop'
+                  ? 'bg-white text-[#1A1A1A] shadow-md scale-105'
+                  : 'text-white/60 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <Laptop className="w-3.5 h-3.5" />
+              <span>Laptop View</span>
+            </button>
+            <button
+              onClick={() => setViewMode('phone')}
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs md:text-sm font-semibold transition-all ${
+                viewMode === 'phone'
+                  ? 'bg-white text-[#1A1A1A] shadow-md scale-105'
+                  : 'text-white/60 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <Smartphone className="w-3.5 h-3.5" />
+              <span>Mobile View</span>
+            </button>
+          </div>
+
+          {/* Main Content Area based on View Mode */}
+          <div className="w-full flex justify-center items-center py-4 overflow-hidden min-h-[450px]">
+            {viewMode === 'desktop' && (
+              <ExamPaper assignment={assignment} />
+            )}
+            {viewMode === 'laptop' && (
+              <LaptopFrame>
+                <ExamPaper assignment={assignment} />
+              </LaptopFrame>
+            )}
+            {viewMode === 'phone' && (
+              <PhoneFrame>
+                <ExamPaper assignment={assignment} />
+              </PhoneFrame>
+            )}
+          </div>
         </div>
       )}
     </AppShell>
