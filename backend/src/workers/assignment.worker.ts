@@ -45,6 +45,7 @@ async function processAssignment(job: Job<JobData>) {
       type: 'job:progress',
       progress: 10,
       status: 'queued',
+      stage: 'queued',
       message: 'Queued in generation pipeline...',
     });
 
@@ -56,6 +57,7 @@ async function processAssignment(job: Job<JobData>) {
         type: 'job:progress',
         progress: 25,
         status: 'processing',
+        stage: 'parsing',
         message: 'Parsing uploaded file...',
       });
 
@@ -147,6 +149,7 @@ async function processAssignment(job: Job<JobData>) {
         type: 'job:progress',
         progress: 25,
         status: 'processing',
+        stage: 'parsing',
         message: 'Fetching and parsing reference file...',
       });
 
@@ -162,7 +165,8 @@ async function processAssignment(job: Job<JobData>) {
       type: 'job:progress',
       progress: 40,
       status: 'processing',
-      message: 'Building structured prompt...',
+      stage: 'prompting',
+      message: 'Aligning to CBSE / NCERT Curriculum...',
     });
 
     let prompt = '';
@@ -241,9 +245,10 @@ async function processAssignment(job: Job<JobData>) {
     // step 4: call AI
     broadcastToJob(jobId, {
       type: 'job:progress',
-      progress: 50,
+      progress: 60,
       status: 'processing',
-      message: 'Consulting AI model for CBSE/NCERT curriculum alignment...',
+      stage: 'generating',
+      message: 'Consulting AI model for alignment...',
     });
 
     const aiResult = await generateWithAI(prompt);
@@ -251,8 +256,9 @@ async function processAssignment(job: Job<JobData>) {
     // step 5: validate and save result
     broadcastToJob(jobId, {
       type: 'job:progress',
-      progress: 85,
+      progress: 80,
       status: 'processing',
+      stage: 'generating',
       message: 'Structuring sections and finalizing paper...',
     });
 
@@ -263,6 +269,15 @@ async function processAssignment(job: Job<JobData>) {
 
     // Sanitize and normalize sections, questions, types, and difficulty to match Mongoose schema enums
     const sanitizedSections = aiResult.sections.map((section: any, sIdx: number) => {
+      broadcastToJob(jobId, {
+        type: 'job:progress',
+        progress: Math.min(88, 80 + Math.round(((sIdx + 1) / aiResult.sections.length) * 8)),
+        status: 'processing',
+        stage: 'generating',
+        message: `Generating section ${sIdx + 1} of ${aiResult.sections.length}...`,
+        sectionIndex: sIdx + 1,
+        totalSections: aiResult.sections.length,
+      });
       const sId = section.id || `sec-${sIdx}-${Date.now()}`;
       return {
         id: sId,
@@ -335,7 +350,8 @@ async function processAssignment(job: Job<JobData>) {
             type: 'job:progress',
             progress: 92,
             status: 'processing',
-            message: 'Uploading generated PDF paper to UploadThing...',
+            stage: 'saving',
+            message: 'Formatting and exporting PDF paper...',
           });
 
           const fileName = `${assignment.title.replace(/[^a-zA-Z0-9]/g, '_')}_paper.pdf`;
@@ -416,6 +432,7 @@ async function processAssignment(job: Job<JobData>) {
       type: 'job:done',
       progress: 100,
       status: 'done',
+      stage: 'completed',
       message: 'Finished! Loading paper preview...',
       assignmentId: assignmentId,
       pdfUrl: assignment.pdfUrl,
@@ -444,6 +461,7 @@ async function processAssignment(job: Job<JobData>) {
     broadcastToJob(jobId, {
       type: 'job:failed',
       status: 'failed',
+      stage: 'failed',
       error: error.message || 'Failed to generate assignment',
     });
 

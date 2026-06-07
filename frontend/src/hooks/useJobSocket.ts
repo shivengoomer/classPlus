@@ -42,19 +42,19 @@ export function useJobSocket(jobId: string | null) {
             switch (data.type) {
               case 'job:queued':
                 setStatus('queued');
-                setProgress(0, 'Queued...');
+                setProgress(0, 'Queued...', data.stage || 'queued');
                 break;
               case 'job:processing':
                 setStatus('processing');
-                setProgress(10, 'Processing started...');
+                setProgress(10, 'Processing started...', data.stage || 'parsing');
                 break;
               case 'job:progress':
                 setStatus('processing');
-                setProgress(data.progress, data.message || 'Generating...');
+                setProgress(data.progress, data.message || 'Generating...', data.stage, data.sectionIndex, data.totalSections);
                 break;
               case 'job:done':
                 setStatus('done');
-                setProgress(100, 'Done!');
+                setProgress(100, 'Done!', 'completed');
                 setDone(data.assignmentId);
                 // Refresh list and notifications from backend
                 import('@/lib/api').then((api) => {
@@ -68,7 +68,7 @@ export function useJobSocket(jobId: string | null) {
                 break;
               case 'job:failed':
                 setStatus('failed');
-                setProgress(0, data.error || 'Generation failed');
+                setProgress(0, data.error || 'Generation failed', 'failed');
                 break;
             }
           } catch (e) {

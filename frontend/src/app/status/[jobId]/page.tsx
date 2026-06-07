@@ -10,6 +10,7 @@ import { regenerateAssignment } from '@/lib/api';
 import { AlertCircle, Sparkles, CheckCircle2 } from 'lucide-react';
 import { PillButton } from '@/components/shared/PillButton';
 import { useToastStore } from '@/store/toastStore';
+import { GenerationStepper } from '@/components/shared/GenerationStepper';
 
 export default function JobStatusPage() {
   const params = useParams();
@@ -20,7 +21,7 @@ export default function JobStatusPage() {
   useJobSocket(jobId);
 
   // Read job details from Zustand
-  const { status, progress, message, assignmentId } = useJobStore();
+  const { status, message, assignmentId, stage, sectionIndex, totalSections } = useJobStore();
   const [retrying, setRetrying] = useState(false);
   const { addToast } = useToastStore();
 
@@ -54,75 +55,23 @@ export default function JobStatusPage() {
     }
   };
 
-  // Status mapping to user-friendly titles
-  const statusTitles = {
-    idle: 'Preparing generation...',
-    queued: 'Queued in pipeline',
-    processing: 'Generating your question paper...',
-    done: 'Question paper generated!',
-    failed: 'Generation failed'
-  };
-
   return (
     <AppShell>
-      <div className="flex flex-col items-center justify-center min-h-[60vh] max-w-md mx-auto text-center px-4">
+      <div className="flex flex-col items-center justify-center min-h-[60vh] max-w-lg mx-auto px-4 py-8">
         
-        {/* Animated Visual Box */}
-        <div className="relative w-36 h-36 flex items-center justify-center mb-6">
-          {/* Progress Circle Border */}
-          <svg className="w-full h-full transform -rotate-90">
-            <circle
-              cx="72"
-              cy="72"
-              r="60"
-              className="stroke-gray-200"
-              strokeWidth="6"
-              fill="transparent"
-            />
-            <circle
-              cx="72"
-              cy="72"
-              r="60"
-              className="stroke-veda-orange transition-all duration-300"
-              strokeWidth="6"
-              fill="transparent"
-              strokeDasharray={2 * Math.PI * 60}
-              strokeDashoffset={2 * Math.PI * 60 * (1 - progress / 100)}
-              strokeLinecap="round"
-            />
-          </svg>
-
-          {/* Centered Icon or Value */}
-          <div className="absolute inset-0 flex flex-col items-center justify-center">
-            {status === 'failed' ? (
-              <AlertCircle className="w-10 h-10 text-veda-orange-red" />
-            ) : status === 'done' ? (
-              <CheckCircle2 className="w-10 h-10 text-green-500" />
-            ) : (
-              <div className="flex flex-col items-center">
-                <span className="text-2xl font-bold text-veda-text-primary">
-                  {progress}%
-                </span>
-                <span className="text-[10px] text-veda-text-secondary uppercase tracking-wider font-semibold animate-pulse">
-                  AI Active
-                </span>
-              </div>
-            )}
-          </div>
+        {/* Granular progress stepper component */}
+        <div className="w-full mb-6">
+          <GenerationStepper
+            currentStage={stage || (status === 'processing' ? 'generating' : (status as any))}
+            currentMessage={message}
+            sectionIndex={sectionIndex}
+            totalSections={totalSections}
+          />
         </div>
-
-        {/* Status Messages */}
-        <h3 className="text-lg font-bold text-veda-text-primary mb-2">
-          {statusTitles[status] || 'Processing...'}
-        </h3>
-        
-        <p className="text-sm text-veda-text-secondary min-h-[40px] leading-relaxed mb-8 px-4">
-          {message || 'Connecting to generation queue...'}
-        </p>
 
         {/* Failed Action Footer */}
         {status === 'failed' && (
-          <div className="flex flex-col gap-2 w-full">
+          <div className="flex flex-col gap-2 w-full max-w-xs mt-4">
             <PillButton
               variant="primary"
               disabled={retrying}
@@ -143,8 +92,8 @@ export default function JobStatusPage() {
 
         {/* Done Action Redirect Info */}
         {status === 'done' && (
-          <p className="text-xs text-green-600 font-semibold flex items-center gap-1.5 animate-pulse">
-            <Sparkles className="w-4 h-4 text-veda-orange" />
+          <p className="text-xs text-green-600 font-semibold flex items-center gap-1.5 animate-pulse mt-4">
+            <Sparkles className="w-4 h-4 text-veda-orange animate-pulse" />
             <span>Redirecting to paper view...</span>
           </p>
         )}
