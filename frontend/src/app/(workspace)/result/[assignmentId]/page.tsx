@@ -191,12 +191,12 @@ export default function ResultPage() {
             </div>
 
             {/* Action Buttons: Download & Regenerate */}
-            <div className="flex items-center gap-2.5 self-end sm:self-auto">
+            <div className="flex items-center gap-2.5 self-end sm:self-auto relative z-20">
               {/* Download Button */}
               <button
                 onClick={handleDownload}
                 disabled={isDownloading}
-                className="flex items-center justify-center gap-1.5 bg-[#10375C] hover:bg-[#0d2f4f] disabled:bg-slate-200 text-white disabled:text-slate-400 rounded-full h-[38px] px-5 text-xs md:text-sm font-bold transition-all active:scale-95 shadow-md shadow-black/5 cursor-pointer font-sans"
+                className="flex items-center justify-center gap-1.5 bg-[#10375C] hover:bg-[#0c2e4f] disabled:bg-slate-100 disabled:text-slate-400 text-white rounded-full h-[40px] px-5 text-xs md:text-sm font-semibold tracking-wide transition-all active:scale-95 shadow-md hover:shadow-lg hover:shadow-slate-200 cursor-pointer font-sans select-none"
               >
                 {isDownloading ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -213,7 +213,7 @@ export default function ResultPage() {
                 <button
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                   disabled={isRegenerating}
-                  className="flex items-center justify-center gap-1 bg-white hover:bg-slate-50 disabled:opacity-50 text-slate-755 rounded-full h-[38px] px-5 text-xs md:text-sm font-bold transition-all border border-slate-250 shadow-sm cursor-pointer font-sans"
+                  className="flex items-center justify-center gap-1.5 bg-white hover:bg-slate-50 disabled:opacity-50 text-[#10375C] rounded-full h-[40px] px-5 text-xs md:text-sm font-semibold tracking-wide transition-all border border-slate-200 shadow-sm hover:border-[#10375C]/35 active:scale-95 cursor-pointer font-sans select-none"
                 >
                   {isRegenerating ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -221,7 +221,7 @@ export default function ResultPage() {
                     <RefreshCw className="w-3.5 h-3.5" />
                   )}
                   <span>Regenerate</span>
-                  <ChevronDown className="w-3.5 h-3.5 ml-0.5 text-slate-555" />
+                  <ChevronDown className="w-3.5 h-3.5 text-[#10375C]/70" />
                 </button>
 
                 {isDropdownOpen && (
@@ -230,24 +230,27 @@ export default function ResultPage() {
                       className="fixed inset-0 z-40 bg-transparent"
                       onClick={() => setIsDropdownOpen(false)}
                     />
-                    <div className="absolute right-0 mt-2 w-48 rounded-xl bg-white border border-slate-200 shadow-2xl py-1.5 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                    <div className="absolute right-0 mt-2.5 w-52 rounded-2xl bg-white/95 backdrop-blur-md border border-slate-100 shadow-2xl p-1.5 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
                       <button
                         onClick={() => handleRegenerate('easier')}
-                        className="w-full text-left px-4.5 py-2 text-xs text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-colors font-bold font-sans cursor-pointer"
+                        className="w-full flex items-center justify-between px-4 py-2.5 text-xs md:text-sm text-slate-700 hover:text-[#10375C] hover:bg-slate-50 rounded-xl transition-all font-semibold font-sans cursor-pointer"
                       >
-                        Regenerate (Easier)
+                        <span>Regenerate (Easier)</span>
+                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                       </button>
                       <button
                         onClick={() => handleRegenerate('harder')}
-                        className="w-full text-left px-4.5 py-2 text-xs text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-colors font-bold font-sans cursor-pointer"
+                        className="w-full flex items-center justify-between px-4 py-2.5 text-xs md:text-sm text-slate-700 hover:text-[#10375C] hover:bg-slate-50 rounded-xl transition-all font-semibold font-sans cursor-pointer"
                       >
-                        Regenerate (Harder)
+                        <span>Regenerate (Harder)</span>
+                        <div className="w-1.5 h-1.5 rounded-full bg-rose-500" />
                       </button>
                       <button
                         onClick={() => handleRegenerate('same')}
-                        className="w-full text-left px-4.5 py-2 text-xs text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-colors font-bold font-sans cursor-pointer"
+                        className="w-full flex items-center justify-between px-4 py-2.5 text-xs md:text-sm text-slate-700 hover:text-[#10375C] hover:bg-slate-50 rounded-xl transition-all font-semibold font-sans cursor-pointer"
                       >
-                        Regenerate (Same)
+                        <span>Regenerate (Same)</span>
+                        <div className="w-1.5 h-1.5 rounded-full bg-amber-500" />
                       </button>
                     </div>
                   </>
