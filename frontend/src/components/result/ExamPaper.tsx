@@ -47,28 +47,28 @@ export function ExamPaper({ assignment }: ExamPaperProps) {
 
   return (
     <div 
-      className="flex flex-col items-center self-stretch bg-[#F6F6F6] md:bg-white shadow-none md:shadow-md text-[#303030] font-sans relative overflow-y-auto no-scrollbar h-auto md:min-h-[1465px] p-4 md:p-8 gap-6 md:gap-6 rounded-[24px] md:rounded-[32px] w-full"
+      className="flex flex-col items-center self-stretch bg-white border border-slate-200 shadow-md hover:shadow-xl text-slate-800 font-sans relative overflow-y-auto no-scrollbar h-auto md:min-h-[1400px] p-6 md:p-12 gap-6 rounded-3xl w-full transition-all duration-305"
     >
       
       {/* Figma Title Header block */}
-      <div className="flex flex-col items-center text-center gap-1.5 pb-4">
-        <h2 className="text-[#303030] text-[28px] md:text-[32px] font-bold leading-tight font-sans">
+      <div className="flex flex-col items-center text-center gap-2 pb-6 border-b-2 border-slate-800 w-full">
+        <h2 className="text-slate-900 text-2xl md:text-3xl font-black tracking-tight uppercase">
           {displaySchoolName}
         </h2>
-        <div className="text-[20px] md:text-[24px] text-[#303030] font-semibold mt-1 font-sans">
-          Subject: {result.subject} &nbsp;|&nbsp; Class: {result.grade}
+        <div className="text-xs md:text-sm text-slate-500 font-bold uppercase tracking-widest mt-1">
+          Subject: {result.subject} &nbsp;•&nbsp; Class: {result.grade}
         </div>
       </div>
 
       {/* Info Row: Time & Marks */}
-      <div className="flex items-center justify-between text-[16px] md:text-[18px] text-[#303030] font-semibold border-b border-gray-200 pb-3 w-full">
+      <div className="flex items-center justify-between text-xs md:text-sm text-slate-700 font-bold uppercase tracking-wider border-b border-slate-200 pb-3 w-full">
         <span>Time Allowed: {result.timeAllowed || '45 minutes'}</span>
         <span>Maximum Marks: {result.totalMarks || assignment.totalMarks}</span>
       </div>
 
       {/* General Instruction Box */}
-      <div className="text-[16px] md:text-[18px] text-[#303030] font-semibold pl-1 py-0.5 w-full">
-        All questions are compulsory unless stated otherwise.
+      <div className="text-xs md:text-sm text-slate-600 font-bold w-full uppercase tracking-wider bg-slate-50 border border-slate-200 px-4 py-3 rounded-2xl">
+        General Instructions: All questions are compulsory. Keep answers clear and legible.
       </div>
 
       {/* Student Info Block */}

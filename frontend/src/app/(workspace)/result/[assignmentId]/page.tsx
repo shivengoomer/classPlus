@@ -99,7 +99,7 @@ export default function ResultPage() {
       ) : (
         // Content Loaded State
         <div 
-          className="flex flex-col items-center mx-auto w-full bg-[var(--Background-bg-dark,#5E5E5E)] p-5 md:p-[24px] gap-3 md:gap-6 rounded-[32px] md:rounded-[40px] md:max-w-[1100px] shadow-md"
+          className="flex flex-col items-center mx-auto w-full bg-white/45 backdrop-blur-xl border border-white/55 p-5 md:p-[24px] gap-3 md:gap-6 rounded-[32px] md:rounded-[40px] md:max-w-[1100px] shadow-xl"
         >
           {/* AI Response Message Banner */}
           {assignment.result && (
@@ -111,13 +111,13 @@ export default function ResultPage() {
           )}
 
           {/* Device Preview Switcher (Desktop, Laptop, Phone) */}
-          <div className="flex items-center bg-[#1A1A1A]/80 backdrop-blur-md p-1 rounded-full gap-1 border border-white/5 shadow-inner">
+          <div className="flex items-center bg-white/80 backdrop-blur-md p-1 rounded-full gap-1 border border-slate-200/50 shadow-sm">
             <button
               onClick={() => setViewMode('desktop')}
               className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs md:text-sm font-semibold transition-all ${
                 viewMode === 'desktop'
-                  ? 'bg-white text-[#1A1A1A] shadow-md scale-105'
-                  : 'text-white/60 hover:text-white hover:bg-white/5'
+                  ? 'bg-[#10375C] text-white shadow-md scale-105'
+                  : 'text-slate-655 hover:text-slate-900 hover:bg-slate-100/50'
               }`}
             >
               <Monitor className="w-3.5 h-3.5" />
@@ -127,8 +127,8 @@ export default function ResultPage() {
               onClick={() => setViewMode('laptop')}
               className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs md:text-sm font-semibold transition-all ${
                 viewMode === 'laptop'
-                  ? 'bg-white text-[#1A1A1A] shadow-md scale-105'
-                  : 'text-white/60 hover:text-white hover:bg-white/5'
+                  ? 'bg-[#10375C] text-white shadow-md scale-105'
+                  : 'text-slate-655 hover:text-slate-900 hover:bg-slate-100/50'
               }`}
             >
               <Laptop className="w-3.5 h-3.5" />
@@ -138,8 +138,8 @@ export default function ResultPage() {
               onClick={() => setViewMode('phone')}
               className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs md:text-sm font-semibold transition-all ${
                 viewMode === 'phone'
-                  ? 'bg-white text-[#1A1A1A] shadow-md scale-105'
-                  : 'text-white/60 hover:text-white hover:bg-white/5'
+                  ? 'bg-[#10375C] text-white shadow-md scale-105'
+                  : 'text-slate-655 hover:text-slate-900 hover:bg-slate-100/50'
               }`}
             >
               <Smartphone className="w-3.5 h-3.5" />
