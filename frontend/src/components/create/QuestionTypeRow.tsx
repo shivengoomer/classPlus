@@ -1,15 +1,19 @@
 // src/components/create/QuestionTypeRow.tsx
 'use client';
 
-import React from 'react';
-import { X } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, Wand2, Loader2 } from 'lucide-react';
 import { QuestionType } from '@/types/question';
+import { generateRubric } from '@/lib/api';
+import { useFormStore } from '@/store/formStore';
+import { useToastStore } from '@/store/toastStore';
 
 interface QuestionTypeRowProps {
   type: QuestionType;
   count: number;
   marks: number;
-  onUpdate: (field: 'type' | 'count' | 'marks', value: QuestionType | number) => void;
+  rubric?: { label: string; marks: number; description: string }[];
+  onUpdate: (field: 'type' | 'count' | 'marks' | 'rubric', value: any) => void;
   onRemove: () => void;
 }
 
@@ -25,10 +29,17 @@ export function QuestionTypeRow({
   type,
   count,
   marks,
+  rubric,
   onUpdate,
   onRemove
 }: QuestionTypeRowProps) {
-  
+  const [isGenerating, setIsGenerating] = useState(false);
+  const { addToast } = useToastStore();
+
+  // Access the parent form state for subject & grade context to give AI better prompting details
+  const subject = useFormStore((state) => state.subject);
+  const grade = useFormStore((state) => state.grade);
+
   // Increment/Decrement helper
   const handleStep = (field: 'count' | 'marks', increment: boolean) => {
     const currentValue = field === 'count' ? count : marks;
@@ -38,12 +49,48 @@ export function QuestionTypeRow({
     }
   };
 
+  const handleWandClick = async () => {
+    const questionText = window.prompt(
+      `Enter a brief description of what this ${type} question will test (e.g. 'Explain photosynthesis in detail' or 'State Ohm's Law and its mathematical derivation'):`
+    );
+    if (!questionText) return;
+
+    setIsGenerating(true);
+    try {
+      addToast('Generating rubric with AI...', 'success');
+      const response = await generateRubric(questionText, marks, subject || undefined, grade || undefined);
+      onUpdate('rubric', response);
+      addToast('Rubric generated successfully!', 'success');
+    } catch (err) {
+      console.error(err);
+      addToast('Failed to generate rubric. Please try again.', 'error');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleUpdateCriterion = (cIdx: number, field: string, value: any) => {
+    const updated = [...(rubric || [])];
+    updated[cIdx] = { ...updated[cIdx], [field]: value };
+    onUpdate('rubric', updated);
+  };
+
+  const handleDeleteCriterion = (cIdx: number) => {
+    const updated = (rubric || []).filter((_, i) => i !== cIdx);
+    onUpdate('rubric', updated.length > 0 ? updated : undefined);
+  };
+
+  const handleAddCriterion = () => {
+    const updated = [...(rubric || []), { label: 'New Criterion', marks: 1, description: 'Demonstrate...' }];
+    onUpdate('rubric', updated);
+  };
+
   return (
-    <>
+    <div className="flex flex-col gap-3.5 w-full bg-white/50 border border-gray-150/40 rounded-[28px] p-4 shadow-sm hover:shadow-md transition-all duration-200">
       {/* Desktop Row View */}
       <div className="hidden md:flex items-center justify-between w-full gap-4">
-        {/* Left Side: Select Dropdown & Remove Button */}
-        <div className="flex items-center gap-2 w-[443px] flex-shrink-0">
+        {/* Left Side: Select Dropdown, Remove & Wand Button */}
+        <div className="flex items-center gap-3.5 w-[443px] flex-shrink-0">
           <div 
             className="flex-1 h-[44px] px-4 bg-white rounded-full flex items-center justify-between relative"
             style={{ 
@@ -77,6 +124,23 @@ export function QuestionTypeRow({
               <X className="w-4 h-4" />
             </button>
           </div>
+
+          {/* Wand Icon for Rubric Auto-Builder */}
+          {['short', 'long'].includes(type) && (
+            <button
+              type="button"
+              onClick={handleWandClick}
+              disabled={isGenerating}
+              className="w-11 h-11 rounded-full flex items-center justify-center bg-purple-50 text-purple-650 hover:bg-purple-100 disabled:opacity-50 transition-all border border-purple-200/50 flex-shrink-0 active:scale-95 shadow-sm"
+              title="Auto-generate rubric with AI"
+            >
+              {isGenerating ? (
+                <Loader2 className="w-4 h-4 animate-spin text-purple-500" />
+              ) : (
+                <Wand2 className="w-4 h-4" />
+              )}
+            </button>
+          )}
         </div>
 
         {/* Right Side: No. of Questions & Marks Steppers */}
@@ -140,32 +204,50 @@ export function QuestionTypeRow({
       </div>
 
       {/* Mobile Card Row View */}
-      <div className="w-full p-4 bg-white border border-[#DADADA] rounded-[24px] flex flex-col gap-4 shadow-sm md:hidden">
-        {/* Top Row: Dropdown Select & Remove Button */}
-        <div className="flex items-center justify-between w-full h-[44px] px-4 bg-white rounded-full border border-[#DADADA] relative">
-          <select
-            value={type}
-            onChange={(e) => onUpdate('type', e.target.value as QuestionType)}
-            className="w-full h-full bg-transparent text-[14px] font-bold text-[#303030] outline-none cursor-pointer appearance-none pr-10 font-sans"
-          >
-            {QUESTION_TYPES.map((qt) => (
-              <option key={qt.value} value={qt.value}>
-                {qt.label}
-              </option>
-            ))}
-          </select>
-          <div className="absolute right-10 pointer-events-none text-black/40">
-            <svg width="10" height="6" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M1 1L6 6L11 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+      <div className="w-full flex flex-col gap-4 md:hidden">
+        {/* Top Row: Dropdown Select & Remove Button & Wand */}
+        <div className="flex items-center gap-2 w-full">
+          <div className="flex-1 flex items-center justify-between h-[44px] px-4 bg-white rounded-full border border-[#DADADA] relative">
+            <select
+              value={type}
+              onChange={(e) => onUpdate('type', e.target.value as QuestionType)}
+              className="w-full h-full bg-transparent text-[14px] font-bold text-[#303030] outline-none cursor-pointer appearance-none pr-10 font-sans"
+            >
+              {QUESTION_TYPES.map((qt) => (
+                <option key={qt.value} value={qt.value}>
+                  {qt.label}
+                </option>
+              ))}
+            </select>
+            <div className="absolute right-10 pointer-events-none text-black/40">
+              <svg width="10" height="6" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1 1L6 6L11 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+            <button
+              type="button"
+              onClick={onRemove}
+              className="absolute right-3 w-6 h-6 rounded-full flex items-center justify-center text-black/20"
+            >
+              <X className="w-4 h-4" />
+            </button>
           </div>
-          <button
-            type="button"
-            onClick={onRemove}
-            className="absolute right-3 w-6 h-6 rounded-full flex items-center justify-center text-black/20"
-          >
-            <X className="w-4 h-4" />
-          </button>
+
+          {['short', 'long'].includes(type) && (
+            <button
+              type="button"
+              onClick={handleWandClick}
+              disabled={isGenerating}
+              className="w-11 h-11 rounded-full flex items-center justify-center bg-purple-50 text-purple-650 hover:bg-purple-100 border border-purple-200/50 flex-shrink-0 active:scale-95 shadow-sm"
+              title="Auto-generate rubric with AI"
+            >
+              {isGenerating ? (
+                <Loader2 className="w-4 h-4 animate-spin text-purple-500" />
+              ) : (
+                <Wand2 className="w-4 h-4" />
+              )}
+            </button>
+          )}
         </div>
 
         {/* Bottom Row: Steppers */}
@@ -223,6 +305,92 @@ export function QuestionTypeRow({
           </div>
         </div>
       </div>
-    </>
+
+      {/* Rubric Auto-Builder Inline Table Editor */}
+      {rubric && rubric.length > 0 && (
+        <div className="w-full mt-2 pl-4 border-l-2 border-purple-400 py-1 transition-all duration-200">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-[12px] font-bold text-purple-700 tracking-wide uppercase font-sans">
+              Marking Rubric ({rubric.reduce((sum, c) => sum + c.marks, 0)} / {marks} Marks)
+            </span>
+            <button
+              type="button"
+              onClick={() => onUpdate('rubric', undefined)}
+              className="text-[11px] font-medium text-red-500 hover:text-red-700 transition-colors font-sans"
+            >
+              Clear Rubric
+            </button>
+          </div>
+          <div className="overflow-x-auto rounded-2xl border border-gray-200 bg-gray-50/50">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-gray-100/80 border-b border-gray-200 text-[12px] font-bold text-[#303030]">
+                  <th className="px-4 py-2 font-sans w-1/4">Criterion</th>
+                  <th className="px-4 py-2 font-sans w-20 text-center">Marks</th>
+                  <th className="px-4 py-2 font-sans">Description</th>
+                  <th className="px-2 py-2 text-center w-10"></th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-250/30 text-[13px]">
+                {rubric.map((criterion, cIdx) => (
+                  <tr key={cIdx} className="hover:bg-white transition-colors">
+                    <td className="px-3 py-2">
+                      <input
+                        type="text"
+                        value={criterion.label}
+                        onChange={(e) => handleUpdateCriterion(cIdx, 'label', e.target.value)}
+                        className="w-full px-2 py-1 bg-transparent hover:bg-gray-100 focus:bg-white focus:ring-1 focus:ring-purple-400 rounded outline-none font-semibold text-[#303030] font-sans"
+                        placeholder="Criterion"
+                      />
+                    </td>
+                    <td className="px-3 py-2 text-center">
+                      <input
+                        type="number"
+                        min="0"
+                        value={criterion.marks}
+                        onChange={(e) => handleUpdateCriterion(cIdx, 'marks', parseInt(e.target.value) || 0)}
+                        className="w-12 px-1 py-1 text-center bg-transparent hover:bg-gray-100 focus:bg-white focus:ring-1 focus:ring-purple-400 rounded outline-none font-bold text-[#303030] font-sans"
+                      />
+                    </td>
+                    <td className="px-3 py-2">
+                      <input
+                        type="text"
+                        value={criterion.description}
+                        onChange={(e) => handleUpdateCriterion(cIdx, 'description', e.target.value)}
+                        className="w-full px-2 py-1 bg-transparent hover:bg-gray-100 focus:bg-white focus:ring-1 focus:ring-purple-400 rounded outline-none text-[#5E5E5E] font-sans"
+                        placeholder="Criteria description"
+                      />
+                    </td>
+                    <td className="px-2 py-2 text-center">
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteCriterion(cIdx)}
+                        className="text-red-400 hover:text-red-650 transition-colors text-[16px]"
+                      >
+                        ✕
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="flex items-center gap-3 mt-2">
+            <button
+              type="button"
+              onClick={handleAddCriterion}
+              className="text-[12px] font-bold text-purple-600 hover:text-purple-800 transition-colors font-sans"
+            >
+              + Add Criterion
+            </button>
+          </div>
+          {rubric.reduce((sum, c) => sum + c.marks, 0) !== marks && (
+            <p className="mt-1.5 text-[11px] text-amber-600 font-medium font-sans">
+              ⚠️ Warning: Sum of criteria marks ({rubric.reduce((sum, c) => sum + c.marks, 0)}) does not equal total marks ({marks}).
+            </p>
+          )}
+        </div>
+      )}
+    </div>
   );
 }

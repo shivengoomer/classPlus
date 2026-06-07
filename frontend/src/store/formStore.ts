@@ -6,6 +6,7 @@ export interface QuestionConfigRow {
   type: QuestionType;
   count: number;
   marks: number;
+  rubric?: { label: string; marks: number; description: string }[];
 }
 
 interface FormState {
@@ -25,7 +26,7 @@ interface FormState {
   setDueDate: (d: string) => void;
   addRow: () => void;
   removeRow: (index: number) => void;
-  updateRow: (index: number, field: 'type' | 'count' | 'marks', value: QuestionType | number) => void;
+  updateRow: (index: number, field: 'type' | 'count' | 'marks' | 'rubric', value: any) => void;
   setInstructions: (s: string) => void;
   reset: () => void;
 }

@@ -8,6 +8,7 @@ import assignmentRoutes from './routes/assignment.routes';
 import libraryRoutes from './routes/library.routes';
 import notificationRoutes from './routes/notification.routes';
 import userRoutes from './routes/user.routes';
+import rubricRoutes from './routes/rubric.routes';
 
 const app = express();
 
@@ -36,6 +37,9 @@ app.use('/api/notifications', notificationRoutes);
 
 // user routes under /api/users
 app.use('/api/users', userRoutes);
+
+// rubric routes under /api/rubrics
+app.use('/api/rubrics', rubricRoutes);
 
 // global error handler
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

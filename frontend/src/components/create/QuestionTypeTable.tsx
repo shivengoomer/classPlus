@@ -11,7 +11,7 @@ interface QuestionTypeTableProps {
   rows: QuestionConfigRow[];
   onAddRow: () => void;
   onRemoveRow: (index: number) => void;
-  onUpdateRow: (index: number, field: 'type' | 'count' | 'marks', value: QuestionType | number) => void;
+  onUpdateRow: (index: number, field: 'type' | 'count' | 'marks' | 'rubric', value: any) => void;
 }
 
 export function QuestionTypeTable({
@@ -38,6 +38,7 @@ export function QuestionTypeTable({
             type={row.type}
             count={row.count}
             marks={row.marks}
+            rubric={row.rubric}
             onUpdate={(field, value) => onUpdateRow(index, field, value)}
             onRemove={() => onRemoveRow(index)}
           />

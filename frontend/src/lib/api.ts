@@ -284,3 +284,21 @@ export async function upgradeUserPlan(plan: string): Promise<UserProfile> {
   if (!res.ok) throw new Error('Failed to upgrade plan');
   return res.json();
 }
+
+export async function generateRubric(
+  questionText: string,
+  totalMarks: number,
+  subject?: string,
+  grade?: string
+): Promise<{ label: string; marks: number; description: string }[]> {
+  const res = await authFetch(`${BASE_URL}/rubrics/generate`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ questionText, totalMarks, subject, grade }),
+  });
+  if (!res.ok) throw new Error('Failed to generate rubric');
+  return res.json();
+}
+
