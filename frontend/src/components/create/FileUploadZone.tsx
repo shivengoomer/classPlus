@@ -284,7 +284,7 @@ export function FileUploadZone({
             {/* Modal Header */}
             <div className="flex items-center justify-between border-b border-gray-100 pb-4">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-50 to-orange-100/50 border border-orange-100 flex items-center justify-center text-veda-orange shadow-sm flex-shrink-0">
+                <div className="w-12 h-12 rounded-2xl bg-[#10375C]/10 border border-[#10375C]/20 flex items-center justify-center text-[#10375C] shadow-sm flex-shrink-0">
                   <BookOpen className="w-6 h-6" />
                 </div>
                 <div className="flex flex-col min-w-0">
@@ -338,7 +338,7 @@ export function FileUploadZone({
                     onClick={() => setSelectedCategory(null)}
                     className={`px-3 py-1.5 rounded-full text-[11px] font-bold transition-all border whitespace-nowrap ${
                       selectedCategory === null
-                        ? 'bg-gradient-to-r from-veda-orange to-red-500 text-white border-transparent shadow-sm'
+                        ? 'bg-[#10375C] text-white border-transparent shadow-sm'
                         : 'bg-gray-50 text-gray-500 border-gray-150 hover:bg-gray-100'
                     }`}
                   >
@@ -351,7 +351,7 @@ export function FileUploadZone({
                       onClick={() => setSelectedCategory(cat)}
                       className={`px-3 py-1.5 rounded-full text-[11px] font-bold transition-all border whitespace-nowrap capitalize ${
                         selectedCategory === cat
-                          ? 'bg-gradient-to-r from-veda-orange to-red-500 text-white border-transparent shadow-sm'
+                          ? 'bg-[#10375C] text-white border-transparent shadow-sm'
                           : 'bg-gray-50 text-gray-500 border-gray-150 hover:bg-gray-100'
                       }`}
                     >

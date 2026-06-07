@@ -4,6 +4,7 @@
 import React from 'react';
 import { Sparkles, MessageSquare, Send } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { Logo } from '@/components/shared/Logo';
 
 export default function Footer() {
   const router = useRouter();
@@ -23,15 +24,13 @@ export default function Footer() {
             onClick={() => router.push('/')} 
             className="flex items-center gap-2 cursor-pointer group self-start"
           >
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-orange-500 to-amber-500 flex items-center justify-center shadow-md shadow-orange-500/10">
-              <Sparkles className="w-4 h-4 text-white" />
-            </div>
-            <span className="font-sans font-bold text-lg text-slate-900 group-hover:text-orange-500 transition-colors">
-              VedAI
+            <Logo className="w-8 h-8 group-hover:scale-105 transition-transform" />
+            <span className="font-sans font-bold text-lg text-slate-900 group-hover:text-[#10375C] transition-colors">
+              ClassPilot
             </span>
           </div>
           <p className="text-slate-550 text-xs leading-relaxed max-w-sm">
-            VedAI is an advanced, curriculum-aligned artificial intelligence assistant built to help teachers design assignments, auto-evaluate student works, and build intelligent learning paths.
+            ClassPilot is an advanced, curriculum-aligned artificial intelligence assistant built to help teachers design assignments, auto-evaluate student works, and build intelligent learning paths.
           </p>
           
           {/* Social icons */}
@@ -99,7 +98,7 @@ export default function Footer() {
               placeholder="Your email" 
               className="bg-transparent border-0 outline-none text-xs text-slate-800 placeholder-slate-400 w-full px-2 py-1"
             />
-            <button className="w-8 h-8 rounded-lg bg-orange-500 hover:bg-orange-600 text-white flex items-center justify-center transition-colors shadow-sm shadow-orange-500/10">
+            <button className="w-8 h-8 rounded-lg bg-[#10375C] hover:bg-[#0d2f4f] text-white flex items-center justify-center transition-colors shadow-sm shadow-[#10375C]/10">
               <Send className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -110,7 +109,7 @@ export default function Footer() {
       {/* Sub Footer */}
       <div className="max-w-6xl mx-auto border-t border-slate-100 mt-16 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
         <span className="text-[10px] text-slate-400">
-          © {new Date().getFullYear()} VedAI Inc. All rights reserved. Designed for startup environments.
+          © {new Date().getFullYear()} ClassPilot Inc. All rights reserved.
         </span>
         <div className="flex gap-4">
           {legalLinks.map((link) => (

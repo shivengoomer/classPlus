@@ -10,6 +10,7 @@ import {
   Brain, FileSpreadsheet, ArrowRight, Star, Laptop, Phone,
   Compass, Award, RefreshCw, Layers
 } from 'lucide-react';
+import { Logo } from '@/components/shared/Logo';
 
 interface DropdownItem {
   icon: React.ReactNode;
@@ -68,7 +69,7 @@ export default function Navbar() {
     ],
     Contact: [
       { icon: <Mail className="w-5 h-5 text-blue-500" />, title: 'Tech Support', desc: '24/7 dedicated helpdesk assistance' },
-      { icon: <Award className="w-5 h-5 text-amber-500" />, title: 'School Partnership', desc: 'Pilot VedAI in your school district' },
+      { icon: <Award className="w-5 h-5 text-[#10375C]" />, title: 'School Partnership', desc: 'Pilot ClassPilot in your school district' },
       { icon: <MessageSquare className="w-5 h-5 text-purple-500" />, title: 'Schedule Demo', desc: '1-on-1 walkthrough with an expert' }
     ]
   };
@@ -79,7 +80,7 @@ export default function Navbar() {
       onMouseLeave={handleMouseLeave}
     >
       <motion.nav 
-        className="w-full rounded-[24px] border border-slate-200 bg-white/70 backdrop-blur-xl shadow-lg shadow-slate-200/40 overflow-hidden"
+        className="w-full rounded-[24px] border border-slate-200/60 bg-white/85 backdrop-blur-2xl shadow-xl shadow-slate-200/50 overflow-hidden"
         animate={{
           height: hoveredTab ? 'auto' : '64px'
         }}
@@ -95,11 +96,9 @@ export default function Navbar() {
             onClick={() => router.push('/')} 
             className="flex items-center gap-2 cursor-pointer group"
           >
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-orange-500 to-amber-500 flex items-center justify-center shadow-md shadow-orange-500/20 group-hover:scale-105 transition-transform">
-              <Sparkles className="w-4 h-4 text-white" />
-            </div>
-            <span className="font-bold text-lg tracking-tight text-slate-900 group-hover:text-orange-500 transition-colors">
-              VedAI
+            <Logo className="w-8 h-8 group-hover:scale-105 transition-transform" />
+            <span className="font-bold text-lg tracking-tight text-slate-900 group-hover:text-[#10375C] transition-colors">
+              ClassPilot
             </span>
           </div>
 
@@ -131,7 +130,7 @@ export default function Navbar() {
               </button>
               <button
                 onClick={() => router.push('/sign-up')}
-                className="px-4 py-2 rounded-full text-xs font-semibold bg-slate-950 hover:bg-slate-800 text-white shadow-md shadow-slate-900/10 hover:shadow-slate-900/20 active:scale-95 transition-all"
+                className="px-4 py-2 rounded-full text-xs font-semibold bg-[#10375C] hover:bg-[#0d2f4f] text-white shadow-md shadow-[#10375C]/20 hover:shadow-[#10375C]/30 active:scale-95 transition-all"
               >
                 Get Started Free
               </button>
@@ -173,11 +172,11 @@ export default function Navbar() {
                     </div>
                     <div className="flex flex-col gap-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-semibold text-slate-800 group-hover:text-orange-500 transition-colors">
+                        <span className="text-sm font-semibold text-slate-800 group-hover:text-[#10375C] transition-colors">
                           {item.title}
                         </span>
                         {item.badge && (
-                          <span className="text-[10px] font-bold text-orange-600 bg-orange-500/10 px-1.5 py-0.5 rounded-full border border-orange-500/20 uppercase tracking-wider">
+                          <span className="text-[10px] font-bold text-[#10375C] bg-[#10375C]/10 px-1.5 py-0.5 rounded-full border border-[#10375C]/20 uppercase tracking-wider">
                             {item.badge}
                           </span>
                         )}

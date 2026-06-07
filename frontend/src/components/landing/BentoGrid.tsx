@@ -16,14 +16,14 @@ export default function BentoGrid() {
     <section className="py-24 px-6 max-w-6xl mx-auto z-10 relative font-sans">
       {/* Section Header */}
       <div className="text-center flex flex-col items-center gap-4 mb-16">
-        <div className="px-3 py-1 rounded-full bg-orange-500/10 text-orange-600 border border-orange-500/20 text-xs font-semibold tracking-wider uppercase flex items-center gap-1.5">
-          <Zap className="w-3 h-3 text-orange-600" /> Core Capabilities
+        <div className="px-3 py-1 rounded-full bg-[#10375C]/10 text-[#10375C] border border-[#10375C]/20 text-xs font-semibold tracking-wider uppercase flex items-center gap-1.5">
+          <Zap className="w-3 h-3 text-[#10375C]" /> Core Capabilities
         </div>
         <h2 className="text-3xl md:text-5xl font-bold text-slate-900 tracking-tight">
           Supercharge the Way You Teach
         </h2>
         <p className="text-slate-500 max-w-xl text-sm md:text-base leading-relaxed">
-          VedAI integrates class creation, intelligent question templates, auto-evaluation, and gap mapping in a single workspace.
+          ClassPilot integrates class creation, intelligent question templates, auto-evaluation, and gap mapping in a single workspace.
         </p>
       </div>
 
@@ -31,23 +31,23 @@ export default function BentoGrid() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         
         {/* Card 1: Intelligent Assignment Generator (Col Span 2) */}
-        <div className="md:col-span-2 rounded-3xl bg-white/60 backdrop-blur-md border border-slate-200/80 p-6 md:p-8 flex flex-col justify-between hover:border-orange-500/30 shadow-md shadow-slate-100/50 transition-all group relative overflow-hidden">
+        <div className="md:col-span-2 rounded-3xl bg-white/60 backdrop-blur-md border border-slate-200/80 p-6 md:p-8 flex flex-col justify-between hover:border-[#10375C]/30 shadow-md shadow-slate-100/50 transition-all group relative overflow-hidden">
           {/* Subtle background glow */}
-          <div className="absolute -top-[10%] -left-[10%] w-[30%] h-[30%] bg-orange-500/5 rounded-full blur-3xl group-hover:bg-orange-500/10 transition-all" />
+          <div className="absolute -top-[10%] -left-[10%] w-[30%] h-[30%] bg-[#10375C]/5 rounded-full blur-3xl group-hover:bg-[#10375C]/10 transition-all" />
           
           <div className="flex flex-col gap-4 relative z-10">
             <div className="flex justify-between items-start">
-              <div className="p-3 rounded-2xl bg-orange-500/10 border border-orange-500/20 text-orange-600">
+              <div className="p-3 rounded-2xl bg-[#10375C]/10 border border-[#10375C]/20 text-[#10375C]">
                 <ClipboardList className="w-6 h-6" />
               </div>
-              <span className="text-[10px] font-bold text-orange-600 uppercase tracking-widest bg-orange-500/15 border border-orange-500/20 px-2 py-0.5 rounded">
+              <span className="text-[10px] font-bold text-[#10375C] uppercase tracking-widest bg-[#10375C]/15 border border-[#10375C]/20 px-2 py-0.5 rounded">
                 AI Generator
               </span>
             </div>
             
             <div className="mt-4">
-              <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2 group-hover:text-orange-600 transition-colors">
-                Smart Assessment Composer <ArrowUpRight className="w-4 h-4 text-slate-400 group-hover:text-orange-600 transition-colors" />
+              <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2 group-hover:text-[#10375C] transition-colors">
+                Smart Assessment Composer <ArrowUpRight className="w-4 h-4 text-slate-400 group-hover:text-[#10375C] transition-colors" />
               </h3>
               <p className="text-slate-500 text-xs md:text-sm mt-2 leading-relaxed max-w-md">
                 Design custom, curriculum-aligned homework sheets, assessments, and quizzes. Select Grade, Subject, and prompt AI to write balanced worksheets.
@@ -86,7 +86,7 @@ export default function BentoGrid() {
                     onClick={() => setActiveQuestionType(type)}
                     className={`px-2 py-0.5 rounded text-[8px] font-bold transition-all ${
                       activeQuestionType === type 
-                        ? 'bg-orange-500 text-white shadow-sm shadow-orange-500/20' 
+                        ? 'bg-[#10375C] text-white shadow-sm shadow-[#10375C]/20' 
                         : 'bg-white border border-slate-200 text-slate-500 hover:text-slate-800'
                     }`}
                   >
@@ -94,7 +94,7 @@ export default function BentoGrid() {
                   </button>
                 ))}
               </div>
-              <button className="px-3 py-1 rounded bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400 text-white font-bold text-[9px] flex items-center gap-1 transition-all active:scale-95 shadow-sm shadow-orange-500/10">
+              <button className="px-3 py-1 rounded bg-[#10375C] hover:bg-[#0d2f4f] text-white font-bold text-[9px] flex items-center gap-1 transition-all active:scale-95 shadow-sm shadow-[#10375C]/10">
                 <Sparkles className="w-2.5 h-2.5" /> Generate Worksheet
               </button>
             </div>
@@ -102,15 +102,15 @@ export default function BentoGrid() {
         </div>
 
         {/* Card 2: Automatic Grading Engine (Col Span 1) */}
-        <div className="rounded-3xl bg-white/60 backdrop-blur-md border border-slate-200/80 p-6 md:p-8 flex flex-col justify-between hover:border-orange-500/30 shadow-md shadow-slate-100/50 transition-all group relative overflow-hidden">
-          <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-orange-500/5 rounded-full blur-3xl group-hover:bg-orange-500/10 transition-all" />
+        <div className="rounded-3xl bg-white/60 backdrop-blur-md border border-slate-200/80 p-6 md:p-8 flex flex-col justify-between hover:border-[#10375C]/30 shadow-md shadow-slate-100/50 transition-all group relative overflow-hidden">
+          <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-[#10375C]/5 rounded-full blur-3xl group-hover:bg-[#10375C]/10 transition-all" />
 
           <div className="flex flex-col gap-4 relative z-10">
-            <div className="p-3 rounded-2xl bg-orange-500/10 border border-orange-500/20 text-orange-600 self-start">
+            <div className="p-3 rounded-2xl bg-[#10375C]/10 border border-[#10375C]/20 text-[#10375C] self-start">
               <Zap className="w-6 h-6" />
             </div>
             <div className="mt-4">
-              <h3 className="text-xl font-bold text-slate-900 group-hover:text-orange-600 transition-colors">
+              <h3 className="text-xl font-bold text-slate-900 group-hover:text-[#10375C] transition-colors">
                 Instant Auto-Grading
               </h3>
               <p className="text-slate-500 text-xs md:text-sm mt-2 leading-relaxed">
@@ -123,11 +123,11 @@ export default function BentoGrid() {
           <div className="mt-8 rounded-2xl bg-[#F8FAFC] border border-slate-200 p-4 flex flex-col gap-3 relative z-10">
             <div className="flex items-center justify-between border-b border-slate-200 pb-2">
               <span className="text-[9px] text-slate-400 font-bold">Grading Progress</span>
-              <span className="text-[9px] font-bold text-orange-600">78% Complete</span>
+              <span className="text-[9px] font-bold text-[#10375C]">78% Complete</span>
             </div>
             <div className="w-full bg-slate-100 border border-slate-200/50 h-2.5 rounded-full p-0.5 overflow-hidden shadow-inner">
               <motion.div 
-                className="bg-gradient-to-r from-orange-500 to-amber-500 h-full rounded-full"
+                className="bg-[#10375C] h-full rounded-full"
                 animate={{ width: `${gradingProgress}%` }}
                 transition={{ duration: 1.5, repeat: Infinity, repeatType: 'reverse' }}
               />
@@ -165,7 +165,7 @@ export default function BentoGrid() {
             <div className="bg-white rounded-lg p-2 text-[8px] leading-relaxed border border-slate-200 shadow-sm text-slate-700">
               <span className="font-bold text-pink-600">Tutor:</span> What is the capital of France? 🇫🇷
             </div>
-            <div className="bg-orange-500 rounded-lg p-2 text-[8px] leading-relaxed text-white self-end shadow-sm shadow-orange-500/10">
+            <div className="bg-[#10375C] rounded-lg p-2 text-[8px] leading-relaxed text-white self-end shadow-sm shadow-[#10375C]/10">
               It&apos;s Paris!
             </div>
             <div className="bg-white rounded-lg p-2 text-[8px] leading-relaxed border border-slate-200 shadow-sm text-slate-700">
@@ -213,7 +213,7 @@ export default function BentoGrid() {
                   <span className="text-slate-750 font-bold">88% Mastery</span>
                 </div>
                 <div className="w-full bg-slate-100 border border-slate-200/50 h-2 rounded-full p-0.5 overflow-hidden shadow-inner">
-                  <div className="bg-gradient-to-r from-orange-500 to-amber-500 h-full rounded-full w-[88%]" />
+                  <div className="bg-[#10375C] h-full rounded-full w-[88%]" />
                 </div>
               </div>
               <div>
@@ -222,7 +222,7 @@ export default function BentoGrid() {
                   <span className="text-slate-750 font-bold">64% Mastery (Action Required)</span>
                 </div>
                 <div className="w-full bg-slate-100 border border-slate-200/50 h-2 rounded-full p-0.5 overflow-hidden shadow-inner">
-                  <div className="bg-gradient-to-r from-orange-500 to-amber-500 h-full rounded-full w-[64%]" />
+                  <div className="bg-[#10375C] h-full rounded-full w-[64%]" />
                 </div>
               </div>
               <div>
@@ -231,7 +231,7 @@ export default function BentoGrid() {
                   <span className="text-slate-750 font-bold">92% Mastery</span>
                 </div>
                 <div className="w-full bg-slate-100 border border-slate-200/50 h-2 rounded-full p-0.5 overflow-hidden shadow-inner">
-                  <div className="bg-gradient-to-r from-orange-500 to-amber-500 h-full rounded-full w-[92%]" />
+                  <div className="bg-[#10375C] h-full rounded-full w-[92%]" />
                 </div>
               </div>
             </div>

@@ -10,6 +10,7 @@ import { listAssignments, listLibraryItems, setGlobalToken } from '@/lib/api';
 import { UserButton, useAuth } from '@clerk/nextjs';
 import { useProfileStore } from '@/store/profileStore';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Logo } from '@/components/shared/Logo';
 
 interface SidebarProps {
   isExpanded: boolean;
@@ -96,9 +97,8 @@ export function Sidebar({
       {/* Brand Header Pill */}
       <div className={`w-full bg-white/80 backdrop-blur-md border border-white/60 rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.015)] h-[50px] flex items-center justify-between ${isOpen ? 'px-4' : 'px-3'} flex-shrink-0 relative`}>
         <div className={`flex items-center gap-2.5 min-w-0 ${!isOpen ? 'mx-auto' : ''}`}>
-          {/* Logo Icon */}
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-orange-500 to-amber-500 flex items-center justify-center shadow-md shadow-orange-500/10 flex-shrink-0">
-            <Sparkles className="w-4 h-4 text-white" />
+          <div className="w-8 h-8 rounded-xl bg-slate-100/80 border border-slate-200/50 flex items-center justify-center shadow-sm flex-shrink-0">
+            <Logo className="w-5 h-5" />
           </div>
           
           {/* Animated Brand Text */}
@@ -112,7 +112,7 @@ export function Sidebar({
                 className="flex flex-col min-w-0"
               >
                 <span className="text-md font-black tracking-tight text-slate-900 font-sans leading-none">
-                  Ved<span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-amber-500">AI</span>
+                  ClassPilot
                 </span>
                 <span className="text-[8px] text-slate-400 font-bold uppercase tracking-wider mt-0.5 whitespace-nowrap">SaaS Workspace</span>
               </motion.div>
@@ -141,7 +141,7 @@ export function Sidebar({
           {isOpen ? (
             <button
               onClick={() => router.push('/create')}
-              className="w-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-bold text-xs tracking-wide shadow-md shadow-orange-500/10 active:scale-95 transition-all rounded-xl py-2.5 px-3 flex items-center justify-center gap-2 cursor-pointer border-0"
+              className="w-full bg-[#10375C] hover:bg-[#0d2f4f] text-white font-bold text-xs tracking-wide shadow-md shadow-[#10375C]/20 active:scale-95 transition-all rounded-xl py-2.5 px-3 flex items-center justify-center gap-2 cursor-pointer border-0"
             >
               <Sparkles className="w-3.5 h-3.5" />
               <span>Create Assessment</span>
@@ -149,7 +149,7 @@ export function Sidebar({
           ) : (
             <button
               onClick={() => router.push('/create')}
-              className="w-10 h-10 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white flex items-center justify-center shadow-md shadow-orange-500/10 active:scale-95 transition-all rounded-xl cursor-pointer border-0"
+              className="w-10 h-10 bg-[#10375C] hover:bg-[#0d2f4f] text-white flex items-center justify-center shadow-md shadow-[#10375C]/20 active:scale-95 transition-all rounded-xl cursor-pointer border-0"
               title="Create Assessment"
             >
               <Sparkles className="w-4 h-4" />
@@ -170,12 +170,12 @@ export function Sidebar({
                 href={item.path}
                 className={`flex items-center rounded-xl text-xs font-bold transition-all border relative ${
                   isActive
-                    ? 'bg-orange-500/10 text-orange-600 border-orange-500/10'
+                    ? 'bg-[#10375C]/10 text-[#10375C] border-[#10375C]/15'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/40 border-transparent'
                 } ${isOpen ? 'w-full py-2 px-3 justify-start gap-2.5' : 'w-10 h-10 justify-center'}`}
                 title={isOpen ? undefined : item.label}
               >
-                <span className={isActive ? 'text-orange-600' : 'text-slate-500'}>
+                <span className={isActive ? 'text-[#10375C]' : 'text-slate-500'}>
                   {item.icon}
                 </span>
                 
@@ -196,13 +196,13 @@ export function Sidebar({
                     <motion.span 
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: 1, scale: 1 }}
-                      className="ml-auto text-white text-[9px] font-black bg-orange-500 border border-orange-400/20 px-1.5 py-0.5 rounded-full min-w-5 h-5 flex items-center justify-center shadow-sm"
+                      className="ml-auto text-white text-[9px] font-black bg-[#10375C] border border-[#10375C]/20 px-1.5 py-0.5 rounded-full min-w-5 h-5 flex items-center justify-center shadow-sm"
                     >
                       {badgeValue}
                     </motion.span>
                   ) : (
-                    /* Red Dot indicator when collapsed */
-                    <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-orange-500 border border-white" />
+                    /* Dot indicator when collapsed */
+                    <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#10375C] border border-white" />
                   )
                 )}
               </Link>
@@ -219,12 +219,12 @@ export function Sidebar({
           href="/settings"
           className={`flex items-center rounded-xl text-xs font-bold transition-all border ${
             pathname.startsWith('/settings')
-              ? 'bg-orange-500/10 text-orange-600 border-orange-500/10'
+              ? 'bg-[#10375C]/10 text-[#10375C] border-[#10375C]/15'
               : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/40 border-transparent'
           } ${isOpen ? 'w-full py-2 px-3 gap-2.5 justify-start' : 'w-10 h-10 justify-center'}`}
           title={isOpen ? undefined : "Settings"}
         >
-          <Settings className={`w-4.5 h-4.5 flex-shrink-0 ${pathname.startsWith('/settings') ? 'text-orange-600' : 'text-slate-500'}`} />
+          <Settings className={`w-4.5 h-4.5 flex-shrink-0 ${pathname.startsWith('/settings') ? 'text-[#10375C]' : 'text-slate-500'}`} />
           {isOpen && (
             <motion.span
               initial={{ opacity: 0 }}
@@ -246,14 +246,14 @@ export function Sidebar({
           >
             <div className="flex items-center justify-between text-[10px] font-bold text-slate-500">
               <span className="flex items-center gap-1">
-                <Sparkles className="w-3 h-3 text-orange-500" />
+                <Sparkles className="w-3 h-3 text-[#10375C]" />
                 <span>AI Credits</span>
               </span>
               <span>{profile.creditsUsed ?? 0}/{profile.creditsLimit ?? 10}</span>
             </div>
             <div className="w-full h-1 bg-slate-200/50 rounded-full overflow-hidden">
               <div 
-                className="h-full bg-gradient-to-r from-orange-500 to-amber-500 transition-all duration-500"
+                className="h-full bg-[#10375C] transition-all duration-500"
                 style={{ width: `${Math.min(((profile.creditsUsed ?? 0) / (profile.creditsLimit ?? 10)) * 100, 100)}%` }}
               />
             </div>

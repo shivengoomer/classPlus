@@ -12,6 +12,8 @@ export interface Question {
   marks: number;
   options?: string[];
   answer?: string;
+  conceptTag?: string;
+  rubric?: { label: string; marks: number; description: string }[];
 }
 
 export interface Section {

@@ -19,7 +19,7 @@ export function TopLoadingBar() {
   return (
     <div className="fixed top-0 left-0 right-0 z-[10000] h-1 pointer-events-none">
       <div 
-        className="h-full bg-gradient-to-r from-veda-orange to-red-500 animate-loading-bar"
+        className="h-full bg-[#10375C] animate-loading-bar"
         style={{ width: '100%' }}
       />
       <style jsx>{`

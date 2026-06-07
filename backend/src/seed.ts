@@ -8,6 +8,10 @@ dotenv.config();
 import mongoose from 'mongoose';
 import { Assignment } from './models/assignment.model';
 import { LibraryItem } from './models/library.model';
+import { Group } from './models/group.model';
+import { AssignedAssignment } from './models/assignedAssignment.model';
+import { StudentSubmission } from './models/studentSubmission.model';
+import { Template } from './models/template.model';
 import { env } from './config/env';
 
 const seedData = [
@@ -46,6 +50,7 @@ const seedData = [
               type: 'short',
               difficulty: 'easy',
               marks: 2,
+              conceptTag: 'Electroplating',
             },
             {
               id: 'q2',
@@ -53,6 +58,7 @@ const seedData = [
               type: 'short',
               difficulty: 'moderate',
               marks: 2,
+              conceptTag: 'Electrolysis',
             },
             {
               id: 'q3',
@@ -60,6 +66,7 @@ const seedData = [
               type: 'short',
               difficulty: 'challenging',
               marks: 2,
+              conceptTag: 'Electrolysis',
             },
           ],
         },
@@ -78,6 +85,7 @@ const seedData = [
               marks: 1,
               options: ['Distilled water', 'Lemon juice', 'Honey', 'Vegetable oil'],
               answer: 'Lemon juice',
+              conceptTag: 'Conductors and Insulators',
             },
           ],
         },
@@ -141,6 +149,7 @@ const seedData = [
               type: 'fillblank',
               difficulty: 'easy',
               marks: 1,
+              conceptTag: 'Prepositions',
             },
             {
               id: 'eng-q2',
@@ -148,6 +157,7 @@ const seedData = [
               type: 'fillblank',
               difficulty: 'moderate',
               marks: 1,
+              conceptTag: 'Prepositions',
             },
             {
               id: 'eng-q3',
@@ -155,6 +165,7 @@ const seedData = [
               type: 'fillblank',
               difficulty: 'challenging',
               marks: 1,
+              conceptTag: 'Prepositions',
             },
           ],
         },
@@ -171,6 +182,7 @@ const seedData = [
               type: 'long',
               difficulty: 'moderate',
               marks: 5,
+              conceptTag: 'Creative Writing',
             },
           ],
         },
@@ -223,6 +235,7 @@ const seedData = [
               type: 'short',
               difficulty: 'easy',
               marks: 3,
+              conceptTag: 'Linear Equations',
             },
             {
               id: 'math-q2',
@@ -230,6 +243,7 @@ const seedData = [
               type: 'short',
               difficulty: 'easy',
               marks: 3,
+              conceptTag: 'Slope-Intercept Form',
             },
             {
               id: 'math-q3',
@@ -237,6 +251,7 @@ const seedData = [
               type: 'short',
               difficulty: 'moderate',
               marks: 3,
+              conceptTag: 'Linear Equations',
             },
             {
               id: 'math-q4',
@@ -244,6 +259,7 @@ const seedData = [
               type: 'short',
               difficulty: 'moderate',
               marks: 3,
+              conceptTag: 'Linear Equations',
             },
             {
               id: 'math-q5',
@@ -251,6 +267,7 @@ const seedData = [
               type: 'short',
               difficulty: 'challenging',
               marks: 3,
+              conceptTag: 'Coordinate Geometry',
             },
           ],
         },
@@ -267,6 +284,7 @@ const seedData = [
               type: 'long',
               difficulty: 'moderate',
               marks: 5,
+              conceptTag: 'Word Problems',
             },
             {
               id: 'math-q7',
@@ -274,6 +292,7 @@ const seedData = [
               type: 'long',
               difficulty: 'challenging',
               marks: 5,
+              conceptTag: 'Graphing Linear Equations',
             },
           ],
         },
@@ -319,11 +338,11 @@ const seedData = [
           instruction: 'सही विकल्प चुनिए। प्रत्येक प्रश्न 1 अंक का है।',
           totalMarks: 5,
           questions: [
-            { id: 'hi-q1', text: '"सुन्दर" शब्द कौन-सा विशेषण है?', type: 'mcq', difficulty: 'easy', marks: 1, options: ['गुणवाचक', 'संख्यावाचक', 'परिमाणवाचक', 'सार्वनामिक'], answer: 'गुणवाचक' },
-            { id: 'hi-q2', text: '"वह खाना खा रहा है" — इसमें क्रिया शब्द कौन-सा है?', type: 'mcq', difficulty: 'easy', marks: 1, options: ['वह', 'खाना', 'खा रहा है', 'है'], answer: 'खा रहा है' },
-            { id: 'hi-q3', text: '"पाँच" किस प्रकार का विशेषण है?', type: 'mcq', difficulty: 'moderate', marks: 1, options: ['गुणवाचक', 'संख्यावाचक', 'परिमाणवाचक', 'सार्वनामिक'], answer: 'संख्यावाचक' },
-            { id: 'hi-q4', text: 'अकर्मक क्रिया का उदाहरण है:', type: 'mcq', difficulty: 'moderate', marks: 1, options: ['वह पढ़ता है', 'वह सोता है', 'वह खाना खाता है', 'वह पत्र लिखता है'], answer: 'वह सोता है' },
-            { id: 'hi-q5', text: '"बहुत" शब्द कौन-सा विशेषण है?', type: 'mcq', difficulty: 'challenging', marks: 1, options: ['गुणवाचक', 'संख्यावाचक', 'परिमाणवाचक', 'सार्वनामिक'], answer: 'परिमाणवाचक' },
+            { id: 'hi-q1', text: '"सुन्दर" शब्द कौन-सा विशेषण है?', type: 'mcq', difficulty: 'easy', marks: 1, options: ['गुणवाचक', 'संख्यावाचक', 'परिमाणवाचक', 'सार्वनामिक'], answer: 'गुणवाचक', conceptTag: 'विशेषण' },
+            { id: 'hi-q2', text: '"वह खाना खा रहा है" — इसमें क्रिया शब्द कौन-सा है?', type: 'mcq', difficulty: 'easy', marks: 1, options: ['वह', 'खाना', 'खा रहा है', 'है'], answer: 'खा रहा है', conceptTag: 'क्रिया' },
+            { id: 'hi-q3', text: '"पाँच" किस प्रकार का विशेषण है?', type: 'mcq', difficulty: 'moderate', marks: 1, options: ['गुणवाचक', 'संख्यावाचक', 'परिमाणवाचक', 'सार्वनामिक'], answer: 'संख्यावाचक', conceptTag: 'विशेषण' },
+            { id: 'hi-q4', text: 'अकर्मक क्रिया का उदाहरण है:', type: 'mcq', difficulty: 'moderate', marks: 1, options: ['वह पढ़ता है', 'वह सोता है', 'वह खाना खाता है', 'वह पत्र लिखता है'], answer: 'वह सोता है', conceptTag: 'क्रिया' },
+            { id: 'hi-q5', text: '"बहुत" शब्द कौन-सा विशेषण है?', type: 'mcq', difficulty: 'challenging', marks: 1, options: ['गुणवाचक', 'संख्यावाचक', 'परिमाणवाचक', 'सार्वनामिक'], answer: 'परिमाणवाचक', conceptTag: 'विशेषण' },
           ],
         },
         {
@@ -333,9 +352,9 @@ const seedData = [
           instruction: 'संक्षेप में उत्तर दीजिए। प्रत्येक प्रश्न 2 अंक का है।',
           totalMarks: 6,
           questions: [
-            { id: 'hi-q6', text: 'विशेषण की परिभाषा दीजिए और दो उदाहरण लिखिए।', type: 'short', difficulty: 'easy', marks: 2 },
-            { id: 'hi-q7', text: 'सकर्मक और अकर्मक क्रिया में अंतर स्पष्ट कीजिए।', type: 'short', difficulty: 'moderate', marks: 2 },
-            { id: 'hi-q8', text: 'प्रेरणार्थक क्रिया किसे कहते हैं? उदाहरण सहित समझाइए।', type: 'short', difficulty: 'challenging', marks: 2 },
+            { id: 'hi-q6', text: 'विशेषण की परिभाषा दीजिए और दो उदाहरण लिखिए।', type: 'short', difficulty: 'easy', marks: 2, conceptTag: 'विशेषण' },
+            { id: 'hi-q7', text: 'सकर्मक और अकर्मक क्रिया में अंतर स्पष्ट कीजिए।', type: 'short', difficulty: 'moderate', marks: 2, conceptTag: 'क्रिया' },
+            { id: 'hi-q8', text: 'प्रेरणार्थक क्रिया किसे कहते हैं? उदाहरण सहित समझाइए।', type: 'short', difficulty: 'challenging', marks: 2, conceptTag: 'क्रिया' },
           ],
         },
       ],
@@ -382,11 +401,11 @@ const seedData = [
           instruction: 'Choose the correct option. Each question carries 1 mark.',
           totalMarks: 5,
           questions: [
-            { id: 'ss-q1', text: 'Which was the most important city of the Harappan civilization?', type: 'mcq', difficulty: 'easy', marks: 1, options: ['Lothal', 'Mohenjo-daro', 'Kalibangan', 'Dholavira'], answer: 'Mohenjo-daro' },
-            { id: 'ss-q2', text: 'The Great Bath was found at:', type: 'mcq', difficulty: 'easy', marks: 1, options: ['Harappa', 'Mohenjo-daro', 'Lothal', 'Rakhigarhi'], answer: 'Mohenjo-daro' },
-            { id: 'ss-q3', text: 'What was the main occupation of the Harappan people?', type: 'mcq', difficulty: 'moderate', marks: 1, options: ['Hunting', 'Agriculture', 'Fishing', 'Mining'], answer: 'Agriculture' },
-            { id: 'ss-q4', text: 'Lothal was an important center for:', type: 'mcq', difficulty: 'moderate', marks: 1, options: ['Bead making', 'Pottery', 'Ship building', 'Iron smelting'], answer: 'Bead making' },
-            { id: 'ss-q5', text: 'The Harappan script has been:', type: 'mcq', difficulty: 'challenging', marks: 1, options: ['Fully deciphered', 'Partially deciphered', 'Not deciphered', 'Written in Sanskrit'], answer: 'Not deciphered' },
+            { id: 'ss-q1', text: 'Which was the most important city of the Harappan civilization?', type: 'mcq', difficulty: 'easy', marks: 1, options: ['Lothal', 'Mohenjo-daro', 'Kalibangan', 'Dholavira'], answer: 'Mohenjo-daro', conceptTag: 'Harappan Cities' },
+            { id: 'ss-q2', text: 'The Great Bath was found at:', type: 'mcq', difficulty: 'easy', marks: 1, options: ['Harappa', 'Mohenjo-daro', 'Lothal', 'Rakhigarhi'], answer: 'Mohenjo-daro', conceptTag: 'Harappan Architecture' },
+            { id: 'ss-q3', text: 'What was the main occupation of the Harappan people?', type: 'mcq', difficulty: 'moderate', marks: 1, options: ['Hunting', 'Agriculture', 'Fishing', 'Mining'], answer: 'Agriculture', conceptTag: 'Harappan Economy' },
+            { id: 'ss-q4', text: 'Lothal was an important center for:', type: 'mcq', difficulty: 'moderate', marks: 1, options: ['Bead making', 'Pottery', 'Ship building', 'Iron smelting'], answer: 'Bead making', conceptTag: 'Harappan Crafts' },
+            { id: 'ss-q5', text: 'The Harappan script has been:', type: 'mcq', difficulty: 'challenging', marks: 1, options: ['Fully deciphered', 'Partially deciphered', 'Not deciphered', 'Written in Sanskrit'], answer: 'Not deciphered', conceptTag: 'Harappan Script' },
           ],
         },
         {
@@ -396,11 +415,11 @@ const seedData = [
           instruction: 'Write True or False. Each question carries 1 mark.',
           totalMarks: 5,
           questions: [
-            { id: 'ss-q6', text: 'The Harappan civilization is also known as the Indus Valley Civilization.', type: 'truefalse', difficulty: 'easy', marks: 1, options: ['True', 'False'], answer: 'True' },
-            { id: 'ss-q7', text: 'The Harappan people used iron tools.', type: 'truefalse', difficulty: 'easy', marks: 1, options: ['True', 'False'], answer: 'False' },
-            { id: 'ss-q8', text: 'The cities had a well-planned drainage system.', type: 'truefalse', difficulty: 'moderate', marks: 1, options: ['True', 'False'], answer: 'True' },
-            { id: 'ss-q9', text: 'Cotton was first produced in Mesopotamia.', type: 'truefalse', difficulty: 'moderate', marks: 1, options: ['True', 'False'], answer: 'False' },
-            { id: 'ss-q10', text: 'The Harappan civilization declined around 1900 BCE.', type: 'truefalse', difficulty: 'challenging', marks: 1, options: ['True', 'False'], answer: 'True' },
+            { id: 'ss-q6', text: 'The Harappan civilization is also known as the Indus Valley Civilization.', type: 'truefalse', difficulty: 'easy', marks: 1, options: ['True', 'False'], answer: 'True', conceptTag: 'Harappan Civilization' },
+            { id: 'ss-q7', text: 'The Harappan people used iron tools.', type: 'truefalse', difficulty: 'easy', marks: 1, options: ['True', 'False'], answer: 'False', conceptTag: 'Harappan Technology' },
+            { id: 'ss-q8', text: 'The cities had a well-planned drainage system.', type: 'truefalse', difficulty: 'moderate', marks: 1, options: ['True', 'False'], answer: 'True', conceptTag: 'Harappan Architecture' },
+            { id: 'ss-q9', text: 'Cotton was first produced in Mesopotamia.', type: 'truefalse', difficulty: 'moderate', marks: 1, options: ['True', 'False'], answer: 'False', conceptTag: 'Harappan Economy' },
+            { id: 'ss-q10', text: 'The Harappan civilization declined around 1900 BCE.', type: 'truefalse', difficulty: 'challenging', marks: 1, options: ['True', 'False'], answer: 'True', conceptTag: 'Harappan Civilization' },
           ],
         },
         {
@@ -410,9 +429,9 @@ const seedData = [
           instruction: 'Answer in 30-50 words. Each question carries 2 marks.',
           totalMarks: 6,
           questions: [
-            { id: 'ss-q11', text: 'Describe the main features of city planning in the Harappan civilization.', type: 'short', difficulty: 'easy', marks: 2 },
-            { id: 'ss-q12', text: 'What was the Great Bath? What was its likely purpose?', type: 'short', difficulty: 'moderate', marks: 2 },
-            { id: 'ss-q13', text: 'Why is the Harappan script still a mystery? What challenges do historians face?', type: 'short', difficulty: 'challenging', marks: 2 },
+            { id: 'ss-q11', text: 'Describe the main features of city planning in the Harappan civilization.', type: 'short', difficulty: 'easy', marks: 2, conceptTag: 'Harappan Architecture' },
+            { id: 'ss-q12', text: 'What was the Great Bath? What was its likely purpose?', type: 'short', difficulty: 'moderate', marks: 2, conceptTag: 'Harappan Architecture' },
+            { id: 'ss-q13', text: 'Why is the Harappan script still a mystery? What challenges do historians face?', type: 'short', difficulty: 'challenging', marks: 2, conceptTag: 'Harappan Script' },
           ],
         },
       ],
@@ -463,10 +482,10 @@ const seedData = [
           instruction: 'Choose the correct option. Each question carries 1 mark.',
           totalMarks: 4,
           questions: [
-            { id: 'cs-q1', text: 'Which of the following is a valid Python variable name?', type: 'mcq', difficulty: 'easy', marks: 1, options: ['2name', 'my-name', 'my_name', 'class'], answer: 'my_name' },
-            { id: 'cs-q2', text: 'What is the output of print(type(3.14))?', type: 'mcq', difficulty: 'easy', marks: 1, options: ['<class \'int\'>', '<class \'float\'>', '<class \'str\'>', '<class \'double\'>'], answer: '<class \'float\'>' },
-            { id: 'cs-q3', text: 'Which operator is used for floor division in Python?', type: 'mcq', difficulty: 'moderate', marks: 1, options: ['/', '//', '%', '**'], answer: '//' },
-            { id: 'cs-q4', text: 'What does len("Hello") return?', type: 'mcq', difficulty: 'moderate', marks: 1, options: ['4', '5', '6', 'Error'], answer: '5' },
+            { id: 'cs-q1', text: 'Which of the following is a valid Python variable name?', type: 'mcq', difficulty: 'easy', marks: 1, options: ['2name', 'my-name', 'my_name', 'class'], answer: 'my_name', conceptTag: 'Variables' },
+            { id: 'cs-q2', text: 'What is the output of print(type(3.14))?', type: 'mcq', difficulty: 'easy', marks: 1, options: ['<class \'int\'>', '<class \'float\'>', '<class \'str\'>', '<class \'double\'>'], answer: '<class \'float\'>', conceptTag: 'Data Types' },
+            { id: 'cs-q3', text: 'Which operator is used for floor division in Python?', type: 'mcq', difficulty: 'moderate', marks: 1, options: ['/', '//', '%', '**'], answer: '//', conceptTag: 'Operators' },
+            { id: 'cs-q4', text: 'What does len("Hello") return?', type: 'mcq', difficulty: 'moderate', marks: 1, options: ['4', '5', '6', 'Error'], answer: '5', conceptTag: 'String Functions' },
           ],
         },
         {
@@ -476,9 +495,9 @@ const seedData = [
           instruction: 'Answer in 30-50 words. Each question carries 2 marks.',
           totalMarks: 6,
           questions: [
-            { id: 'cs-q5', text: 'What is the difference between a list and a tuple in Python?', type: 'short', difficulty: 'easy', marks: 2 },
-            { id: 'cs-q6', text: 'Write a Python program to check whether a number entered by the user is even or odd.', type: 'short', difficulty: 'moderate', marks: 2 },
-            { id: 'cs-q7', text: 'Explain what a loop is. Give an example using a for loop.', type: 'short', difficulty: 'moderate', marks: 2 },
+            { id: 'cs-q5', text: 'What is the difference between a list and a tuple in Python?', type: 'short', difficulty: 'easy', marks: 2, conceptTag: 'Data Structures' },
+            { id: 'cs-q6', text: 'Write a Python program to check whether a number entered by the user is even or odd.', type: 'short', difficulty: 'moderate', marks: 2, conceptTag: 'Control Flow' },
+            { id: 'cs-q7', text: 'Explain what a loop is. Give an example using a for loop.', type: 'short', difficulty: 'moderate', marks: 2, conceptTag: 'Loops' },
           ],
         },
         {
@@ -488,7 +507,7 @@ const seedData = [
           instruction: 'Answer in detail (80-120 words). Each question carries 5 marks.',
           totalMarks: 5,
           questions: [
-            { id: 'cs-q8', text: 'Write a Python program that takes a list of numbers from the user and prints the largest number, smallest number, and the average.', type: 'long', difficulty: 'challenging', marks: 5 },
+            { id: 'cs-q8', text: 'Write a Python program that takes a list of numbers from the user and prints the largest number, smallest number, and the average.', type: 'long', difficulty: 'challenging', marks: 5, conceptTag: 'Lists and Functions' },
           ],
         },
       ],
@@ -532,6 +551,102 @@ const librarySeedData = [
   { name: 'English Grammar Prepositions Test.pdf', type: 'pdf', size: '890 KB', category: 'Exports', url: 'https://utfs.io/f/dummy-prepositions-test.pdf' }
 ];
 
+const groupSeedData = [
+  {
+    name: 'Grade 8 Science - Sec A',
+    grade: '8th',
+    subject: 'Science',
+    rubric: 'NCERT CBSE Rubric v2.1',
+    students: ['Aarav Sharma', 'Aditi Verma', 'Amit Kumar', 'Anjali Gupta', 'Deepak Roy', 'Ishaan Sen', 'Karan Mehta', 'Neha Patel', 'Pooja Joshi', 'Rahul Singh'],
+  },
+  {
+    name: 'Grade 5 English - Sec B',
+    grade: '5th',
+    subject: 'English',
+    rubric: 'Primary Grammar Guide',
+    students: ['Aryan Jha', 'Bhavna Das', 'Chirag Seth', 'Divya Iyer', 'Esha Rao', 'Gaurav Gill', 'Jaya Nair', 'Manish Goel', 'Nikhil Sethi', 'Ritu Malhotra'],
+  },
+  {
+    name: 'Grade 9 Maths - Sec C',
+    grade: '9th',
+    subject: 'Mathematics',
+    rubric: 'Algebra Evaluation Key',
+    students: ['Abhishek Vyas', 'Arjun Saxena', 'Komal Pandey', 'Meera Kapoor', 'Pranav Mishra', 'Rohan Dutta', 'Sanjay Dutt', 'Sneha Reddy', 'Vikas Dubey', 'Yash Gupta'],
+  },
+  {
+    name: 'Grade 7 Science - Sec B',
+    grade: '7th',
+    subject: 'Science',
+    rubric: 'NCERT CBSE Rubric v1.0',
+    students: ['Alok Mishra', 'Geeta Johri', 'Harish Rao', 'Jyoti Prasad', 'Kiran Bedi', 'Mukul Dev', 'Narendra Sen', 'Prachi Desai', 'Sameer Kohli', 'Tanvi Shah'],
+  },
+];
+
+const templateSeedData = [
+  {
+    name: 'CBSE Term Paper',
+    description: 'Standard CBSE term examination format with MCQs, short answers, and long answers.',
+    isDefault: true,
+    createdBy: null,
+    blueprint: {
+      sections: [
+        { type: 'mcq', count: 10, marks: 1 },
+        { type: 'short', count: 5, marks: 3 },
+        { type: 'long', count: 3, marks: 5 },
+      ],
+    },
+  },
+  {
+    name: 'MCQ Quiz',
+    description: 'Quick multiple choice quiz for class revision or weekly tests.',
+    isDefault: true,
+    createdBy: null,
+    blueprint: {
+      sections: [
+        { type: 'mcq', count: 20, marks: 1 },
+      ],
+    },
+  },
+  {
+    name: 'Viva Sheet',
+    description: 'Short and long answer questions for oral examination preparation.',
+    isDefault: true,
+    createdBy: null,
+    blueprint: {
+      sections: [
+        { type: 'short', count: 5, marks: 2 },
+        { type: 'long', count: 3, marks: 5 },
+      ],
+    },
+  },
+  {
+    name: 'Fill-in-the-Blanks Worksheet',
+    description: 'Worksheet-style assessment focusing on fill-in-the-blank questions.',
+    isDefault: true,
+    createdBy: null,
+    blueprint: {
+      sections: [
+        { type: 'fillblank', count: 15, marks: 1 },
+      ],
+    },
+  },
+  {
+    name: 'Mixed Assessment',
+    description: 'Comprehensive assessment mixing all question types for thorough evaluation.',
+    isDefault: true,
+    createdBy: null,
+    blueprint: {
+      sections: [
+        { type: 'mcq', count: 5, marks: 1 },
+        { type: 'truefalse', count: 5, marks: 1 },
+        { type: 'fillblank', count: 5, marks: 1 },
+        { type: 'short', count: 3, marks: 3 },
+        { type: 'long', count: 2, marks: 5 },
+      ],
+    },
+  },
+];
+
 async function seed() {
   console.log('🌱 Connecting to MongoDB...');
   await mongoose.connect(env.MONGODB_URI);
@@ -557,6 +672,136 @@ async function seed() {
   console.log(`✅ Seeded ${createdLibrary.length} library items:`);
   createdLibrary.forEach((li) => {
     console.log(`   - ${li.name} (${li.type}) — category: ${li.category}`);
+  });
+
+  // clear and seed groups
+  await Group.deleteMany({});
+  console.log('🗑️  Cleared existing groups');
+  const createdGroups = await Group.insertMany(groupSeedData);
+  console.log(`✅ Seeded ${createdGroups.length} groups:`);
+  createdGroups.forEach((g) => {
+    console.log(`   - ${g.name} (${g.grade} ${g.subject}) — ${g.students.length} students`);
+  });
+
+  // clear and seed assigned assignments + student submissions
+  await AssignedAssignment.deleteMany({});
+  await StudentSubmission.deleteMany({});
+  console.log('🗑️  Cleared existing assigned assignments and submissions');
+
+  // Assign the Science quiz to Grade 8 Science group
+  const scienceAssignment = created.find(a => a.title === 'Quiz on Electricity');
+  const scienceGroup = createdGroups.find(g => g.name === 'Grade 8 Science - Sec A');
+  if (scienceAssignment && scienceGroup) {
+    const assigned = await AssignedAssignment.create({
+      assignmentId: scienceAssignment._id,
+      groupId: scienceGroup._id,
+      assignedDate: new Date('2026-05-21T10:00:00Z'),
+      dueDate: '2026-06-21',
+      hintsEnabled: true,
+      durationMinutes: 45,
+    });
+
+    // Create student submissions with varied scores
+    const studentAnswers = [
+      { name: 'Aarav Sharma', score: 6, answers: [
+        { questionId: 'q1', answer: 'Electroplating is coating metal using electricity. Prevents corrosion.', isCorrect: true, marks: 2 },
+        { questionId: 'q2', answer: 'Conductor completes the circuit for electrolysis.', isCorrect: true, marks: 2 },
+        { questionId: 'q3', answer: 'NaOH is made by electrolysis of salt water.', isCorrect: true, marks: 2 },
+        { questionId: 'q4', answer: 'Lemon juice', isCorrect: true, marks: 1, aiFeedback: 'Correct! Citric acid makes lemon juice a conductor.' },
+      ]},
+      { name: 'Aditi Verma', score: 5, answers: [
+        { questionId: 'q1', answer: 'Electroplating uses electricity to coat metal.', isCorrect: true, marks: 2 },
+        { questionId: 'q2', answer: 'It dissolves the chemicals.', isCorrect: false, marks: 0, aiFeedback: 'Partially correct. A conductor allows charge flow, not dissolution.' },
+        { questionId: 'q3', answer: 'Chloralkali process produces NaOH from brine.', isCorrect: true, marks: 2 },
+        { questionId: 'q4', answer: 'Lemon juice', isCorrect: true, marks: 1 },
+      ]},
+      { name: 'Amit Kumar', score: 3, answers: [
+        { questionId: 'q1', answer: 'It is a type of painting.', isCorrect: false, marks: 0, aiFeedback: 'Incorrect. Electroplating uses electricity to deposit metal, not paint.' },
+        { questionId: 'q2', answer: 'Conductor carries current.', isCorrect: true, marks: 2 },
+        { questionId: 'q3', answer: 'By mixing chemicals.', isCorrect: false, marks: 0, aiFeedback: 'Incorrect. NaOH is produced via electrolysis, not simple mixing.' },
+        { questionId: 'q4', answer: 'Lemon juice', isCorrect: true, marks: 1 },
+      ]},
+      { name: 'Anjali Gupta', score: 4, answers: [
+        { questionId: 'q1', answer: 'Using electricity to put a metal layer on objects.', isCorrect: true, marks: 2 },
+        { questionId: 'q2', answer: 'It makes heat.', isCorrect: false, marks: 0, aiFeedback: 'Incorrect. Conductors allow current flow, not heat generation in electrolysis.' },
+        { questionId: 'q3', answer: 'Electrolysis of NaCl solution.', isCorrect: true, marks: 2 },
+        { questionId: 'q4', answer: 'Distilled water', isCorrect: false, marks: 0, aiFeedback: 'Incorrect. Distilled water lacks ions and is a poor conductor.' },
+      ]},
+      { name: 'Deepak Roy', score: 7, answers: [
+        { questionId: 'q1', answer: 'Electroplating deposits metal using electrical current for corrosion prevention.', isCorrect: true, marks: 2 },
+        { questionId: 'q2', answer: 'Conductor lets charge carriers flow through the solution.', isCorrect: true, marks: 2 },
+        { questionId: 'q3', answer: 'Chloralkali process: electrolysis of brine gives NaOH, Cl2, H2.', isCorrect: true, marks: 2 },
+        { questionId: 'q4', answer: 'Lemon juice', isCorrect: true, marks: 1 },
+      ]},
+    ];
+
+    for (const sa of studentAnswers) {
+      await StudentSubmission.create({
+        assignedAssignmentId: assigned._id,
+        studentName: sa.name,
+        answers: sa.answers,
+        totalScore: sa.score,
+        totalMarks: 7,
+        submittedAt: new Date('2026-05-22T10:00:00Z'),
+      });
+    }
+    console.log(`✅ Assigned "Quiz on Electricity" to Grade 8 Science with ${studentAnswers.length} submissions`);
+  }
+
+  // Assign the Math test to Grade 9 Maths group
+  const mathAssignment = created.find(a => a.title === 'Mathematics: Algebra Basics');
+  const mathGroup = createdGroups.find(g => g.name === 'Grade 9 Maths - Sec C');
+  if (mathAssignment && mathGroup) {
+    const assigned = await AssignedAssignment.create({
+      assignmentId: mathAssignment._id,
+      groupId: mathGroup._id,
+      assignedDate: new Date('2026-05-19T09:00:00Z'),
+      dueDate: '2026-06-15',
+      hintsEnabled: false,
+      durationMinutes: 90,
+    });
+
+    const mathStudentAnswers = [
+      { name: 'Abhishek Vyas', score: 22, answers: [
+        { questionId: 'math-q1', answer: 'x=3, y=2', isCorrect: true, marks: 3 },
+        { questionId: 'math-q2', answer: 'y = -3/2 x + 4, slope = -3/2', isCorrect: true, marks: 3 },
+        { questionId: 'math-q3', answer: '(0,4) and (6,0)', isCorrect: true, marks: 3 },
+        { questionId: 'math-q4', answer: '4a + b = 10', isCorrect: true, marks: 3 },
+        { questionId: 'math-q5', answer: '2(3)-2=4=RHS', isCorrect: true, marks: 3 },
+        { questionId: 'math-q6', answer: 'orange=4, apple=5', isCorrect: true, marks: 5 },
+        { questionId: 'math-q7', answer: 'Incomplete graph description', isCorrect: false, marks: 2, aiFeedback: 'Partially correct. Graph is right but missing intersection point labels.' },
+      ]},
+      { name: 'Komal Pandey', score: 18, answers: [
+        { questionId: 'math-q1', answer: 'x=3, y=2', isCorrect: true, marks: 3 },
+        { questionId: 'math-q2', answer: 'y = -3/2 x + 4', isCorrect: true, marks: 3 },
+        { questionId: 'math-q3', answer: '(3,2) and (0,4)', isCorrect: true, marks: 3 },
+        { questionId: 'math-q4', answer: 'Unable to solve', isCorrect: false, marks: 0, aiFeedback: 'Substitute x=2, y=1 to get 4a+b=10.' },
+        { questionId: 'math-q5', answer: '2(3)-2=4', isCorrect: true, marks: 3 },
+        { questionId: 'math-q6', answer: 'orange=4, apple=5', isCorrect: true, marks: 5 },
+        { questionId: 'math-q7', answer: 'Did not attempt', isCorrect: false, marks: 1 },
+      ]},
+    ];
+
+    for (const sa of mathStudentAnswers) {
+      await StudentSubmission.create({
+        assignedAssignmentId: assigned._id,
+        studentName: sa.name,
+        answers: sa.answers,
+        totalScore: sa.score,
+        totalMarks: 25,
+        submittedAt: new Date('2026-05-20T11:00:00Z'),
+      });
+    }
+    console.log(`✅ Assigned "Mathematics: Algebra Basics" to Grade 9 Maths with ${mathStudentAnswers.length} submissions`);
+  }
+
+  // clear and seed templates
+  await Template.deleteMany({});
+  console.log('🗑️  Cleared existing templates');
+  const createdTemplates = await Template.insertMany(templateSeedData);
+  console.log(`✅ Seeded ${createdTemplates.length} templates:`);
+  createdTemplates.forEach((t) => {
+    console.log(`   - ${t.name} (${t.isDefault ? 'default' : 'custom'})`);
   });
 
   await mongoose.disconnect();

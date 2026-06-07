@@ -3,23 +3,27 @@
 @tailwind utilities;
 
 :root {
-  --background: #EFEFEF;
+  --background: #F3F4F6;
   --foreground: #111111;
 
-  --veda-bg: linear-gradient(180deg, #EEEEEE 0%, #DADADA 100%);
+  --veda-bg: #F3F4F6;
   --veda-sidebar: #FFFFFF;
   --veda-card: #FFFFFF;
   --veda-card-border: #E5E7EB;
   --veda-text-primary: #111111;
   --veda-text-secondary: #6B7280;
   --veda-text-hint: #9CA3AF;
-  --veda-btn-primary: #1A1A1A;
-  --veda-orange: #F97316;
+  --veda-btn-primary: #10375C;
+  --veda-orange: #10375C;
   --veda-orange-red: #EF4444;
-  --veda-nav-active-bg: #F3F4F6;
-  --veda-progress: #1A1A1A;
-  --veda-dark-banner: #1A1A1A;
+  --veda-nav-active-bg: #EBF1F7;
+  --veda-progress: #10375C;
+  --veda-dark-banner: #10375C;
   --background-bg-off-white-50: #CECECE;
+  --cp-primary: #10375C;
+  --cp-primary-hover: #0d2f4f;
+  --cp-primary-light: #EBF1F7;
+  --cp-primary-border: #CBD8E6;
 }
 
 body {
@@ -46,6 +50,272 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   border: 1px solid rgba(0, 0, 0, 0.20) !important;
   transition: all 0.2s ease-in-out;
 }
+
 .custom-search-bar:focus-within {
   border-color: rgba(0, 0, 0, 0.40) !important;
+}
+
+/* From Uiverse.io by dexter-st */ 
+.btn-wrapper {
+  --dot-size: 5px;
+  --line-weight: 1px;
+  --line-distance: 0.5rem 0.7rem;
+  --animation-speed: 0.35s;
+  --dot-color: #10375C;
+  --line-color: rgba(16, 55, 92, 0.4);
+
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: auto;
+  height: auto;
+  padding: var(--line-distance);
+  background-color: #0000;
+  transition: background-color 0.3s ease-in-out;
+  user-select: none;
+}
+
+.btn-wrapper:has(.btn:hover) {
+  animation: backround-color-change calc(var(--animation-speed) * 4) ease-in-out
+    forwards;
+}
+@keyframes backround-color-change {
+  80% {
+    background-color: #0000;
+  }
+  100% {
+    background-color: rgba(16, 55, 92, 0.08);
+  }
+}
+
+.btn {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background-color: #10375C;
+  background-image: linear-gradient(rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.15));
+  border: none;
+
+  color: #ffffff;
+  font-family: "Inter", sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: capitalize;
+
+  border-radius: 30% / 200%;
+  cursor: pointer;
+
+  box-shadow:
+    0 0 0px 1px rgba(16, 55, 92, 0.2),
+    0px 1px 2px rgba(3, 7, 18, 0.04),
+    0px 4px 6px rgba(3, 7, 18, 0.06);
+
+  transition:
+    background-color 0.2s ease-in-out,
+    transform 0.2s ease-in-out,
+    box-shadow 0.2s ease-in-out,
+    border-radius 0.3s ease-in-out,
+    border-color 0.2s ease-in-out;
+}
+
+.btn:hover {
+  background-color: #1d4ed8;
+  color: #ffffff;
+  transform: scale(1.03);
+  border-radius: 10% / 200%;
+}
+.btn:active {
+  background-color: #10375C;
+  transform: scale(0.98);
+  border-radius: 20% / 200%;
+}
+
+.btn-svg {
+  margin-left: 0.4rem;
+  height: 18px;
+  width: 18px;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke: rgba(255, 255, 255, 0.8);
+  fill: rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease-in-out;
+}
+
+.btn:hover .btn-svg {
+  stroke: #ffffff;
+  fill: rgba(255, 255, 255, 0.3);
+}
+.btn:active .btn-svg {
+  stroke: #ffffff;
+  fill: rgba(255, 255, 255, 0.5);
+}
+
+/* Dots */
+.dot {
+  position: absolute;
+  width: var(--dot-size);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background-color: var(--dot-color);
+  transition: all 0.3s ease-in-out;
+  opacity: 0;
+}
+
+.btn-wrapper:has(.btn:hover) .dot.top.left {
+  top: 50%;
+  left: 20%;
+  animation: move-top-left var(--animation-speed) ease-in-out forwards;
+}
+@keyframes move-top-left {
+  90% {
+    opacity: 0.6;
+  }
+  100% {
+    top: calc(var(--dot-size) * -0.5);
+    left: calc(var(--dot-size) * -0.5);
+    opacity: 1;
+  }
+}
+.btn-wrapper:has(.btn:hover) .dot.top.right {
+  top: 50%;
+  right: 20%;
+  animation: move-top-right var(--animation-speed) ease-in-out forwards;
+  animation-delay: calc(var(--animation-speed) * 0.6);
+}
+@keyframes move-top-right {
+  80% {
+    opacity: 0.6;
+  }
+  100% {
+    top: calc(var(--dot-size) * -0.5);
+    right: calc(var(--dot-size) * -0.5);
+    opacity: 1;
+  }
+}
+.btn-wrapper:has(.btn:hover) .dot.bottom.right {
+  bottom: 50%;
+  right: 20%;
+  animation: move-bottom-right var(--animation-speed) ease-in-out forwards;
+  animation-delay: calc(var(--animation-speed) * 1.2);
+}
+@keyframes move-bottom-right {
+  80% {
+    opacity: 0.6;
+  }
+  100% {
+    bottom: calc(var(--dot-size) * -0.5);
+    right: calc(var(--dot-size) * -0.5);
+    opacity: 1;
+  }
+}
+.btn-wrapper:has(.btn:hover) .dot.bottom.left {
+  bottom: 50%;
+  left: 20%;
+  animation: move-bottom-left var(--animation-speed) ease-in-out forwards;
+  animation-delay: calc(var(--animation-speed) * 1.8);
+}
+@keyframes move-bottom-left {
+  80% {
+    opacity: 0.6;
+  }
+  100% {
+    bottom: calc(var(--dot-size) * -0.5);
+    left: calc(var(--dot-size) * -0.5);
+    opacity: 1;
+  }
+}
+
+/* Lines */
+.line {
+  position: absolute;
+  transition: all 0.3s ease-in-out;
+}
+.line.horizontal {
+  height: var(--line-weight);
+  width: 100%;
+  background-image: repeating-linear-gradient(
+    90deg,
+    #0000 0 calc(var(--line-weight) * 2),
+    var(--line-color) calc(var(--line-weight) * 2) calc(var(--line-weight) * 4)
+  );
+}
+.line.top {
+  top: calc(var(--line-weight) * -0.5);
+}
+.line.bottom {
+  bottom: calc(var(--line-weight) * -0.5);
+}
+.line.vertical {
+  width: var(--line-weight);
+  height: 100%;
+  background-image: repeating-linear-gradient(
+    0deg,
+    #0000 0 calc(var(--line-weight) * 2),
+    var(--line-color) calc(var(--line-weight) * 2) calc(var(--line-weight) * 4)
+  );
+}
+.line.left {
+  left: calc(var(--line-weight) * -0.5);
+}
+.line.right {
+  right: calc(var(--line-weight) * -0.5);
+}
+
+.line.top {
+  transform-origin: top left;
+  transform: rotate(5deg) scaleX(0);
+}
+.btn-wrapper:has(.btn:hover) .line.top {
+  animation: draw-top var(--animation-speed) ease-in-out forwards;
+  animation-delay: calc(var(--animation-speed) * 0.8);
+}
+@keyframes draw-top {
+  100% {
+    transform: rotate(0deg) scaleX(1);
+  }
+}
+.line.bottom {
+  transform-origin: bottom right;
+  transform: rotate(5deg) scaleX(0);
+}
+.btn-wrapper:has(.btn:hover) .line.bottom {
+  animation: draw-bottom var(--animation-speed) ease-in-out forwards;
+  animation-delay: calc(var(--animation-speed) * 2);
+}
+@keyframes draw-bottom {
+  100% {
+    transform: rotate(0deg) scaleX(1);
+  }
+}
+
+.line.left {
+  transform-origin: bottom left;
+  transform: rotate(0deg) scaleY(0);
+}
+.btn-wrapper:has(.btn:hover) .line.left {
+  animation: draw-left var(--animation-speed) ease-in-out forwards;
+  animation-delay: calc(var(--animation-speed) * 2.4);
+}
+@keyframes draw-left {
+  100% {
+    transform: rotate(0deg) scaleY(1);
+  }
+}
+
+.line.right {
+  transform-origin: top right;
+  transform: rotate(5deg) scaleY(0);
+}
+.btn-wrapper:has(.btn:hover) .line.right {
+  animation: draw-right var(--animation-speed) ease-in-out forwards;
+  animation-delay: calc(var(--animation-speed) * 1.4);
+}
+@keyframes draw-right {
+  100% {
+    transform: rotate(0deg) scaleY(1);
+  }
 }

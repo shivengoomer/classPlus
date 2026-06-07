@@ -140,7 +140,7 @@ export function AssignmentGrid({ assignments }: AssignmentGridProps) {
             onClick={() => setSelectedSubject(null)}
             className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${
               selectedSubject === null
-                ? 'bg-orange-500 text-white border-orange-500 shadow-sm shadow-orange-500/10'
+                ? 'bg-[#10375C] text-white border-[#10375C] shadow-sm shadow-[#10375C]/10'
                 : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100/40 border-transparent'
             }`}
           >
@@ -152,7 +152,7 @@ export function AssignmentGrid({ assignments }: AssignmentGridProps) {
               onClick={() => setSelectedSubject(sub)}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${
                 selectedSubject === sub
-                  ? 'bg-orange-500 text-white border-orange-500 shadow-sm shadow-orange-500/10'
+                  ? 'bg-[#10375C] text-white border-[#10375C] shadow-sm shadow-[#10375C]/10'
                   : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100/40 border-transparent'
               }`}
             >
@@ -210,14 +210,14 @@ export function AssignmentGrid({ assignments }: AssignmentGridProps) {
                 >
                   {/* Name column */}
                   <div className="flex items-center gap-3.5 min-w-0">
-                    <div className="w-8 h-8 rounded-xl bg-orange-500/10 text-orange-600 flex items-center justify-center flex-shrink-0">
-                      <ClipboardCheck className="w-4.5 h-4.5 text-orange-500" />
+                    <div className="w-8 h-8 rounded-xl bg-[#10375C]/10 text-[#10375C] flex items-center justify-center flex-shrink-0">
+                      <ClipboardCheck className="w-4.5 h-4.5 text-[#10375C]" />
                     </div>
                     <div className="flex flex-col min-w-0">
                       <div className="flex items-center gap-2">
                         <span 
                           onClick={() => handleRowClick(assignment)}
-                          className="font-bold truncate hover:text-orange-500 cursor-pointer"
+                          className="font-bold truncate hover:text-[#10375C] cursor-pointer"
                         >
                           {assignment.title}
                         </span>
@@ -245,7 +245,7 @@ export function AssignmentGrid({ assignments }: AssignmentGridProps) {
 
                   {/* Subject & Grade Column */}
                   <div className="hidden sm:flex items-center gap-2 w-36">
-                    <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-orange-50 text-orange-600 border border-orange-100/50">
+                    <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-[#10375C]/5 text-[#10375C] border border-orange-100/50">
                       {assignment.subject}
                     </span>
                     <span className="text-[10px] font-bold text-slate-500">
@@ -317,7 +317,7 @@ export function AssignmentGrid({ assignments }: AssignmentGridProps) {
             variant="primary"
             icon={<Plus className="w-4 h-4 text-white" />}
             onClick={() => router.push('/create')}
-            className="shadow-lg hover:scale-105 active:scale-95 transition-transform bg-gradient-to-r from-orange-500 to-amber-500 border-0 rounded-2xl px-6 py-3.5 text-xs font-bold text-white cursor-pointer"
+            className="shadow-lg hover:scale-105 active:scale-95 transition-transform bg-[#10375C] border-0 rounded-2xl px-6 py-3.5 text-xs font-bold text-white cursor-pointer"
           >
             Create Assessment
           </PillButton>

@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { ArrowLeft, Sparkles, BookOpen, BarChart3, Star } from 'lucide-react';
 import BackgroundMesh from '@/components/landing/BackgroundMesh';
 import ShapeGrid from '@/components/ShapeGrid';
+import { Logo } from '@/components/shared/Logo';
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -66,14 +67,14 @@ export default function AuthLayout({ children, title, subtitle }: AuthLayoutProp
             <span>Back to website</span>
           </Link>
 
-          {/* VedAI Logo Branding */}
+          {/* ClassPilot Logo Branding */}
           <div className="flex items-center gap-3 mt-4">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-orange-500 to-amber-500 flex items-center justify-center shadow-md shadow-orange-500/10">
-              <Sparkles className="w-5 h-5 text-white" />
+            <div className="w-10 h-10 rounded-2xl bg-slate-100/80 border border-slate-200/50 flex items-center justify-center shadow-sm flex-shrink-0">
+              <Logo className="w-6.5 h-6.5" />
             </div>
             <div>
               <span className="text-2xl font-black tracking-tight text-slate-900 font-sans">
-                Ved<span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-amber-500">AI</span>
+                ClassPilot
               </span>
               <p className="text-[10px] text-slate-500 font-semibold tracking-wider uppercase">Assessments Redefined</p>
             </div>
@@ -104,7 +105,7 @@ export default function AuthLayout({ children, title, subtitle }: AuthLayoutProp
           >
             {/* Feature 1 */}
             <motion.div variants={itemVariants} className="flex gap-4 group">
-              <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-600 group-hover:scale-110 transition-transform">
+              <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-[#10375C]/10 border border-[#10375C]/20 flex items-center justify-center text-[#10375C] group-hover:scale-110 transition-transform">
                 <Sparkles className="w-5 h-5" />
               </div>
               <div>
@@ -157,7 +158,7 @@ export default function AuthLayout({ children, title, subtitle }: AuthLayoutProp
               ))}
             </div>
             <p className="text-xs italic text-slate-600 leading-relaxed font-medium">
-              &quot;VedAI has revolutionized our worksheet preparation. What used to take hours now takes minutes. The students love the responsive hints!&quot;
+              &quot;ClassPilot has revolutionized our worksheet preparation. What used to take hours now takes minutes. The students love the responsive hints!&quot;
             </p>
             <div className="flex items-center gap-3">
               <img 
@@ -185,10 +186,10 @@ export default function AuthLayout({ children, title, subtitle }: AuthLayoutProp
         {/* Mobile Header Branding (hidden on large screens) */}
         <div className="lg:hidden absolute top-8 left-8 right-8 flex items-center justify-between z-20">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-orange-500 to-amber-500 flex items-center justify-center shadow-md shadow-orange-500/10">
-              <Sparkles className="w-4 h-4 text-white" />
+            <div className="w-8 h-8 rounded-xl bg-slate-100/80 border border-slate-200/50 flex items-center justify-center shadow-sm flex-shrink-0">
+              <Logo className="w-5 h-5" />
             </div>
-            <span className="text-lg font-black text-slate-900">VedAI</span>
+            <span className="text-lg font-black text-slate-900">ClassPilot</span>
           </div>
           <Link 
             href="/" 

@@ -25,7 +25,7 @@ export default function BackgroundMesh() {
 
       {/* Floating Aurora Glowing Orb 1: Soft Orange/Amber (Top Left) */}
       <motion.div
-        className="absolute -top-[10%] -left-[10%] w-[50vw] h-[50vw] rounded-full bg-gradient-to-br from-orange-400/10 via-amber-300/5 to-transparent blur-[100px]"
+        className="absolute -top-[10%] -left-[10%] w-[50vw] h-[50vw] rounded-full bg-[#10375C]/5 blur-[100px]"
         animate={{
           x: [0, 30, -20, 0],
           y: [0, -20, 30, 0],

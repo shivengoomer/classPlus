@@ -231,7 +231,7 @@ export default function GroupsPage() {
         <div className="absolute inset-0 flex items-start justify-center p-4 pt-16 md:pt-24 z-20">
           <div className="max-w-md w-full bg-white/80 backdrop-blur-xl border border-white/40 rounded-3xl p-8 shadow-[0_20px_50px_rgba(0,0,0,0.08)] flex flex-col items-center text-center gap-6 border-gray-100">
             {/* Tag badge */}
-            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider text-white bg-gradient-to-r from-veda-orange to-red-500 shadow-md shadow-orange-500/20">
+            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider text-white bg-[#10375C] shadow-md shadow-[#10375C]/20">
               <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
               <span>Coming Soon</span>
             </div>

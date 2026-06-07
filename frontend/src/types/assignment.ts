@@ -31,6 +31,7 @@ export interface Assignment {
     answerKey: { questionId: string; answer: string }[];
     generatedAt: string;
   };
+  parentAssignmentId?: string;
   createdAt: string;
 }
 

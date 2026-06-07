@@ -15,6 +15,7 @@ import DeviceShowcase from '@/components/landing/DeviceShowcase';
 import BentoGrid from '@/components/landing/BentoGrid';
 import PricingSection from '@/components/landing/PricingSection';
 import Footer from '@/components/landing/Footer';
+
 import ShapeGrid from '@/components/ShapeGrid';
 
 export default function LandingPage() {
@@ -31,46 +32,63 @@ export default function LandingPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#F3F4F6] text-slate-800 selection:bg-orange-500/20 selection:text-orange-900 font-sans overflow-x-hidden relative flex flex-col justify-between">
+    <div className="min-h-screen bg-[#EEF2F8] text-slate-800 selection:bg-[#10375C]/20 selection:text-[#10375C] font-sans overflow-x-hidden relative flex flex-col justify-between">
       
-      {/* 1. BACKGROUND ENGINE */}
+      {/* ============= LAYERED AESTHETIC BACKGROUND ============= */}
+      {/* 1. Base warm-cool gradient */}
+      <div className="fixed inset-0 z-0 bg-gradient-to-br from-[#EAF0F8] via-[#EEF2F8] to-[#E6ECF5]" />
+
+      {/* 2. Large soft navy orb — top-left */}
+      <div className="fixed top-[-25%] left-[-15%] w-[65vw] h-[65vw] rounded-full bg-[#10375C]/[0.065] blur-[130px] pointer-events-none z-0" />
+
+      {/* 3. Soft indigo orb — top-right */}
+      <div className="fixed top-[-10%] right-[-10%] w-[45vw] h-[45vw] rounded-full bg-indigo-300/[0.07] blur-[110px] pointer-events-none z-0" />
+
+      {/* 4. Subtle slate orb — bottom center */}
+      <div className="fixed bottom-[-15%] left-[15%] w-[70vw] h-[45vw] rounded-full bg-slate-300/[0.05] blur-[150px] pointer-events-none z-0" />
+
+      {/* 5. Vignette — softens harsh edges */}
+      <div
+        className="fixed inset-0 z-0 pointer-events-none"
+        style={{ background: 'radial-gradient(ellipse 85% 80% at 50% 50%, transparent 35%, #EAF0F8 100%)' }}
+      />
+
+      {/* 6. BackgroundMesh (existing subtle animated lines) */}
       <BackgroundMesh />
 
       {/* 2. FLOATING HEADER */}
       <Navbar />
 
       {/* 3. HERO SECTION */}
-      <main className="flex-1 w-full pt-32 pb-16 px-6 relative z-10 overflow-hidden">
-        {/* Shape Grid Background in matching white/light theme colors */}
-        <div className="absolute inset-0 z-0 opacity-80 pointer-events-none">
-          <ShapeGrid 
-            borderColor="rgba(203, 213, 225, 0.85)" 
-            hoverFillColor="rgba(249, 115, 22, 0.12)" 
-            gradientColor="#F3F4F6"
+      <main className="flex-1 w-full pt-28 pb-12 px-6 relative z-10 overflow-x-hidden">
+        {/* ShapeGrid — hexagon pattern with navy hover accent, sits at z-0 inside hero */}
+        <div className="absolute inset-0 z-0 pointer-events-none">
+          <ShapeGrid
+            borderColor="rgba(148, 163, 184, 0.45)"
+            hoverFillColor="rgba(16, 55, 92, 0.08)"
+            gradientColor="#EEF2F8"
             shape="hexagon"
-            squareSize={48}
-            speed={0.4}
-            hoverTrailAmount={4}
+            squareSize={44}
+            speed={0.35}
+            hoverTrailAmount={5}
           />
-          {/* Smooth linear fade to background at the bottom */}
-          <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-[#F3F4F6] via-[#F3F4F6]/70 to-transparent" />
+          {/* Bottom fade so grid doesn't bleed into bento section */}
+          <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-[#EEF2F8] to-transparent" />
         </div>
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center min-h-[calc(100vh-180px)] relative z-10">
-          
-          {/* Hero Left Side: Content */}
-          <div className="lg:col-span-5 flex flex-col gap-6 md:gap-8 text-left relative">
-            
-            {/* Animated Glow Backdrop Behind Left Side */}
-            <div className="absolute top-[20%] left-[-10%] w-[60%] h-[60%] bg-orange-500/5 rounded-full blur-[80px] pointer-events-none" />
 
-            {/* Badge Indicator */}
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 items-center min-h-[calc(100vh-160px)] relative z-10">
+
+          {/* ── LEFT: Hero Content ── */}
+          <div className="lg:col-span-5 flex flex-col gap-6 md:gap-8 text-left relative">
+
+            {/* Badge */}
             <motion.div
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, ease: 'easeOut' }}
-              className="self-start px-4 py-1.5 rounded-full border border-orange-500/20 bg-orange-500/5 text-orange-600 text-xs font-semibold tracking-wide flex items-center gap-2 shadow-[0_2px_12px_rgba(249,115,22,0.05)] backdrop-blur-md"
+              className="self-start px-4 py-1.5 rounded-full border border-[#10375C]/20 bg-[#10375C]/5 text-[#10375C] text-xs font-semibold tracking-wide flex items-center gap-2 shadow-[0_2px_12px_rgba(16,55,92,0.06)] backdrop-blur-md"
             >
-              <Sparkles className="w-3.5 h-3.5 text-orange-500 animate-pulse" />
+              <Sparkles className="w-3.5 h-3.5 text-[#10375C] animate-pulse" />
               <span>AI-Powered Education Platform</span>
             </motion.div>
 
@@ -82,8 +100,8 @@ export default function LandingPage() {
               className="text-4xl md:text-6xl font-extrabold tracking-tight text-slate-900 leading-[1.1]"
             >
               Learn Smarter with{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 via-purple-500 to-pink-500 animate-pulse">
-                VedAI
+              <span className="text-[#10375C]">
+                ClassPilot
               </span>
             </motion.h1>
 
@@ -107,7 +125,7 @@ export default function LandingPage() {
               <SignedOut>
                 <button
                   onClick={() => router.push('/sign-up')}
-                  className="px-6 py-3.5 rounded-2xl text-xs font-semibold bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400 text-white shadow-lg shadow-orange-500/15 active:scale-95 flex items-center gap-2 transition-all group"
+                  className="px-6 py-3.5 rounded-2xl text-xs font-semibold bg-[#10375C] hover:bg-[#0d2f4f] text-white shadow-lg shadow-[#10375C]/20 active:scale-95 flex items-center gap-2 transition-all group"
                 >
                   <span>Get Started Free</span>
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -117,7 +135,7 @@ export default function LandingPage() {
               <SignedIn>
                 <button
                   onClick={() => router.push('/home')}
-                  className="px-6 py-3.5 rounded-2xl text-xs font-semibold bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400 text-white shadow-lg shadow-orange-500/15 active:scale-95 flex items-center gap-2 transition-all group"
+                  className="px-6 py-3.5 rounded-2xl text-xs font-semibold bg-[#10375C] hover:bg-[#0d2f4f] text-white shadow-lg shadow-[#10375C]/20 active:scale-95 flex items-center gap-2 transition-all group"
                 >
                   <span>Go to Dashboard</span>
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -128,7 +146,7 @@ export default function LandingPage() {
                 onClick={() => setShowDemoModal(true)}
                 className="px-6 py-3.5 rounded-2xl text-xs font-semibold bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 shadow-sm active:scale-95 flex items-center gap-2 transition-all"
               >
-                <Play className="w-4 h-4 text-orange-500 fill-orange-500/20" />
+                <Play className="w-4 h-4 text-[#10375C] fill-[#10375C]/20" />
                 <span>Watch Demo</span>
               </button>
             </motion.div>
@@ -138,21 +156,18 @@ export default function LandingPage() {
               initial={{ opacity: 0, y: 25 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, ease: 'easeOut', delay: 0.4 }}
-              className="flex items-center gap-4 mt-4 border-t border-slate-200 pt-6 font-sans"
+              className="flex items-center gap-4 mt-4 border-t border-slate-200/70 pt-6 font-sans"
             >
-              {/* Avatars group */}
               <div className="flex -space-x-3.5">
                 {teachers.map((t, idx) => (
                   <img
                     key={idx}
                     src={t.avatar}
                     alt="Educator avatar"
-                    className="w-9 h-9 rounded-full border-2 border-[#F3F4F6] object-cover shadow-sm"
+                    className="w-9 h-9 rounded-full border-2 border-[#EEF2F8] object-cover shadow-sm"
                   />
                 ))}
               </div>
-
-              {/* Statistics metrics */}
               <div className="flex flex-col gap-0.5 border-l border-slate-200 pl-4">
                 <div className="flex items-center gap-1">
                   <span className="text-slate-900 font-bold text-sm">10k+ Students</span>
@@ -172,12 +187,13 @@ export default function LandingPage() {
 
           </div>
 
-          {/* Hero Right Side: 3D Parallax Device Showcase */}
+          {/* ── RIGHT: Device Showcase — strictly contained ── */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, ease: 'easeOut', delay: 0.2 }}
-            className="hidden lg:flex lg:col-span-7 relative items-center justify-center"
+            className="hidden lg:flex lg:col-span-7 relative items-center justify-center overflow-hidden"
+            style={{ height: '600px' }}
           >
             <DeviceShowcase />
           </motion.div>
@@ -223,14 +239,14 @@ export default function LandingPage() {
               {/* Demo video simulation placeholder screen */}
               <div className="w-full aspect-video bg-[#F8FAFC] flex flex-col items-center justify-center p-8 text-center relative overflow-hidden font-sans">
                 {/* Visual ambient rings */}
-                <div className="absolute w-[80%] h-[80%] rounded-full border border-orange-500/10 animate-pulse pointer-events-none" />
-                <div className="absolute w-[60%] h-[60%] rounded-full border border-orange-500/10 animate-pulse pointer-events-none" />
+                <div className="absolute w-[80%] h-[80%] rounded-full border border-[#10375C]/10 animate-pulse pointer-events-none" />
+                <div className="absolute w-[60%] h-[60%] rounded-full border border-[#10375C]/10 animate-pulse pointer-events-none" />
                 
-                <div className="p-4 rounded-full bg-gradient-to-tr from-orange-500 to-amber-500 text-white mb-4 relative z-10 shadow-md shadow-orange-500/20">
+                <div className="p-4 rounded-full bg-[#10375C] text-white mb-4 relative z-10 shadow-md shadow-[#10375C]/20">
                   <Play className="w-8 h-8 fill-current translate-x-0.5" />
                 </div>
                 
-                <h3 className="text-xl font-bold text-slate-800 relative z-10">VedAI Platform Walkthrough</h3>
+                <h3 className="text-xl font-bold text-slate-800 relative z-10">ClassPilot Platform Walkthrough</h3>
                 <p className="text-slate-500 text-xs max-w-sm mt-2 relative z-10">
                   Watch how teachers create curriculum-aligned questions, generate worksheets, and auto-evaluate student works in 2 minutes.
                 </p>
@@ -243,7 +259,7 @@ export default function LandingPage() {
                     }}
                     className="px-5 py-2.5 rounded-xl bg-slate-950 hover:bg-slate-850 text-white font-bold text-xs shadow-sm transition-all"
                   >
-                    Try VedAI Now
+                    Try ClassPilot Now
                   </button>
                   <button 
                     onClick={() => setShowDemoModal(false)}

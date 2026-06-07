@@ -136,7 +136,7 @@ export function TopBar({ onMenuToggle }: TopBarProps) {
     if (pathname === '/billing') return { parent: 'Settings', current: 'Billing' };
     if (pathname.includes('/result')) return { parent: 'Assessments', current: 'Results' };
     if (pathname.includes('/status')) return { parent: 'Assessments', current: 'Processing' };
-    return { parent: 'Workspace', current: 'VedAI' };
+    return { parent: 'Workspace', current: 'ClassPilot' };
   };
 
   const breadcrumbs = getBreadcrumb();
@@ -448,7 +448,7 @@ export function TopBar({ onMenuToggle }: TopBarProps) {
               }}
               className="text-xl font-bold tracking-tight text-slate-900 leading-none"
             >
-              VedaAI<span className="text-orange-500">.</span>
+              ClassPilot<span className="text-[#10375C]">.</span>
             </span>
           </div>
   

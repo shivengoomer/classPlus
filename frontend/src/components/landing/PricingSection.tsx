@@ -11,7 +11,7 @@ export default function PricingSection() {
   const plans = [
     {
       name: 'Free Trial',
-      desc: 'Perfect for trying out VedAI worksheets.',
+      desc: 'Perfect for trying out ClassPilot worksheets.',
       price: { monthly: 0, annual: 0 },
       features: [
         '10 AI credits limit',
@@ -116,13 +116,13 @@ export default function PricingSection() {
               whileHover={{ y: -6 }}
               className={`rounded-3xl p-8 flex flex-col justify-between transition-all duration-300 relative overflow-hidden ${
                 plan.highlighted 
-                  ? 'bg-white border-2 border-orange-500 shadow-xl shadow-orange-500/5' 
+                  ? 'bg-white border-2 border-[#10375C] shadow-xl shadow-[#10375C]/5' 
                   : 'bg-white/60 border border-slate-200/80 hover:border-slate-300 shadow-md shadow-slate-100/50'
               }`}
             >
               {/* Highlight background glow */}
               {plan.highlighted && (
-                <div className="absolute top-0 right-0 w-[50%] h-[50%] bg-orange-500/5 rounded-full blur-[80px] pointer-events-none" />
+                <div className="absolute top-0 right-0 w-[50%] h-[50%] bg-[#10375C]/5 rounded-full blur-[80px] pointer-events-none" />
               )}
 
               {/* Header section */}
@@ -130,8 +130,8 @@ export default function PricingSection() {
                 <div className="flex justify-between items-center">
                   <h3 className="text-xl font-bold text-slate-900">{plan.name}</h3>
                   {plan.badge && (
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-orange-500/10 text-orange-600 border border-orange-500/20 uppercase tracking-wide flex items-center gap-1">
-                      <Sparkles className="w-3 h-3 text-orange-600" /> {plan.badge}
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#10375C]/10 text-[#10375C] border border-[#10375C]/20 uppercase tracking-wide flex items-center gap-1">
+                      <Sparkles className="w-3 h-3 text-[#10375C]" /> {plan.badge}
                     </span>
                   )}
                 </div>
@@ -154,7 +154,7 @@ export default function PricingSection() {
                 <div className="flex flex-col gap-3.5">
                   {plan.features.map((feature, idx) => (
                     <div key={idx} className="flex items-start gap-3">
-                      <div className="w-4 h-4 rounded-full bg-orange-500/10 text-orange-600 flex items-center justify-center flex-shrink-0 mt-0.5 animate-pulse">
+                      <div className="w-4 h-4 rounded-full bg-[#10375C]/10 text-[#10375C] flex items-center justify-center flex-shrink-0 mt-0.5">
                         <Check className="w-3 h-3" />
                       </div>
                       <span className="text-xs text-slate-650 leading-relaxed">{feature}</span>
@@ -167,7 +167,7 @@ export default function PricingSection() {
               <button
                 className={`w-full py-3.5 rounded-2xl text-xs font-semibold mt-8 transition-all active:scale-95 ${
                   plan.highlighted
-                    ? 'bg-gradient-to-r from-orange-500 via-orange-600 to-amber-500 hover:from-orange-400 hover:via-orange-550 hover:to-amber-400 text-white shadow-md shadow-orange-500/20'
+                    ? 'bg-[#10375C] hover:bg-[#0d2f4f] text-white shadow-md shadow-[#10375C]/20'
                     : 'bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200/80'
                 }`}
               >

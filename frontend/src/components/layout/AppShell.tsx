@@ -161,8 +161,8 @@ export function AppShell({ children }: AppShellProps) {
                 <div>
                   <div className="flex items-center justify-between border-b border-slate-200/60 pb-4 mb-4">
                     <div className="flex items-center gap-2">
-                      <div className="flex-shrink-0 w-7 h-7 rounded-lg bg-gradient-to-tr from-orange-500 to-amber-500 flex items-center justify-center shadow-md shadow-orange-500/10">
-                        <span className="text-white text-xs font-black">V</span>
+                      <div className="flex-shrink-0 w-7 h-7 rounded-lg bg-[#10375C] flex items-center justify-center shadow-md shadow-[#10375C]/20">
+                        <span className="text-white text-xs font-black">C</span>
                       </div>
                       <span 
                         style={{
@@ -175,7 +175,7 @@ export function AppShell({ children }: AppShellProps) {
                           letterSpacing: '-1.2px',
                         }}
                       >
-                        VedaAI
+                        ClassPilot
                       </span>
                     </div>
                     <button 
@@ -196,11 +196,11 @@ export function AppShell({ children }: AppShellProps) {
                           onClick={() => setMobileMenuOpen(false)}
                           className={`flex items-center gap-3 py-2.5 px-3 rounded-xl text-sm font-bold transition-all ${
                             isActive 
-                              ? 'bg-orange-500/10 text-orange-655 border border-orange-500/10' 
+                              ? 'bg-[#10375C]/10 text-[#10375C] border border-[#10375C]/15' 
                               : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/40 border-transparent'
                           }`}
                         >
-                          <span className={`${isActive ? 'text-orange-600' : 'text-slate-500'}`}>
+                          <span className={`${isActive ? 'text-[#10375C]' : 'text-slate-500'}`}>
                             {item.icon}
                           </span>
                           <span>{item.label}</span>
@@ -212,7 +212,7 @@ export function AppShell({ children }: AppShellProps) {
 
                 <div className="border-t border-slate-200/60 pt-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-orange-500 to-amber-500 text-white flex items-center justify-center font-bold text-xs uppercase shadow-md shadow-orange-500/10">
+                    <div className="w-8 h-8 rounded-full bg-[#10375C] text-white flex items-center justify-center font-bold text-xs uppercase shadow-md shadow-[#10375C]/20">
                       {profile?.schoolName ? profile.schoolName.substring(0, 2) : 'DP'}
                     </div>
                     <div className="flex flex-col min-w-0">

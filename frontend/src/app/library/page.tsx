@@ -193,7 +193,7 @@ export default function LibraryPage() {
       );
     }
     return (
-      <div className="w-9 h-9 rounded-xl bg-orange-50 border border-orange-100/60 text-orange-500 flex items-center justify-center flex-shrink-0">
+      <div className="w-9 h-9 rounded-xl bg-[#10375C]/5 border border-[#10375C]/15/60 text-[#10375C] flex items-center justify-center flex-shrink-0">
         <FileText className="w-4.5 h-4.5" />
       </div>
     );
@@ -227,7 +227,7 @@ export default function LibraryPage() {
         <div className="hidden md:flex flex-col md:flex-row md:items-center justify-between gap-4 pl-2 select-none">
           <div className="flex flex-col gap-1">
             <h2 className="text-[20px] font-bold text-slate-800 flex items-center gap-2.5">
-              <BookOpen className="w-4.5 h-4.5 text-orange-500" />
+              <BookOpen className="w-4.5 h-4.5 text-[#10375C]" />
               <span>Library</span>
             </h2>
             <p className="text-[13px] text-slate-505 font-sans leading-tight">
@@ -240,7 +240,7 @@ export default function LibraryPage() {
               disabled={loading}
               icon={loading ? <Loader2 className="w-3.5 h-3.5 animate-spin text-white" /> : <Plus className="w-3.5 h-3.5 text-white" />}
               onClick={handleUploadClick}
-              className="bg-gradient-to-r from-orange-500 to-amber-500 border-0 rounded-2xl px-5 py-3 text-xs font-bold text-white shadow-md active:scale-95 cursor-pointer transition-all"
+              className="bg-[#10375C] border-0 rounded-2xl px-5 py-3 text-xs font-bold text-white shadow-md active:scale-95 cursor-pointer transition-all"
             >
               Upload Material
             </PillButton>
@@ -267,7 +267,7 @@ export default function LibraryPage() {
             disabled={loading}
             icon={loading ? <Loader2 className="w-3.5 h-3.5 animate-spin text-white" /> : <Plus className="w-3.5 h-3.5 text-white" />}
             onClick={handleUploadClick}
-            className="w-full justify-center bg-gradient-to-r from-orange-500 to-amber-500 border-0 rounded-2xl py-3.5 text-xs font-bold text-white shadow-md active:scale-95 cursor-pointer"
+            className="w-full justify-center bg-[#10375C] border-0 rounded-2xl py-3.5 text-xs font-bold text-white shadow-md active:scale-95 cursor-pointer"
           >
             Upload Material
           </PillButton>
@@ -284,20 +284,20 @@ export default function LibraryPage() {
                 onClick={() => setActiveCategory(null)}
                 className={`backdrop-blur-md border rounded-2xl p-4 transition-all cursor-pointer flex items-center justify-between gap-3 shadow-[0_4px_20px_rgba(0,0,0,0.015)] hover:scale-[1.01] active:scale-[0.99] group ${
                   activeCategory === null 
-                    ? 'border-orange-500 bg-gradient-to-tr from-orange-500/10 to-amber-500/5 text-orange-655 ring-1 ring-orange-500/20' 
+                    ? 'border-[#10375C] bg-[#10375C]/10 text-[#10375C] ring-1 ring-[#10375C]/20' 
                     : 'border-slate-200 bg-white/90 hover:bg-white hover:border-orange-500/20 text-slate-800'
                 }`}
               >
                 <div className="flex items-center gap-3.5 min-w-0">
                   <Folder className={`w-9 h-9 flex-shrink-0 transition-colors ${
-                    activeCategory === null ? 'text-orange-500 fill-orange-500/10' : 'text-slate-400 fill-slate-50 group-hover:text-orange-500 group-hover:fill-orange-50/50'
+                    activeCategory === null ? 'text-[#10375C] fill-orange-500/10' : 'text-slate-400 fill-slate-50 group-hover:text-[#10375C] group-hover:fill-orange-50/50'
                   }`} />
                   <div className="flex flex-col min-w-0 leading-none">
                     <span className="text-sm font-bold truncate text-slate-800 group-hover:text-slate-900">All Documents</span>
                     <span className="text-xs text-slate-400 font-medium mt-1 font-sans">{totalCount} items</span>
                   </div>
                 </div>
-                <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-orange-500 group-hover:translate-x-0.5 transition-all" />
+                <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-[#10375C] group-hover:translate-x-0.5 transition-all" />
               </div>
 
               {categories.map((cat) => (
@@ -306,20 +306,20 @@ export default function LibraryPage() {
                   onClick={() => setActiveCategory(activeCategory === cat ? null : cat)}
                   className={`backdrop-blur-md border rounded-2xl p-4 transition-all cursor-pointer flex items-center justify-between gap-3 shadow-[0_4px_20px_rgba(0,0,0,0.015)] hover:scale-[1.01] active:scale-[0.99] group ${
                     activeCategory === cat 
-                      ? 'border-orange-500 bg-gradient-to-tr from-orange-500/10 to-amber-500/5 text-orange-655 ring-1 ring-orange-500/20' 
+                      ? 'border-[#10375C] bg-[#10375C]/10 text-[#10375C] ring-1 ring-[#10375C]/20' 
                       : 'border-slate-200 bg-white/90 hover:bg-white hover:border-orange-500/20 text-slate-800'
                   }`}
                 >
                   <div className="flex items-center gap-3.5 min-w-0">
                     <Folder className={`w-9 h-9 flex-shrink-0 transition-colors ${
-                      activeCategory === cat ? 'text-orange-500 fill-orange-500/10' : 'text-slate-400 fill-slate-50 group-hover:text-orange-500 group-hover:fill-orange-50/50'
+                      activeCategory === cat ? 'text-[#10375C] fill-orange-500/10' : 'text-slate-400 fill-slate-50 group-hover:text-[#10375C] group-hover:fill-orange-50/50'
                     }`} />
                     <div className="flex flex-col min-w-0 leading-none">
                       <span className="text-sm font-bold truncate text-slate-800 group-hover:text-slate-900">{cat}</span>
                       <span className="text-xs text-slate-400 font-medium mt-1 font-sans">{getCategoryCount(cat)} items</span>
                     </div>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-orange-500 group-hover:translate-x-0.5 transition-all" />
+                  <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-[#10375C] group-hover:translate-x-0.5 transition-all" />
                 </div>
               ))}
             </div>
@@ -335,15 +335,15 @@ export default function LibraryPage() {
               onClick={handleUploadClick}
               className={`backdrop-blur-md border border-dashed rounded-3xl p-5 shadow-[0_8px_30px_rgba(0,0,0,0.015)] transition-all cursor-pointer flex flex-col items-center justify-center text-center min-h-[140px] gap-2.5 group relative overflow-hidden ${
                 isDragging 
-                  ? 'border-orange-500 bg-orange-500/5 ring-2 ring-orange-500/10 shadow-lg shadow-orange-500/5' 
+                  ? 'border-[#10375C] bg-[#10375C]/5 ring-2 ring-[#10375C]/10 shadow-lg shadow-orange-500/5' 
                   : 'border-slate-250 bg-white/90 hover:bg-white hover:border-orange-500/30 hover:shadow-lg hover:shadow-orange-500/5'
               }`}
             >
-              <div className="p-3 rounded-full bg-orange-50 border border-orange-100 text-orange-500 group-hover:scale-110 group-hover:bg-orange-500 group-hover:text-white transition-all duration-300 shadow-sm">
+              <div className="p-3 rounded-full bg-[#10375C]/5 border border-[#10375C]/15 text-[#10375C] group-hover:scale-110 group-hover:bg-[#10375C] group-hover:text-white transition-all duration-300 shadow-sm">
                 <Plus className="w-4 h-4 transition-colors" />
               </div>
               <div className="flex flex-col gap-0.5 leading-tight">
-                <span className="text-sm font-bold text-slate-800 group-hover:text-orange-600 transition-colors">
+                <span className="text-sm font-bold text-slate-800 group-hover:text-[#10375C] transition-colors">
                   Upload Document
                 </span>
                 <span className="text-xs text-slate-400 font-medium font-sans mt-0.5">
@@ -388,7 +388,7 @@ export default function LibraryPage() {
           
           {loading && (
             <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-10 flex items-center justify-center">
-              <Loader2 className="w-7 h-7 animate-spin text-orange-500" />
+              <Loader2 className="w-7 h-7 animate-spin text-[#10375C]" />
             </div>
           )}
 
@@ -421,7 +421,7 @@ export default function LibraryPage() {
                       <div className="flex items-center gap-2">
                         <span 
                           onClick={() => item.type !== 'folder' && handleDownload(item)}
-                          className={`font-bold truncate transition-colors ${item.type !== 'folder' ? 'hover:text-orange-600 cursor-pointer' : ''}`}
+                          className={`font-bold truncate transition-colors ${item.type !== 'folder' ? 'hover:text-[#10375C] cursor-pointer' : ''}`}
                         >
                           {item.name}
                         </span>
@@ -432,7 +432,7 @@ export default function LibraryPage() {
                             Export
                           </span>
                         ) : (
-                          <span className="flex-shrink-0 text-[8px] font-bold uppercase px-2 py-0.5 rounded-full bg-orange-50/85 text-orange-655 border border-orange-150 tracking-wider">
+                          <span className="flex-shrink-0 text-[8px] font-bold uppercase px-2 py-0.5 rounded-full bg-[#10375C]/5 text-[#10375C] border border-orange-150 tracking-wider">
                             Upload
                           </span>
                         )}
@@ -505,7 +505,7 @@ export default function LibraryPage() {
               {/* Header */}
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-10 h-10 rounded-xl bg-orange-50 text-orange-500 flex items-center justify-center shadow-sm">
+                  <div className="w-10 h-10 rounded-xl bg-orange-50 text-[#10375C] flex items-center justify-center shadow-sm">
                     <BookOpen className="w-5 h-5" />
                   </div>
                   <div>
@@ -528,8 +528,8 @@ export default function LibraryPage() {
 
               {/* File Info Card */}
               <div className="p-3.5 bg-slate-50 border border-slate-150/40 rounded-2xl flex items-center gap-3">
-                <div className="w-8 h-8 rounded-xl bg-orange-500/10 text-orange-650 flex items-center justify-center flex-shrink-0">
-                  <FileText className="w-4.5 h-4.5 text-orange-500" />
+                <div className="w-8 h-8 rounded-xl bg-[#10375C]/10 text-[#10375C] flex items-center justify-center flex-shrink-0">
+                  <FileText className="w-4.5 h-4.5 text-[#10375C]" />
                 </div>
                 <div className="flex flex-col min-w-0">
                   <span className="text-xs font-bold text-slate-700 truncate font-sans">{pendingFile.name}</span>
@@ -554,13 +554,13 @@ export default function LibraryPage() {
                       }}
                       className={`p-3 rounded-xl border text-left text-xs font-bold font-sans transition-all flex items-center justify-between cursor-pointer ${
                         uploadCategoryMode === 'existing' && selectedUploadCategory === cat
-                          ? 'border-orange-500 bg-orange-500/5 text-orange-600 ring-1 ring-orange-500/20'
+                          ? 'border-[#10375C] bg-[#10375C]/5 text-[#10375C] ring-1 ring-[#10375C]/20'
                           : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
                       }`}
                     >
                       <span className="truncate">{cat}</span>
                       {uploadCategoryMode === 'existing' && selectedUploadCategory === cat && (
-                        <Check className="w-3.5 h-3.5 text-orange-500 flex-shrink-0 ml-1.5" />
+                        <Check className="w-3.5 h-3.5 text-[#10375C] flex-shrink-0 ml-1.5" />
                       )}
                     </button>
                   ))}
@@ -573,13 +573,13 @@ export default function LibraryPage() {
                     }}
                     className={`p-3 rounded-xl border text-left text-xs font-bold font-sans transition-all flex items-center justify-between cursor-pointer ${
                       uploadCategoryMode === 'new'
-                        ? 'border-orange-500 bg-orange-500/5 text-orange-600 ring-1 ring-orange-500/20'
+                        ? 'border-[#10375C] bg-[#10375C]/5 text-[#10375C] ring-1 ring-[#10375C]/20'
                         : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
                     }`}
                   >
                     <span>+ Create Custom</span>
                     {uploadCategoryMode === 'new' && (
-                      <Check className="w-3.5 h-3.5 text-orange-500 flex-shrink-0 ml-1.5" />
+                      <Check className="w-3.5 h-3.5 text-[#10375C] flex-shrink-0 ml-1.5" />
                     )}
                   </button>
                 </div>

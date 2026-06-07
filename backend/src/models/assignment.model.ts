@@ -20,6 +20,7 @@ const QuestionSchema = new Schema({
   marks: { type: Number, required: true },
   options: [{ type: String }], // only for mcq and truefalse
   answer: { type: String },
+  conceptTag: { type: String }, // topic/concept label for progress tracking
 }, { _id: false });
 
 // section of the paper (Section A, B, C...)
@@ -78,6 +79,7 @@ export interface IAssignment extends Document {
   jobId?: string;
   result?: any;
   userId?: string;
+  parentAssignmentId?: string; // links difficulty variant to original
   createdAt: Date;
   updatedAt: Date;
 }
@@ -102,6 +104,7 @@ const AssignmentSchema = new Schema(
     jobId: { type: String },
     result: ResultSchema,
     userId: { type: String },
+    parentAssignmentId: { type: String }, // links difficulty variant to original
   },
   {
     timestamps: true, // auto adds createdAt and updatedAt
