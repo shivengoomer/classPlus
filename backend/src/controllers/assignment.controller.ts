@@ -5,6 +5,8 @@ import { Request, Response } from 'express';
 import crypto from 'crypto';
 import { Assignment } from '../models/assignment.model';
 import { User } from '../models/user.model';
+import { AssignedAssignment } from '../models/assignedAssignment.model';
+import { StudentSubmission } from '../models/studentSubmission.model';
 import { addAssignmentJob } from '../queues/assignment.queue';
 import { generatePDF } from '../services/pdf.service';
 import { broadcastToJob } from '../websocket/socket';
@@ -153,6 +155,61 @@ export async function regenerateAssignment(req: Request, res: Response) {
   } catch (error) {
     logError('Failed to regenerate assignment', error);
     return res.status(500).json({ error: 'Failed to regenerate assignment' });
+  }
+}
+
+// POST /api/assignments/:id/regenerate-difficulty — regenerate variant with different difficulty
+export async function regenerateWithDifficulty(req: Request, res: Response) {
+  try {
+    const { id } = req.params;
+    const { targetDifficulty } = req.body; // 'easier' | 'same' | 'harder'
+    const userId = (req as any).auth?.userId;
+
+    if (!['easier', 'same', 'harder'].includes(targetDifficulty)) {
+      return res.status(400).json({ error: 'Invalid targetDifficulty' });
+    }
+
+    const originalAssignment = await Assignment.findOne({ _id: id, userId });
+    if (!originalAssignment) {
+      return res.status(404).json({ error: 'Original assignment not found' });
+    }
+
+    // Generate a new variant assignment
+    const jobId = crypto.randomUUID();
+    const newAssignment = await Assignment.create({
+      title: `${originalAssignment.title} (${targetDifficulty.toUpperCase()})`,
+      subject: originalAssignment.subject,
+      grade: originalAssignment.grade,
+      dueDate: originalAssignment.dueDate,
+      questionRows: originalAssignment.questionRows,
+      totalMarks: originalAssignment.totalMarks,
+      additionalInstructions: `Difficulty: ${targetDifficulty}`,
+      status: 'pending',
+      jobId,
+      userId,
+      parentAssignmentId: originalAssignment._id.toString(),
+    });
+
+    log(`Difficulty variant assignment created: ${newAssignment._id} with jobId: ${jobId} for user ${userId}`);
+
+    // Queue the job
+    await addAssignmentJob(newAssignment._id.toString(), jobId);
+
+    // immediately tell connected clients the job is queued
+    broadcastToJob(jobId, {
+      type: 'job:queued',
+      status: 'queued',
+      progress: 0,
+      message: 'Regeneration job queued...',
+    });
+
+    return res.status(201).json({
+      assignmentId: newAssignment._id,
+      jobId,
+    });
+  } catch (error) {
+    logError('Failed to regenerate assignment with difficulty', error);
+    return res.status(500).json({ error: 'Failed to regenerate assignment with difficulty' });
   }
 }
 

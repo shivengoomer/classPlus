@@ -3,6 +3,12 @@
 
 import mongoose, { Schema, Document } from 'mongoose';
 
+const RubricCriteriaSchema = new Schema({
+  label: { type: String, required: true },
+  marks: { type: Number, required: true },
+  description: { type: String, required: true },
+}, { _id: false });
+
 // question inside a section
 const QuestionSchema = new Schema({
   id: { type: String, required: true },
@@ -21,7 +27,9 @@ const QuestionSchema = new Schema({
   options: [{ type: String }], // only for mcq and truefalse
   answer: { type: String },
   conceptTag: { type: String }, // topic/concept label for progress tracking
+  rubric: [RubricCriteriaSchema], // detailed marking rubric
 }, { _id: false });
+
 
 // section of the paper (Section A, B, C...)
 const SectionSchema = new Schema({

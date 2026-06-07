@@ -12,6 +12,7 @@ import {
   deleteAssignment,
   regenerateAssignment,
   exportPDF,
+  regenerateWithDifficulty,
 } from '../controllers/assignment.controller';
 import { requireAuth, syncUserMiddleware } from '../middlewares/auth.middleware';
 
@@ -58,5 +59,6 @@ router.get('/', listAssignments);
 router.get('/:id', getAssignment);
 router.delete('/:id', deleteAssignment);
 router.post('/:id/regenerate', regenerateAssignment);
+router.post('/:id/regenerate-difficulty', regenerateWithDifficulty);
 
 export default router;

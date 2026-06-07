@@ -7,6 +7,8 @@ import path from 'path';
 import fs from 'fs';
 import { getRedisOptions } from '../config/redis';
 import { Assignment } from '../models/assignment.model';
+import { AssignedAssignment } from '../models/assignedAssignment.model';
+import { StudentSubmission } from '../models/studentSubmission.model';
 import { Notification } from '../models/notification.model';
 import { LibraryItem } from '../models/library.model';
 import { User } from '../models/user.model';
@@ -15,7 +17,7 @@ import { generateWithAI } from '../services/ai.service';
 import { generatePDF } from '../services/pdf.service';
 import { env } from '../config/env';
 import { UTApi, UTFile } from 'uploadthing/server';
-import { buildPrompt } from '../utils/promptBuilder';
+import { buildPrompt, buildRegeneratePrompt } from '../utils/promptBuilder';
 import { broadcastToJob } from '../websocket/socket';
 import { log, logError } from '../utils/logger';
 
@@ -163,14 +165,78 @@ async function processAssignment(job: Job<JobData>) {
       message: 'Building structured prompt...',
     });
 
-    const prompt = buildPrompt({
-      title: assignment.title,
-      subject: assignment.subject,
-      grade: assignment.grade,
-      questionRows: assignment.questionRows,
-      additionalInstructions: assignment.additionalInstructions,
-      fileContent: fileContent || undefined,
-    });
+    let prompt = '';
+    if (assignment.parentAssignmentId) {
+      const parentAssignment = await Assignment.findById(assignment.parentAssignmentId);
+      if (!parentAssignment) {
+        throw new Error(`Parent assignment ${assignment.parentAssignmentId} not found`);
+      }
+
+      // Parse target difficulty from instructions (e.g. "Difficulty: easier")
+      let targetDifficulty: 'easier' | 'same' | 'harder' = 'same';
+      if (assignment.additionalInstructions?.includes('easier')) {
+        targetDifficulty = 'easier';
+      } else if (assignment.additionalInstructions?.includes('harder')) {
+        targetDifficulty = 'harder';
+      }
+
+      // Get original questions from parent result
+      const originalQuestions = parentAssignment.result?.sections?.flatMap((s: any) => 
+        (s.questions || []).map((q: any) => ({
+          id: q.id,
+          text: q.text,
+          type: q.type,
+          difficulty: q.difficulty,
+          marks: q.marks,
+          conceptTag: q.conceptTag || '',
+        }))
+      ) || [];
+
+      // Fetch student submissions for the parent assignment to construct performance stats
+      let scoreStats: { averagePercent: number; totalStudents: number } | undefined;
+      try {
+        const assignedAssignments = await AssignedAssignment.find({ assignmentId: assignment.parentAssignmentId });
+        if (assignedAssignments.length > 0) {
+          const assignedIds = assignedAssignments.map(a => a._id);
+          const submissions = await StudentSubmission.find({
+            assignedAssignmentId: { $in: assignedIds },
+            submittedAt: { $ne: null }
+          });
+          
+          if (submissions.length > 0) {
+            let totalPercent = 0;
+            submissions.forEach(sub => {
+              const subMarks = sub.totalMarks || parentAssignment.totalMarks || 1;
+              totalPercent += (sub.totalScore / subMarks) * 100;
+            });
+            scoreStats = {
+              averagePercent: Math.round(totalPercent / submissions.length),
+              totalStudents: submissions.length,
+            };
+          }
+        }
+      } catch (statsErr) {
+        logError('Failed to fetch class performance stats for adaptive regeneration', statsErr);
+      }
+
+      prompt = buildRegeneratePrompt({
+        subject: assignment.subject,
+        grade: assignment.grade,
+        originalQuestions,
+        targetDifficulty,
+        questionRows: assignment.questionRows,
+        scoreStats,
+      });
+    } else {
+      prompt = buildPrompt({
+        title: assignment.title,
+        subject: assignment.subject,
+        grade: assignment.grade,
+        questionRows: assignment.questionRows,
+        additionalInstructions: assignment.additionalInstructions,
+        fileContent: fileContent || undefined,
+      });
+    }
 
     // step 4: call AI
     broadcastToJob(jobId, {
@@ -215,6 +281,8 @@ async function processAssignment(job: Job<JobData>) {
             marks: typeof q.marks === 'number' ? q.marks : 1,
             options: Array.isArray(q.options) ? q.options : [],
             answer: q.answer || '',
+            conceptTag: q.conceptTag || '',
+            rubric: Array.isArray(q.rubric) ? q.rubric : [],
           };
         }),
       };

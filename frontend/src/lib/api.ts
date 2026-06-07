@@ -125,6 +125,18 @@ export async function regenerateAssignment(id: string): Promise<{ jobId: string 
   return res.json();
 }
 
+export async function regenerateWithDifficulty(id: string, targetDifficulty: 'easier' | 'same' | 'harder'): Promise<{ assignmentId: string; jobId: string }> {
+  const res = await authFetch(`${BASE_URL}/assignments/${id}/regenerate-difficulty`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ targetDifficulty }),
+  });
+  if (!res.ok) throw new Error('Failed to regenerate assignment with difficulty');
+  return res.json();
+}
+
 export async function exportAssignmentPDF(id: string): Promise<Blob> {
   const res = await authFetch(`${BASE_URL}/assignments/${id}/export-pdf`);
   if (!res.ok) throw new Error('Failed to export PDF');
