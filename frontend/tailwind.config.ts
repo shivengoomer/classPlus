@@ -9,7 +9,7 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["var(--font-bricolage)", "sans-serif"],
+        sans: ["var(--font-plus-jakarta-sans)", "sans-serif"],
       },
       colors: {
         background: "var(--background)",

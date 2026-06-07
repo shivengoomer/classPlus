@@ -29,7 +29,7 @@
 body {
   color: var(--veda-text-primary);
   background: var(--veda-bg);
-  font-family: var(--font-bricolage), sans-serif;
+  font-family: var(--font-plus-jakarta-sans), sans-serif;
   overflow-x: hidden;
 }
 

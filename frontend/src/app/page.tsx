@@ -13,6 +13,7 @@ import BackgroundMesh from '@/components/landing/BackgroundMesh';
 import Navbar from '@/components/landing/Navbar';
 import DeviceShowcase from '@/components/landing/DeviceShowcase';
 import BentoGrid from '@/components/landing/BentoGrid';
+import FeaturesExplorer from '@/components/landing/FeaturesExplorer';
 import PricingSection from '@/components/landing/PricingSection';
 import Footer from '@/components/landing/Footer';
 
@@ -203,6 +204,9 @@ export default function LandingPage() {
 
       {/* 4. BENTO GRID FEATURES */}
       <BentoGrid />
+
+      {/* 4.5. INTERACTIVE FEATURE SUITE EXPLORER */}
+      <FeaturesExplorer />
 
       {/* 5. PRICING SEGMENT */}
       <PricingSection />

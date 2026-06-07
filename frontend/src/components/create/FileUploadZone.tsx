@@ -136,7 +136,7 @@ export function FileUploadZone({
       <label 
         style={{
           color: '#303030',
-          fontFamily: '"Bricolage Grotesque", sans-serif',
+          fontFamily: '"Plus Jakarta Sans", sans-serif',
           fontSize: '16px',
           fontWeight: 700,
           lineHeight: '140%',
@@ -228,7 +228,7 @@ export function FileUploadZone({
             <p 
               style={{
                 color: '#303030',
-                fontFamily: '"Bricolage Grotesque", sans-serif',
+                fontFamily: '"Plus Jakarta Sans", sans-serif',
                 fontSize: '16px',
                 fontWeight: 600,
                 lineHeight: '140%',
@@ -241,7 +241,7 @@ export function FileUploadZone({
             <p 
               style={{
                 color: 'rgba(94, 94, 94, 0.80)',
-                fontFamily: '"Bricolage Grotesque", sans-serif',
+                fontFamily: '"Plus Jakarta Sans", sans-serif',
                 fontSize: '14px',
                 fontWeight: 400,
                 lineHeight: '140%',
@@ -453,7 +453,7 @@ export function FileUploadZone({
       <span 
         style={{
           color: 'rgba(94, 94, 94, 0.55)',
-          fontFamily: '"Bricolage Grotesque", sans-serif',
+          fontFamily: '"Plus Jakarta Sans", sans-serif',
           fontSize: '14px',
           fontWeight: 400,
           lineHeight: '140%',

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Bricolage_Grotesque, Inter } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { ToastContainer } from "@/components/shared/ToastContainer";
 import { TopLoadingBar } from "@/components/layout/TopLoadingBar";
@@ -7,14 +7,9 @@ import { ClerkTokenProvider } from "@/components/layout/ClerkTokenProvider";
 import { Suspense } from "react";
 import { ClerkProvider } from "@clerk/nextjs";
 
-const bricolage = Bricolage_Grotesque({
+const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  variable: "--font-bricolage",
-});
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-plus-jakarta-sans",
 });
 
 export const metadata: Metadata = {
@@ -34,7 +29,7 @@ export default function RootLayout({
     <ClerkProvider afterSignOutUrl="/sign-in">
       <html lang="en">
         <body
-          className={`${bricolage.variable} ${inter.variable} antialiased`}
+          className={`${plusJakartaSans.variable} antialiased`}
         >
           <ClerkTokenProvider>
             <Suspense fallback={null}>

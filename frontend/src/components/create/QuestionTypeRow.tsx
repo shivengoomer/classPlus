@@ -95,7 +95,7 @@ export function QuestionTypeRow({
       {/* Desktop Row View */}
       <div className="hidden md:flex items-center justify-between w-full gap-4">
         {/* Left Side: Select Dropdown, Remove & Wand Button */}
-        <div className="flex items-center gap-3.5 w-[443px] flex-shrink-0">
+        <div className="flex-1 flex items-center gap-3.5 min-w-[200px]">
           <div 
             className="flex-1 h-[44px] px-4 bg-white rounded-full flex items-center justify-between relative"
             style={{ 

@@ -167,7 +167,7 @@ export function AppShell({ children }: AppShellProps) {
                       <span 
                         style={{
                           color: 'var(--Text-Primary, #303030)',
-                          fontFamily: 'var(--font-bricolage), "Bricolage Grotesque", sans-serif',
+                          fontFamily: 'var(--font-plus-jakarta-sans), "Plus Jakarta Sans", sans-serif',
                           fontSize: '20px',
                           fontStyle: 'normal',
                           fontWeight: 700,

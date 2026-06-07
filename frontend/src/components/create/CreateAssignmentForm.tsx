@@ -239,224 +239,185 @@ export function CreateAssignmentForm() {
   };
 
   return (
-    <div>
-      <div className="hidden md:flex flex-col gap-1">
-        <div className="pl-2 flex items-center gap-3">
-          {/* Glowing Green Live Indicator dot */}
-          <div
-            className="w-3 h-3 bg-[#4BC26D] rounded-full inline-block flex-shrink-0"
-            style={{
-              boxShadow: '0px 32px 48px rgba(0, 0, 0, 0.20), 0px 16px 48px rgba(0, 0, 0, 0.12)',
-              outline: '4px rgba(75.15, 193.95, 108.81, 0.40) solid'
-            }}
-          />
-          <h2 className="text-[20px] font-bold text-[#303030] font-sans">
-            Create Assignment
-          </h2>
+    <div className="w-full flex flex-col gap-6">
+      {/* Page Header (Desktop) */}
+      <div className="hidden lg:flex items-center justify-between pb-2">
+        <div className="flex flex-col gap-1.5">
+          <div className="flex items-center gap-3">
+            {/* Glowing Green Live Indicator dot */}
+            <div
+              className="w-2.5 h-2.5 bg-[#4BC26D] rounded-full flex-shrink-0"
+              style={{
+                boxShadow: '0px 0px 12px 2px rgba(75, 194, 109, 0.60)',
+                outline: '4px rgba(75, 194, 109, 0.25) solid'
+              }}
+            />
+            <h2 className="text-[24px] font-black tracking-tight text-slate-900 font-sans" style={{ fontFamily: 'var(--font-plus-jakarta-sans), "Plus Jakarta Sans", sans-serif' }}>
+              Create Assessment
+            </h2>
+          </div>
+          <p className="text-xs text-slate-500 font-sans font-medium">
+            Upload reference materials and configure your exam blueprints to generate sheets instantly.
+          </p>
         </div>
-        <p
-          style={{
-            color: 'rgba(94, 94, 94, 0.80)',
-            fontFamily: '"Bricolage Grotesque", sans-serif',
-            fontSize: '14px',
-            fontWeight: 400,
-            lineHeight: '140%',
-            letterSpacing: '-0.56px',
-            marginLeft: '28px'
-          }}
+        
+        <button
+          type="button"
+          onClick={() => router.push('/assignments')}
+          className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-slate-650 hover:text-slate-900 hover:bg-slate-100 rounded-full border border-slate-200 shadow-sm active:scale-95 transition-all font-sans"
         >
-          Basic information about your assignment
-        </p>
+          <ArrowLeft className="w-3.5 h-3.5" />
+          <span>Back to Library</span>
+        </button>
       </div>
-      <div className="w-full max-w-[810px] mx-auto flex flex-col gap-6 pb-16 px-[2px] relative z-10">
 
-        {/* Page Header (Desktop vs Mobile Figma match) */}
-        <div className="md:flex flex-col gap-1 hidden pl-2">
-
-        </div>
-
-        {/* Mobile Figma Header */}
-        <div 
+      {/* Mobile Figma Header */}
+      <div 
+        style={{
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          alignSelf: 'stretch',
+        }}
+        className="flex lg:hidden w-full px-2 py-1"
+      >
+        <button
+          type="button"
+          onClick={handleMobileBack}
           style={{
-            justifyContent: 'space-between',
+            display: 'flex',
+            width: '42px',
+            height: '42px',
+            justifyContent: 'center',
             alignItems: 'center',
-            alignSelf: 'stretch',
+            borderRadius: '100px',
+            background: 'white',
           }}
-          className="flex md:hidden w-full px-4 py-2"
+          className="active:scale-95 transition-all text-slate-700 border border-slate-200/60 shadow-sm flex-shrink-0"
         >
-          <button
-            type="button"
-            onClick={handleMobileBack}
-            style={{
-              display: 'flex',
-              width: '48px',
-              height: '48px',
-              justifyContent: 'center',
-              alignItems: 'center',
-              gap: '10px',
-              aspectRatio: '1/1',
-              borderRadius: '100px',
-              background: 'var(--Background-white-25, rgba(255, 255, 255, 0.25))',
-              backdropFilter: 'blur(12px)',
-              WebkitBackdropFilter: 'blur(12px)',
-            }}
-            className="active:scale-95 transition-all text-[#303030] border border-gray-200/50 flex-shrink-0"
-          >
-            <ArrowLeft className="w-5 h-5 stroke-[2.5]" />
-          </button>
+          <ArrowLeft className="w-4 h-4 stroke-[2.5]" />
+        </button>
 
-          <h2
-            style={{
-              color: 'var(--Text-Primary, #303030)',
-              textAlign: 'center',
-              fontFamily: '"Bricolage Grotesque", sans-serif',
-              fontSize: '16px',
-              fontStyle: 'normal',
-              fontWeight: 700,
-              lineHeight: '140%',
-              letterSpacing: '-0.64px',
-            }}
-            className="flex-1"
-          >
-            Create Assignment
-          </h2>
-
-          {/* Spacer to center the heading */}
-          <div className="w-12 h-12 flex-shrink-0" />
-        </div>
-
-        {/* Form Completion Progress Bar */}
-        <div className="px-2 -mt-4 -mb-2">
-          <ProgressBar progress={progressPercent} />
-        </div>
-
-        {/* Form Container */}
-        <form
-          onSubmit={handleSubmit}
-          className="backdrop-blur-md border border-veda-card-border shadow-sm p-4 sm:p-6 md:p-8 flex flex-col gap-6 md:gap-8 w-full"
+        <h2
           style={{
-            borderRadius: '32px',
-            background: 'rgba(255, 255, 255, 0.50)'
+            color: '#111111',
+            textAlign: 'center',
+            fontFamily: '"Plus Jakarta Sans", sans-serif',
+            fontSize: '17px',
+            fontWeight: 800,
+            lineHeight: '140%',
+            letterSpacing: '-0.64px',
           }}
+          className="flex-1"
         >
+          {mobileStep === 1 ? '1. Details & Files' : '2. Question Blueprint'}
+        </h2>
 
-          {/* Validation errors are now presented in a premium modal overlay */}
+        {/* Spacer to center the heading */}
+        <div className="w-10 h-10 flex-shrink-0" />
+      </div>
 
-          {/* --- STEP 1: Basic Info & File (Visible always on Desktop, Step 1 on Mobile) --- */}
-          <div className={`${mobileStep === 1 ? 'flex' : 'hidden'} md:flex flex-col gap-8`}>
+      {/* Form Completion Progress Bar */}
+      <div className="w-full">
+        <ProgressBar progress={progressPercent} />
+      </div>
 
-            {/* Section: Basic Details */}
-            <div className="flex flex-col gap-6">
-              <div className="flex flex-col gap-1 items-center w-full border-b border-gray-150/50 pb-4">
-                <h3
-                  style={{
-                    color: '#303030',
-                    textAlign: 'center',
-                    fontFamily: '"Bricolage Grotesque", sans-serif',
-                    fontSize: '20px',
-                    fontWeight: 700,
-                    lineHeight: '140%',
-                    letterSpacing: '-0.8px',
-                  }}
-                >
-                  Assignment Details
-                </h3>
-                <p
-                  style={{
-                    color: 'rgba(94, 94, 94, 0.55)',
-                    textAlign: 'center',
-                    fontFamily: '"Bricolage Grotesque", sans-serif',
-                    fontSize: '14px',
-                    fontWeight: 400,
-                    lineHeight: '140%',
-                    letterSpacing: '-0.56px',
-                  }}
-                >
-                  Set up a new assignment for your students
-                </p>
+      {/* Form Grid Container */}
+      <form onSubmit={handleSubmit} className="w-full flex flex-col gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start w-full">
+          
+          {/* --- COLUMN 1: Basic Info & File (Visible always on Desktop, Step 1 on Mobile) --- */}
+          <div 
+            className={`${mobileStep === 1 ? 'flex' : 'hidden'} lg:flex lg:col-span-5 flex-col gap-6 p-6 sm:p-7 md:p-8 bg-white border border-slate-200/85 rounded-[28px] shadow-sm w-full`}
+          >
+            {/* Section: Basic Details Header */}
+            <div className="flex flex-col gap-1.5 border-b border-slate-100 pb-4">
+              <h3 className="text-[16px] font-black text-[#10375C] font-sans tracking-tight">
+                1. Assignment Settings
+              </h3>
+              <p className="text-[11px] text-slate-500 font-sans font-medium">
+                Set core syllabus info, grades, and reference files.
+              </p>
+            </div>
+
+            {/* Template Library Quick Start */}
+            <div className="flex flex-col gap-3 p-4 bg-gradient-to-br from-indigo-50/50 via-purple-50/20 to-white border border-purple-100/60 rounded-2xl">
+              <div className="flex flex-col gap-1">
+                <span className="text-[12.5px] font-bold text-slate-800 font-sans flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-purple-600 animate-pulse" />
+                  <span>Start with Blueprint Template</span>
+                </span>
+                <span className="text-[11px] text-slate-500 font-sans leading-relaxed">
+                  Quick-load template presets for standard formats like CBSE term papers or quizzes.
+                </span>
               </div>
+              <button
+                type="button"
+                onClick={() => setIsTemplateModalOpen(true)}
+                className="w-full py-2 px-4 text-xs font-bold text-white bg-purple-600 hover:bg-purple-700 active:scale-[0.98] transition-all rounded-xl font-sans shadow-md text-center"
+              >
+                Open Blueprint Library
+              </button>
+            </div>
 
-              {/* Template Library Button */}
-              <div className="flex justify-end -mb-2">
-                <button
-                  type="button"
-                  onClick={() => setIsTemplateModalOpen(true)}
-                  className="flex items-center gap-2 px-4 py-2 text-[14px] font-bold text-purple-650 hover:text-purple-800 transition-all bg-purple-50 hover:bg-purple-100/80 rounded-full font-sans border border-purple-200/50 shadow-sm active:scale-95"
-                >
-                  <Sparkles className="w-4 h-4 text-purple-500 animate-pulse" />
-                  <span>Start from Template</span>
-                </button>
-              </div>
+            {/* Title Field */}
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[14px] font-extrabold text-slate-800 font-sans">
+                Assignment Title
+              </label>
+              <input
+                type="text"
+                placeholder="e.g. Quiz on Electricity"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="w-full h-[40px] px-4 text-[14px] font-semibold text-slate-850 bg-slate-50 focus:bg-white border border-slate-200 rounded-xl outline-none focus:ring-1 focus:ring-[#10375C] focus:border-[#10375C] transition-all font-sans"
+              />
+              {getErrorForField('title') && (
+                <span className="text-xs text-red-500 font-medium font-sans">{getErrorForField('title')}</span>
+              )}
+            </div>
 
-              {/* Title Field */}
-              <div className="flex flex-col gap-2">
-                <label className="text-[16px] font-bold text-[#303030] font-sans">
-                  Assignment Title
+            {/* Subject & Grade Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Subject */}
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[14px] font-extrabold text-slate-800 font-sans">
+                  Subject
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g. Quiz on Electricity"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  className="w-full h-[44px] px-6 text-[16px] font-medium text-[#303030] bg-white placeholder-black/40 rounded-full outline-none transition-all font-sans"
-                  style={{
-                    outline: '1.25px #DADADA solid',
-                    outlineOffset: '-1.25px'
-                  }}
+                  placeholder="e.g. Science"
+                  value={subject}
+                  onChange={(e) => setSubject(e.target.value)}
+                  className="w-full h-[40px] px-4 text-[14px] font-semibold text-slate-850 bg-slate-50 focus:bg-white border border-slate-200 rounded-xl outline-none focus:ring-1 focus:ring-[#10375C] focus:border-[#10375C] transition-all font-sans"
                 />
-                {getErrorForField('title') && (
-                  <span className="text-xs text-veda-orange-red">{getErrorForField('title')}</span>
+                {getErrorForField('subject') && (
+                  <span className="text-xs text-red-500 font-medium font-sans">{getErrorForField('subject')}</span>
                 )}
               </div>
 
-              {/* Subject & Grade Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* Subject */}
-                <div className="flex flex-col gap-2">
-                  <label className="text-[16px] font-bold text-[#303030] font-sans">
-                    Subject
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Science"
-                    value={subject}
-                    onChange={(e) => setSubject(e.target.value)}
-                    className="w-full h-[44px] px-6 text-[16px] font-medium text-[#303030] bg-white placeholder-black/40 rounded-full outline-none transition-all font-sans"
-                    style={{
-                      outline: '1.25px #DADADA solid',
-                      outlineOffset: '-1.25px'
-                    }}
-                  />
-                  {getErrorForField('subject') && (
-                    <span className="text-xs text-veda-orange-red">{getErrorForField('subject')}</span>
-                  )}
-                </div>
-
-                {/* Class/Grade */}
-                <div className="flex flex-col gap-2">
-                  <label className="text-[16px] font-bold text-[#303030] font-sans">
-                    Class / Grade
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="e.g. 8th"
-                    value={grade}
-                    onChange={(e) => setGrade(e.target.value)}
-                    className="w-full h-[44px] px-6 text-[16px] font-medium text-[#303030] bg-white placeholder-black/40 rounded-full outline-none transition-all font-sans"
-                    style={{
-                      outline: '1.25px #DADADA solid',
-                      outlineOffset: '-1.25px'
-                    }}
-                  />
-                  {getErrorForField('grade') && (
-                    <span className="text-xs text-veda-orange-red">{getErrorForField('grade')}</span>
-                  )}
-                </div>
+              {/* Class/Grade */}
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[14px] font-extrabold text-slate-800 font-sans">
+                  Class / Grade
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. 8th"
+                  value={grade}
+                  onChange={(e) => setGrade(e.target.value)}
+                  className="w-full h-[40px] px-4 text-[14px] font-semibold text-slate-850 bg-slate-50 focus:bg-white border border-slate-200 rounded-xl outline-none focus:ring-1 focus:ring-[#10375C] focus:border-[#10375C] transition-all font-sans"
+                />
+                {getErrorForField('grade') && (
+                  <span className="text-xs text-red-500 font-medium font-sans">{getErrorForField('grade')}</span>
+                )}
               </div>
             </div>
 
             {/* Section 1 – File Upload */}
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2.5">
+              <label className="text-[14px] font-extrabold text-slate-800 font-sans">
+                Reference Material <span className="text-xs text-slate-400 font-medium font-sans">(Optional)</span>
+              </label>
               <FileUploadZone
                 selectedFile={file}
                 onFileSelect={setFile}
@@ -466,24 +427,46 @@ export function CreateAssignmentForm() {
             </div>
 
             {/* Section 2 – Due Date */}
-            <DueDatePicker
-              value={dueDate}
-              onChange={setDueDate}
-            />
-            {getErrorForField('dueDate') && (
-              <span className="text-xs text-veda-orange-red -mt-6">{getErrorForField('dueDate')}</span>
-            )}
-
+            <div className="flex flex-col gap-1.5">
+              <DueDatePicker
+                value={dueDate}
+                onChange={setDueDate}
+              />
+              {getErrorForField('dueDate') && (
+                <span className="text-xs text-red-500 font-medium font-sans">{getErrorForField('dueDate')}</span>
+              )}
+            </div>
           </div>
 
-          {/* --- STEP 2: Questions & Instructions (Visible always on Desktop, Step 2 on Mobile) --- */}
-          <div className={`${mobileStep === 2 ? 'flex' : 'hidden'} md:flex flex-col gap-8`}>
+          {/* --- COLUMN 2: Questions & Instructions (Visible always on Desktop, Step 2 on Mobile) --- */}
+          <div 
+            className={`${mobileStep === 2 ? 'flex' : 'hidden'} lg:flex lg:col-span-7 flex-col gap-6 p-6 sm:p-7 md:p-8 bg-white border border-slate-200/85 rounded-[28px] shadow-sm w-full`}
+          >
+            {/* Section: Blueprint Details Header */}
+            <div className="flex flex-col gap-1.5 border-b border-slate-100 pb-4">
+              <h3 className="text-[16px] font-black text-[#10375C] font-sans tracking-tight">
+                2. Assessment Blueprint
+              </h3>
+              <p className="text-[11px] text-slate-500 font-sans font-medium">
+                Add sections, choose formats, and configure custom marking keys.
+              </p>
+            </div>
+
+            {/* Totals Pill Summary Bar */}
+            <div className="flex items-center gap-4 bg-slate-50 border border-slate-200/40 rounded-2xl p-4 select-none font-sans text-sm">
+              <div className="flex-1 flex flex-col items-center">
+                <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider font-sans">Total Questions</span>
+                <span className="text-[19px] font-black text-[#10375C] font-sans mt-0.5">{totalQuestions}</span>
+              </div>
+              <div className="w-[1.5px] h-8 bg-slate-200" />
+              <div className="flex-1 flex flex-col items-center">
+                <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider font-sans">Total Marks</span>
+                <span className="text-[19px] font-black text-[#10375C] font-sans mt-0.5">{totalMarks} M</span>
+              </div>
+            </div>
 
             {/* Section 3 – Question Type Table */}
-            <div className="flex flex-col gap-4">
-              <h3 className="text-[18px] font-bold text-[#303030] font-sans">
-                Question Type Table
-              </h3>
+            <div className="flex flex-col gap-3">
               <QuestionTypeTable
                 rows={questionRows}
                 onAddRow={addRow}
@@ -491,48 +474,32 @@ export function CreateAssignmentForm() {
                 onUpdateRow={updateRow}
               />
               {getErrorForField('questionRows') && (
-                <span className="text-xs text-veda-orange-red">{getErrorForField('questionRows')}</span>
+                <span className="text-xs text-red-500 font-medium font-sans">{getErrorForField('questionRows')}</span>
               )}
-
-              {/* Totals Summary */}
-              <div className="flex flex-col items-end gap-1 w-full mt-2">
-                <div className="text-[16px] font-semibold text-[#303030] font-sans">
-                  Total Questions :  {totalQuestions}
-                </div>
-                <div className="text-[16px] font-semibold text-[#303030] font-sans">
-                  Total Marks :  {totalMarks}
-                </div>
-              </div>
             </div>
 
             {/* Section 4 – Additional Information */}
-            <div className="flex flex-col gap-3">
-              <label className="text-[16px] font-bold text-[#303030] font-sans">
-                Additional Information (For better output)
+            <div className="flex flex-col gap-2 mt-2">
+              <label className="text-[14px] font-extrabold text-slate-800 font-sans">
+                Additional Prompt Instructions <span className="text-xs text-slate-400 font-medium font-sans">(Optional)</span>
               </label>
 
               <div
-                className="w-full p-6 bg-white rounded-[24px] flex flex-col justify-between items-end transition-all relative"
-                style={{
-                  minHeight: '140px',
-                  outline: '1.25px #DADADA solid',
-                  outlineOffset: '-1.25px'
-                }}
+                className="w-full p-4 bg-slate-50 hover:bg-white border border-slate-200 focus-within:bg-white focus-within:ring-1 focus-within:ring-[#10375C] focus-within:border-[#10375C] rounded-2xl flex flex-col justify-between items-end transition-all relative min-h-[120px]"
               >
                 <textarea
-                  placeholder="e.g Generate a question paper for 3 hour exam duration..."
+                  placeholder="e.g. Include questions on CBSE Chapter 14, focus heavily on conductors. Keep tone academic."
                   maxLength={500}
                   value={additionalInstructions}
                   onChange={(e) => setInstructions(e.target.value)}
-                  className="w-full bg-transparent text-[16px] font-medium text-[#303030] placeholder-black/40 outline-none resize-none font-sans"
-                  style={{ height: '80px' }}
+                  className="w-full bg-transparent text-[14px] font-medium text-slate-800 placeholder-slate-400 outline-none resize-none font-sans h-16"
                 />
 
                 {/* Microphone Icon Button */}
                 <div
-                  className="w-10 h-10 bg-[#F0F0F0] rounded-full flex items-center justify-center text-black/40 hover:text-black cursor-pointer transition-all shadow-sm"
+                  className="w-8 h-8 bg-white hover:bg-slate-100 border border-slate-200 rounded-full flex items-center justify-center text-slate-500 hover:text-slate-900 cursor-pointer transition-all shadow-sm active:scale-95 flex-shrink-0"
                 >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" fill="currentColor" />
                     <path d="M19 10v2a7 7 0 0 1-14 0v-2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                     <line x1="12" y1="19" x2="12" y2="23" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -543,28 +510,26 @@ export function CreateAssignmentForm() {
             </div>
 
             {/* Template Option */}
-            <div className="flex flex-col gap-4 p-5 bg-purple-50/20 border border-purple-250/20 rounded-[28px]">
-              <div className="flex items-start gap-3.5 pt-4 border-t border-gray-150/40">
-                <div className="flex items-center h-5">
-                  <input
-                    id="saveAsTemplate"
-                    type="checkbox"
-                    checked={saveAsTemplate}
-                    onChange={(e) => {
-                      const checked = e.target.checked;
-                      setSaveAsTemplate(checked);
-                      if (checked) {
-                        setTempTemplateName(templateName);
-                        setTempTemplateDescription(templateDescription);
-                        setIsSaveTemplateModalOpen(true);
-                      }
-                    }}
-                    className="w-4 h-4 rounded text-purple-600 focus:ring-purple-500 border-gray-300 cursor-pointer"
-                  />
-                </div>
-                <div className="flex flex-col">
-                  <label htmlFor="saveAsTemplate" className="text-[15px] font-bold text-[#303030] font-sans cursor-pointer flex items-center flex-wrap gap-x-2">
-                    <span>Save blueprint as reusable template</span>
+            <div className="flex flex-col gap-3 p-4 bg-purple-50/10 border border-purple-150/20 rounded-2xl mt-2 select-none">
+              <div className="flex items-start gap-3">
+                <input
+                  id="saveAsTemplate"
+                  type="checkbox"
+                  checked={saveAsTemplate}
+                  onChange={(e) => {
+                    const checked = e.target.checked;
+                    setSaveAsTemplate(checked);
+                    if (checked) {
+                      setTempTemplateName(templateName);
+                      setTempTemplateDescription(templateDescription);
+                      setIsSaveTemplateModalOpen(true);
+                    }
+                  }}
+                  className="w-4 h-4 rounded text-purple-600 focus:ring-purple-500 border-slate-350 cursor-pointer mt-1"
+                />
+                <div className="flex flex-col gap-0.5">
+                  <label htmlFor="saveAsTemplate" className="text-[13.5px] font-bold text-slate-800 font-sans cursor-pointer flex items-center flex-wrap gap-x-1.5">
+                    <span>Save configuration as template</span>
                     {saveAsTemplate && (
                       <button
                         type="button"
@@ -573,71 +538,80 @@ export function CreateAssignmentForm() {
                           setTempTemplateDescription(templateDescription);
                           setIsSaveTemplateModalOpen(true);
                         }}
-                        className="text-[12.5px] font-bold text-purple-650 hover:text-purple-800 underline transition-colors font-sans"
+                        className="text-[11.5px] font-bold text-purple-650 hover:text-purple-800 underline transition-colors font-sans"
                       >
-                        (Configure template{templateName ? `: ${templateName}` : ''})
+                        (Configure Name{templateName ? `: ${templateName}` : ''})
                       </button>
                     )}
                   </label>
-                  <span className="text-[12px] text-gray-500 font-sans mt-0.5">
-                    Save this blueprint configuration to your library for future assignments
+                  <span className="text-[11px] text-slate-500 font-sans leading-relaxed">
+                    Save this blueprint layout to your template library for single-click loads.
                   </span>
                 </div>
               </div>
             </div>
-
           </div>
 
-          {/* --- FOOTER NAVIGATION / SUBMIT ACTIONS --- */}
+        </div>
 
-          {/* Mobile View Navigation Buttons (Step 1 vs Step 2) */}
-          <div className="flex md:hidden items-center justify-center gap-3 border-t border-gray-150/50 pt-4 mt-2">
-            {mobileStep === 1 ? (
-              <>
-                <button
-                  type="button"
-                  onClick={handleMobileCancel}
-                  className="px-6 py-3 text-[16px] font-medium text-[#303030] bg-white rounded-[48px] border border-gray-200 shadow-sm active:scale-95 transition-all font-sans"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={handleMobileNext}
-                  className="px-6 py-3 text-[16px] font-medium text-white bg-[#181818] rounded-[48px] active:scale-95 transition-all font-sans"
-                  style={{ outline: '1.50px white solid', outlineOffset: '-1.50px' }}
-                >
-                  Next
-                </button>
-              </>
-            ) : (
-              <>
-                <button
-                  type="button"
-                  onClick={handleMobilePrevious}
-                  className="px-6 py-3 text-[16px] font-medium text-[#303030] bg-white rounded-[48px] border border-gray-200 shadow-sm active:scale-95 transition-all font-sans"
-                >
-                  Previous
-                </button>
-                <button
-                  type="button"
-                  onClick={handleMobileGenerate}
-                  disabled={isSubmitting}
-                  className="px-6 py-3 text-[16px] font-medium text-white bg-[#181818] rounded-[48px] active:scale-95 transition-all disabled:opacity-50 font-sans"
-                  style={{ outline: '1.50px white solid', outlineOffset: '-1.50px' }}
-                >
-                  {isSubmitting ? 'Generating...' : 'Generate'}
-                </button>
-              </>
-            )}
+        {/* --- FOOTER NAVIGATION / SUBMIT ACTIONS --- */}
+
+        {/* Mobile View Navigation Buttons (Step 1 vs Step 2) */}
+        <div className="flex lg:hidden items-center justify-center gap-3 border-t border-slate-200/60 pt-4 mt-2 select-none">
+          {mobileStep === 1 ? (
+            <>
+              <button
+                type="button"
+                onClick={handleMobileCancel}
+                className="px-6 py-2.5 text-[14px] font-bold text-slate-700 bg-white rounded-full border border-slate-200 shadow-sm active:scale-95 transition-all font-sans flex-1 text-center"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleMobileNext}
+                className="px-6 py-2.5 text-[14px] font-bold text-white bg-[#10375C] hover:bg-[#0d2f4f] rounded-full active:scale-95 transition-all font-sans flex-1 text-center shadow-md shadow-[#10375C]/10"
+              >
+                Next
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                type="button"
+                onClick={handleMobilePrevious}
+                className="px-6 py-2.5 text-[14px] font-bold text-slate-700 bg-white rounded-full border border-slate-200 shadow-sm active:scale-95 transition-all font-sans flex-1 text-center"
+              >
+                Previous
+              </button>
+              <button
+                type="button"
+                onClick={handleMobileGenerate}
+                disabled={isSubmitting}
+                className="px-6 py-2.5 text-[14px] font-bold text-white bg-[#10375C] hover:bg-[#0d2f4f] rounded-full active:scale-95 transition-all disabled:opacity-50 font-sans flex-1 text-center shadow-md shadow-[#10375C]/10"
+              >
+                {isSubmitting ? 'Generating...' : 'Generate'}
+              </button>
+            </>
+          )}
+        </div>
+
+        {/* Desktop View Action Bar (Right Aligned, Beautiful Card style spans whole width) */}
+        <div className="hidden lg:flex items-center justify-between bg-white border border-slate-200/80 rounded-[24px] p-5 shadow-sm select-none">
+          <div className="flex items-center gap-6">
+            <div className="flex flex-col">
+              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider font-sans">Final Summary</span>
+              <span className="text-[14px] font-black text-slate-800 font-sans mt-0.5">
+                {totalQuestions} Questions • {totalMarks} Marks
+              </span>
+            </div>
           </div>
-
-          {/* Desktop View Buttons (Right Aligned) */}
-          <div className="hidden md:flex items-center justify-end gap-3 border-t border-gray-100 pt-6">
+          
+          <div className="flex items-center gap-3">
             <button
               type="button"
               onClick={() => router.push('/assignments')}
-              className="px-6 py-3 text-[16px] font-bold text-gray-500 hover:text-black transition-all font-sans"
+              className="px-5 py-2.5 text-[14px] font-bold text-slate-505 hover:text-slate-800 hover:bg-slate-50 transition-all font-sans rounded-full active:scale-95"
             >
               Cancel
             </button>
@@ -645,14 +619,15 @@ export function CreateAssignmentForm() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-8 py-3 text-[16px] font-bold text-white bg-[#181818] rounded-full shadow-lg hover:shadow-xl hover:bg-black active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed font-sans flex items-center gap-2"
+              className="px-7 py-3 text-[14px] font-bold text-white bg-[#10375C] hover:bg-[#0d2f4f] rounded-full shadow-lg hover:shadow-xl active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed font-sans flex items-center gap-2"
             >
-              {isSubmitting ? 'Generating...' : 'Generate Assignment'}
-              {!isSubmitting && <Sparkles className="w-4 h-4 text-veda-orange animate-pulse" />}
+              {isSubmitting ? 'Generating Paper...' : 'Generate Assignment'}
+              {!isSubmitting && <Sparkles className="w-4 h-4 text-amber-350 animate-pulse" />}
             </button>
           </div>
+        </div>
 
-        </form>
+      </form>
 
         {/* Template Selection Library Modal */}
         <TemplateModal
@@ -814,6 +789,5 @@ export function CreateAssignmentForm() {
           </div>
         )}
       </div>
-    </div>
   );
 }

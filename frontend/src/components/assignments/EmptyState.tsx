@@ -81,7 +81,7 @@ export function EmptyState() {
             style={{
               color: 'var(--Text-Secondary-Default, rgba(94, 94, 94, 0.80))',
               textAlign: 'center',
-              fontFamily: '"Bricolage Grotesque", sans-serif',
+              fontFamily: '"Plus Jakarta Sans", sans-serif',
               fontSize: '16px',
               fontStyle: 'normal',
               fontWeight: 400,

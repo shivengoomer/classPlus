@@ -253,7 +253,7 @@ export default function HomePage() {
             className="flex flex-col md:flex-row md:items-center justify-between gap-4 mt-2"
           >
             <div className="flex flex-col gap-1">
-              <h1 className="text-3xl font-black tracking-tight text-slate-900" style={{ fontFamily: 'var(--font-bricolage), "Bricolage Grotesque", sans-serif' }}>
+              <h1 className="text-3xl font-black tracking-tight text-slate-900" style={{ fontFamily: 'var(--font-plus-jakarta-sans), "Plus Jakarta Sans", sans-serif' }}>
                 Overview
               </h1>
               <p className="text-xs text-slate-500 font-sans font-medium">

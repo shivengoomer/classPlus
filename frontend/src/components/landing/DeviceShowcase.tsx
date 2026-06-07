@@ -45,16 +45,29 @@ export default function DeviceShowcase() {
           rotateY: rotateYSpring,
           transformStyle: 'preserve-3d',
         }}
-        className="flex flex-row items-center justify-center w-full h-full gap-1 px-2"
+        className="flex flex-row items-center justify-center w-full h-full gap-8 px-4 bg-transparent"
       >
         {/* ===== LAPTOP ===== */}
         <motion.div
           animate={{ y: [0, -10, 0] }}
           transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
-          style={{ transformStyle: 'preserve-3d', flexShrink: 0 }}
-          className="scale-[0.5] xl:scale-[0.62] origin-center"
+          style={{
+            transformStyle: 'preserve-3d',
+            flexShrink: 0,
+            width: '484px', // 620px * 0.78
+            height: '265px', // 340px * 0.78
+          }}
+          className="relative"
         >
-          <LaptopFrame>
+          <div
+            style={{
+              transform: 'scale(0.78)',
+              transformOrigin: 'top left',
+              width: '700px',
+              height: '100px',
+            }}
+          >
+            <LaptopFrame>
             <div className="flex w-full h-full bg-[#F8FAFC] text-slate-800 font-sans">
               
               {/* Sidebar */}
@@ -171,16 +184,32 @@ export default function DeviceShowcase() {
               </div>
             </div>
           </LaptopFrame>
+          </div>
         </motion.div>
 
         {/* ===== PHONE — sits right of laptop, slightly elevated ===== */}
         <motion.div
           animate={{ y: [0, 10, 0] }}
           transition={{ duration: 5.5, repeat: Infinity, ease: 'easeInOut', delay: 0.8 }}
-          style={{ transformStyle: 'preserve-3d', translateZ: '40px', flexShrink: 0, marginTop: '-40px' }}
-          className="scale-[0.72] xl:scale-[0.80] origin-center"
+          style={{
+            transformStyle: 'preserve-3d',
+            translateZ: '40px',
+            flexShrink: 0,
+            width: '160px', // 290px * 0.55
+            height: '297px', // 540px * 0.55
+            marginTop: '-30px', // floating offset
+          }}
+          className="relative"
         >
-          <PhoneFrame disableScale={true}>
+          <div
+            style={{
+              transform: 'scale(0.55)',
+              transformOrigin: 'top left',
+              width: '290px',
+              height: '540px',
+            }}
+          >
+            <PhoneFrame disableScale={true}>
             <div className="flex flex-col w-full h-full bg-[#F8FAFC]">
               {/* Phone Header */}
               <div className="w-full pt-6 pb-2.5 bg-white border-b border-slate-100 px-3 flex items-center justify-between">
@@ -233,6 +262,7 @@ export default function DeviceShowcase() {
               </div>
             </div>
           </PhoneFrame>
+          </div>
         </motion.div>
       </motion.div>
     </div>

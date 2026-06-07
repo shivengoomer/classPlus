@@ -24,7 +24,7 @@ export function DueDatePicker({ value, onChange }: DueDatePickerProps) {
       <label 
         style={{
           color: '#303030',
-          fontFamily: '"Bricolage Grotesque", sans-serif',
+          fontFamily: '"Plus Jakarta Sans", sans-serif',
           fontSize: '16px',
           fontWeight: 700,
           lineHeight: '140%',

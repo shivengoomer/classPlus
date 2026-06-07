@@ -17,6 +17,7 @@ interface DropdownItem {
   title: string;
   desc: string;
   badge?: string;
+  href: string;
 }
 
 export default function Navbar() {
@@ -37,40 +38,49 @@ export default function Navbar() {
 
   const navItems = ['Features', 'AI Assistant', 'Assignments', 'Analytics', 'Pricing', 'Contact'];
 
+  const routeMap: Record<string, string> = {
+    Features: '/features',
+    'AI Assistant': '/ai-assistant',
+    Assignments: '/assignments-suite',
+    Analytics: '/analytics',
+    Pricing: '/pricing',
+    Contact: '/contact'
+  };
+
   const dropdownData: Record<string, DropdownItem[]> = {
     Features: [
-      { icon: <BookOpen className="w-5 h-5 text-orange-500" />, title: 'Smart Learning', desc: 'Curriculum-aligned paths for students' },
-      { icon: <Brain className="w-5 h-5 text-purple-500" />, title: 'AI Tutor', desc: '24/7 personalized explanations & chat', badge: 'Popular' },
-      { icon: <FileSpreadsheet className="w-5 h-5 text-blue-500" />, title: 'Assignment Gen', desc: 'Generate custom worksheets in seconds' },
-      { icon: <BarChart3 className="w-5 h-5 text-emerald-500" />, title: 'Performance Analytics', desc: 'Identify learning gaps instantly' }
+      { icon: <BookOpen className="w-5 h-5 text-orange-500" />, title: 'Smart Learning', desc: 'Curriculum-aligned paths for students', href: '/features#smart-learning' },
+      { icon: <Brain className="w-5 h-5 text-purple-500" />, title: 'AI Tutor', desc: '24/7 personalized explanations & chat', badge: 'Popular', href: '/features#ai-tutor' },
+      { icon: <FileSpreadsheet className="w-5 h-5 text-blue-500" />, title: 'Assignment Gen', desc: 'Generate custom worksheets in seconds', href: '/features#assignment-gen' },
+      { icon: <BarChart3 className="w-5 h-5 text-emerald-500" />, title: 'Performance Analytics', desc: 'Identify learning gaps instantly', href: '/features#analytics' }
     ],
     'AI Assistant': [
-      { icon: <MessageSquare className="w-5 h-5 text-blue-500" />, title: 'Student Chat', desc: 'Interactive tutoring on any subject' },
-      { icon: <Brain className="w-5 h-5 text-purple-500" />, title: 'Concept Explainer', desc: 'Breaks down topics into simple visuals' },
-      { icon: <Award className="w-5 h-5 text-orange-500" />, title: 'Writing Coach', desc: 'AI editing, style & grammar tutor' },
-      { icon: <Compass className="w-5 h-5 text-pink-500" />, title: 'Math Solver', desc: 'Step-by-step guidance for equations' }
+      { icon: <MessageSquare className="w-5 h-5 text-blue-500" />, title: 'Student Chat', desc: 'Interactive tutoring on any subject', href: '/ai-assistant#student-chat' },
+      { icon: <Brain className="w-5 h-5 text-purple-500" />, title: 'Concept Explainer', desc: 'Breaks down topics into simple visuals', href: '/ai-assistant#concept-explainer' },
+      { icon: <Award className="w-5 h-5 text-orange-500" />, title: 'Writing Coach', desc: 'AI editing, style & grammar tutor', href: '/ai-assistant#writing-coach' },
+      { icon: <Compass className="w-5 h-5 text-pink-500" />, title: 'Math Solver', desc: 'Step-by-step guidance for equations', href: '/ai-assistant#math-solver' }
     ],
     Assignments: [
-      { icon: <RefreshCw className="w-5 h-5 text-rose-500" />, title: 'Automatic Grading', desc: 'Instant marks & qualitative feedback', badge: 'Hot' },
-      { icon: <Layers className="w-5 h-5 text-indigo-500" />, title: 'CBSE & Board Prep', desc: 'Tailored to curriculum rules' },
-      { icon: <ClipboardList className="w-5 h-5 text-teal-500" />, title: 'Multiple Formats', desc: 'MCQs, short answer, fill-blanks' },
-      { icon: <Laptop className="w-5 h-5 text-amber-500" />, title: 'Export PDFs', desc: 'Download print-ready files' }
+      { icon: <RefreshCw className="w-5 h-5 text-rose-500" />, title: 'Automatic Grading', desc: 'Instant marks & qualitative feedback', badge: 'Hot', href: '/assignments-suite#automatic-grading' },
+      { icon: <Layers className="w-5 h-5 text-indigo-500" />, title: 'CBSE & Board Prep', desc: 'Tailored to curriculum rules', href: '/assignments-suite#cbse-board-prep' },
+      { icon: <ClipboardList className="w-5 h-5 text-teal-500" />, title: 'Multiple Formats', desc: 'MCQs, short answer, fill-blanks', href: '/assignments-suite#multiple-formats' },
+      { icon: <Laptop className="w-5 h-5 text-amber-500" />, title: 'Export PDFs', desc: 'Download print-ready files', href: '/assignments-suite#export-pdfs' }
     ],
     Analytics: [
-      { icon: <BarChart3 className="w-5 h-5 text-emerald-500" />, title: 'Class Overview', desc: 'Visual statistics of class performance' },
-      { icon: <Star className="w-5 h-5 text-yellow-500" />, title: 'Competency Mapping', desc: 'Track subject-wise skill mastery' },
-      { icon: <Phone className="w-5 h-5 text-blue-500" />, title: 'Engagement Stats', desc: 'Assess study habits & activity' },
-      { icon: <FileSpreadsheet className="w-5 h-5 text-indigo-500" />, title: 'Parent Reports', desc: 'Generate printable PDF metrics' }
+      { icon: <BarChart3 className="w-5 h-5 text-emerald-500" />, title: 'Class Overview', desc: 'Visual statistics of class performance', href: '/analytics#class-overview' },
+      { icon: <Star className="w-5 h-5 text-yellow-500" />, title: 'Competency Mapping', desc: 'Track subject-wise skill mastery', href: '/analytics#competency-mapping' },
+      { icon: <Phone className="w-5 h-5 text-blue-500" />, title: 'Engagement Stats', desc: 'Assess study habits & activity', href: '/analytics#engagement-stats' },
+      { icon: <FileSpreadsheet className="w-5 h-5 text-indigo-500" />, title: 'Parent Reports', desc: 'Generate printable PDF metrics', href: '/analytics#parent-reports' }
     ],
     Pricing: [
-      { icon: <Tag className="w-5 h-5 text-green-500" />, title: 'Free Tier', desc: 'Explore basic AI features for free' },
-      { icon: <Sparkles className="w-5 h-5 text-orange-500" />, title: 'Teacher Pro', desc: 'Unlimited generation & advanced models', badge: 'Best Value' },
-      { icon: <Laptop className="w-5 h-5 text-blue-500" />, title: 'School License', desc: 'Custom integrations & SSO' }
+      { icon: <Tag className="w-5 h-5 text-green-500" />, title: 'Free Tier', desc: 'Explore basic AI features for free', href: '/pricing#free' },
+      { icon: <Sparkles className="w-5 h-5 text-orange-500" />, title: 'Teacher Pro', desc: 'Unlimited generation & advanced models', badge: 'Best Value', href: '/pricing#pro' },
+      { icon: <Laptop className="w-5 h-5 text-blue-500" />, title: 'School License', desc: 'Custom integrations & SSO', href: '/pricing#school' }
     ],
     Contact: [
-      { icon: <Mail className="w-5 h-5 text-blue-500" />, title: 'Tech Support', desc: '24/7 dedicated helpdesk assistance' },
-      { icon: <Award className="w-5 h-5 text-[#10375C]" />, title: 'School Partnership', desc: 'Pilot ClassPilot in your school district' },
-      { icon: <MessageSquare className="w-5 h-5 text-purple-500" />, title: 'Schedule Demo', desc: '1-on-1 walkthrough with an expert' }
+      { icon: <Mail className="w-5 h-5 text-blue-500" />, title: 'Tech Support', desc: '24/7 dedicated helpdesk assistance', href: '/contact' },
+      { icon: <Award className="w-5 h-5 text-[#10375C]" />, title: 'School Partnership', desc: 'Pilot ClassPilot in your school district', href: '/contact' },
+      { icon: <MessageSquare className="w-5 h-5 text-purple-500" />, title: 'Schedule Demo', desc: '1-on-1 walkthrough with an expert', href: '/contact' }
     ]
   };
 
@@ -108,6 +118,10 @@ export default function Navbar() {
               <button
                 key={item}
                 onMouseEnter={() => handleMouseEnter(item)}
+                onClick={() => {
+                  setHoveredTab(null);
+                  router.push(routeMap[item]);
+                }}
                 className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
                   hoveredTab === item 
                     ? 'text-slate-950 bg-slate-100' 
@@ -165,6 +179,10 @@ export default function Navbar() {
                 {dropdownData[hoveredTab]?.map((item, idx) => (
                   <div
                     key={idx}
+                    onClick={() => {
+                      setHoveredTab(null);
+                      router.push(item.href);
+                    }}
                     className="p-4 rounded-2xl bg-slate-50/50 hover:bg-slate-50 border border-slate-100/60 hover:border-slate-200/80 transition-all cursor-pointer group flex items-start gap-4"
                   >
                     <div className="p-2.5 rounded-xl bg-white border border-slate-200 group-hover:scale-110 transition-transform shadow-sm">

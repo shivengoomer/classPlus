@@ -444,7 +444,7 @@ export function TopBar({ onMenuToggle }: TopBarProps) {
           <div className="flex items-center">
             <span 
               style={{
-                fontFamily: 'var(--font-bricolage), "Bricolage Grotesque", sans-serif',
+                fontFamily: 'var(--font-plus-jakarta-sans), "Plus Jakarta Sans", sans-serif',
               }}
               className="text-xl font-bold tracking-tight text-slate-900 leading-none"
             >
