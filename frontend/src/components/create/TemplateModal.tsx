@@ -1,8 +1,8 @@
 // src/components/create/TemplateModal.tsx
 'use client';
 
-import React, { useEffect } from 'react';
-import { X, Trash2, FileText, Sparkles } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { X, Trash2, FileText, Sparkles, AlertCircle } from 'lucide-react';
 import { Template } from '@/types/group';
 import { useTemplateStore } from '@/store/templateStore';
 import { useToastStore } from '@/store/toastStore';
@@ -16,6 +16,9 @@ interface TemplateModalProps {
 export function TemplateModal({ isOpen, onClose, onSelectTemplate }: TemplateModalProps) {
   const { templates, fetchTemplates, isLoading, removeTemplate } = useTemplateStore();
   const { addToast } = useToastStore();
+  
+  // Custom overlay confirmation state
+  const [deleteTemplateId, setDeleteTemplateId] = useState<string | null>(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -25,15 +28,20 @@ export function TemplateModal({ isOpen, onClose, onSelectTemplate }: TemplateMod
 
   if (!isOpen) return null;
 
-  const handleDelete = async (e: React.MouseEvent, id: string) => {
+  const handleDelete = (e: React.MouseEvent, id: string) => {
     e.stopPropagation(); // prevent selecting the template when clicking delete
-    if (window.confirm('Are you sure you want to delete this custom template?')) {
-      try {
-        await removeTemplate(id);
-        addToast('Template deleted successfully', 'success');
-      } catch (err) {
-        addToast('Failed to delete template', 'error');
-      }
+    setDeleteTemplateId(id);
+  };
+
+  const confirmDeleteTemplate = async () => {
+    if (!deleteTemplateId) return;
+    try {
+      await removeTemplate(deleteTemplateId);
+      addToast('Template deleted successfully', 'success');
+    } catch (err) {
+      addToast('Failed to delete template', 'error');
+    } finally {
+      setDeleteTemplateId(null);
     }
   };
 
@@ -150,6 +158,43 @@ export function TemplateModal({ isOpen, onClose, onSelectTemplate }: TemplateMod
           )}
         </div>
       </div>
+
+      {/* Delete Confirmation Custom Popup Overlay */}
+      {deleteTemplateId && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          {/* Blur Backdrop */}
+          <div 
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300"
+            onClick={() => setDeleteTemplateId(null)}
+          />
+          {/* Modal Box */}
+          <div className="relative bg-white border border-gray-200/80 rounded-[28px] w-full max-w-[380px] p-6 shadow-2xl z-10 animate-in fade-in zoom-in-95 duration-150 text-center">
+            <div className="mx-auto w-12 h-12 rounded-full bg-red-50 flex items-center justify-center text-red-500 mb-3.5">
+              <AlertCircle className="w-6 h-6" />
+            </div>
+            <h4 className="text-[18px] font-bold text-[#303030] font-sans mb-1.5">Delete Blueprint Template</h4>
+            <p className="text-[13px] text-gray-500 font-sans mb-5 leading-relaxed">
+              Are you sure you want to delete this custom template? This action cannot be undone.
+            </p>
+            <div className="flex justify-center gap-2.5">
+              <button
+                type="button"
+                onClick={() => setDeleteTemplateId(null)}
+                className="px-4 py-2 text-[14px] font-bold text-gray-500 hover:text-black transition-colors font-sans"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={confirmDeleteTemplate}
+                className="px-5 py-2 text-[14px] font-bold text-white bg-red-500 hover:bg-red-600 rounded-full transition-all font-sans active:scale-95 shadow-md"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -49,16 +49,21 @@ export function QuestionTypeRow({
     }
   };
 
-  const handleWandClick = async () => {
-    const questionText = window.prompt(
-      `Enter a brief description of what this ${type} question will test (e.g. 'Explain photosynthesis in detail' or 'State Ohm's Law and its mathematical derivation'):`
-    );
-    if (!questionText) return;
+  const [isWandModalOpen, setIsWandModalOpen] = useState(false);
+  const [wandInput, setWandInput] = useState('');
 
+  const handleWandClick = () => {
+    setWandInput('');
+    setIsWandModalOpen(true);
+  };
+
+  const handleGenerateFromWand = async () => {
+    if (!wandInput.trim()) return;
+    setIsWandModalOpen(false);
     setIsGenerating(true);
     try {
       addToast('Generating rubric with AI...', 'success');
-      const response = await generateRubric(questionText, marks, subject || undefined, grade || undefined);
+      const response = await generateRubric(wandInput, marks, subject || undefined, grade || undefined);
       onUpdate('rubric', response);
       addToast('Rubric generated successfully!', 'success');
     } catch (err) {
@@ -389,6 +394,65 @@ export function QuestionTypeRow({
               ⚠️ Warning: Sum of criteria marks ({rubric.reduce((sum, c) => sum + c.marks, 0)}) does not equal total marks ({marks}).
             </p>
           )}
+        </div>
+      )}
+      {/* Rubric Generation Custom Prompt Modal */}
+      {isWandModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div 
+            className="fixed inset-0 bg-black/60 backdrop-blur-md transition-opacity duration-300"
+            onClick={() => setIsWandModalOpen(false)}
+          />
+          {/* Modal Box */}
+          <div className="relative bg-white border border-gray-200/80 rounded-[32px] w-full max-w-[450px] p-6 shadow-2xl z-10 animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-full bg-purple-50 flex items-center justify-center text-purple-600">
+                  <Wand2 className="w-4.5 h-4.5" />
+                </div>
+                <h4 className="text-[18px] font-bold text-[#303030] font-sans">Generate Rubric</h4>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsWandModalOpen(false)}
+                className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            
+            <p className="text-[13px] text-gray-500 font-sans mb-3.5 leading-relaxed">
+              Enter a brief description of what this {type === 'short' ? 'short-answer' : 'long-answer'} question will test to align the marking criteria:
+            </p>
+            
+            <textarea
+              className="w-full p-4 text-[14px] text-[#303030] bg-gray-50 border border-gray-200 rounded-[20px] outline-none focus:ring-1 focus:ring-purple-400 focus:border-purple-400 font-sans resize-none h-24 mb-4 transition-all"
+              placeholder="e.g. Describe the carbon cycle and the role of photosynthesis and respiration..."
+              value={wandInput}
+              onChange={(e) => setWandInput(e.target.value)}
+              autoFocus
+            />
+            
+            <div className="flex justify-end gap-2.5">
+              <button
+                type="button"
+                onClick={() => setIsWandModalOpen(false)}
+                className="px-4 py-2 text-[14px] font-bold text-gray-500 hover:text-black transition-colors font-sans"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleGenerateFromWand}
+                disabled={!wandInput.trim() || isGenerating}
+                className="px-5 py-2 text-[14px] font-bold text-white bg-[#181818] hover:bg-black disabled:opacity-50 rounded-full transition-all font-sans active:scale-95 shadow-md flex items-center gap-1.5"
+              >
+                {isGenerating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Wand2 className="w-3.5 h-3.5" />}
+                <span>Generate</span>
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

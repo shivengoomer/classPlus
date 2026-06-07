@@ -12,7 +12,7 @@ import { QuestionTypeTable } from './QuestionTypeTable';
 import { ProgressBar } from '../shared/ProgressBar';
 import { validateAssignmentForm, ValidationError } from '@/lib/validators';
 import { createAssignment } from '@/lib/api';
-import { Sparkles, ArrowLeft } from 'lucide-react';
+import { Sparkles, ArrowLeft, AlertCircle, X } from 'lucide-react';
 import { useToastStore } from '@/store/toastStore';
 import { TemplateModal } from './TemplateModal';
 import { useTemplateStore } from '@/store/templateStore';
@@ -29,6 +29,14 @@ export function CreateAssignmentForm() {
   const [saveAsTemplate, setSaveAsTemplate] = useState(false);
   const [templateName, setTemplateName] = useState('');
   const [templateDescription, setTemplateDescription] = useState('');
+
+  // Validation errors modal state
+  const [isValidationErrorModalOpen, setIsValidationErrorModalOpen] = useState(false);
+
+  // Save Template popup modal state
+  const [isSaveTemplateModalOpen, setIsSaveTemplateModalOpen] = useState(false);
+  const [tempTemplateName, setTempTemplateName] = useState('');
+  const [tempTemplateDescription, setTempTemplateDescription] = useState('');
 
   // Zustand form state
   const {
@@ -121,8 +129,8 @@ export function CreateAssignmentForm() {
     const validationErrors = validateAssignmentForm(payload);
     if (validationErrors.length > 0) {
       setErrors(validationErrors);
-      // Scroll to top so the user immediately sees the validation error alert
-      window.scrollTo(0, 0);
+      setIsValidationErrorModalOpen(true);
+      addToast('Form validation failed. Please resolve all errors.', 'error');
       // If there are errors in basic details and we are on mobile step 2, take them back to step 1
       const basicFields = ['title', 'subject', 'grade', 'dueDate'];
       const hasBasicError = validationErrors.some(err => basicFields.includes(err.field));
@@ -136,8 +144,11 @@ export function CreateAssignmentForm() {
     try {
       if (saveAsTemplate) {
         if (!templateName.trim()) {
-          addToast('Please enter a template name', 'error');
+          setTempTemplateName('');
+          setTempTemplateDescription('');
+          setIsSaveTemplateModalOpen(true);
           setIsSubmitting(false);
+          addToast('Please enter a template name', 'error');
           return;
         }
         await saveTemplate({
@@ -329,12 +340,7 @@ export function CreateAssignmentForm() {
           }}
         >
 
-          {/* Validation Errors Header Alert */}
-          {errors.length > 0 && (
-            <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-veda-orange-red font-medium">
-              Please correct the errors in the form before generating.
-            </div>
-          )}
+          {/* Validation errors are now presented in a premium modal overlay */}
 
           {/* --- STEP 1: Basic Info & File (Visible always on Desktop, Step 1 on Mobile) --- */}
           <div className={`${mobileStep === 1 ? 'flex' : 'hidden'} md:flex flex-col gap-8`}>
@@ -538,52 +544,46 @@ export function CreateAssignmentForm() {
 
             {/* Template Option */}
             <div className="flex flex-col gap-4 p-5 bg-purple-50/20 border border-purple-250/20 rounded-[28px]">
-              <div className="flex items-center gap-3">
-                <input
-                  type="checkbox"
-                  id="saveAsTemplate"
-                  checked={saveAsTemplate}
-                  onChange={(e) => setSaveAsTemplate(e.target.checked)}
-                  className="w-5 h-5 rounded border-gray-300 text-purple-650 focus:ring-purple-400 cursor-pointer"
-                />
+              <div className="flex items-start gap-3.5 pt-4 border-t border-gray-150/40">
+                <div className="flex items-center h-5">
+                  <input
+                    id="saveAsTemplate"
+                    type="checkbox"
+                    checked={saveAsTemplate}
+                    onChange={(e) => {
+                      const checked = e.target.checked;
+                      setSaveAsTemplate(checked);
+                      if (checked) {
+                        setTempTemplateName(templateName);
+                        setTempTemplateDescription(templateDescription);
+                        setIsSaveTemplateModalOpen(true);
+                      }
+                    }}
+                    className="w-4 h-4 rounded text-purple-600 focus:ring-purple-500 border-gray-300 cursor-pointer"
+                  />
+                </div>
                 <div className="flex flex-col">
-                  <label htmlFor="saveAsTemplate" className="text-[15px] font-bold text-[#303030] font-sans cursor-pointer">
-                    Save blueprint as reusable template
+                  <label htmlFor="saveAsTemplate" className="text-[15px] font-bold text-[#303030] font-sans cursor-pointer flex items-center flex-wrap gap-x-2">
+                    <span>Save blueprint as reusable template</span>
+                    {saveAsTemplate && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setTempTemplateName(templateName);
+                          setTempTemplateDescription(templateDescription);
+                          setIsSaveTemplateModalOpen(true);
+                        }}
+                        className="text-[12.5px] font-bold text-purple-650 hover:text-purple-800 underline transition-colors font-sans"
+                      >
+                        (Configure template{templateName ? `: ${templateName}` : ''})
+                      </button>
+                    )}
                   </label>
                   <span className="text-[12px] text-gray-500 font-sans mt-0.5">
                     Save this blueprint configuration to your library for future assignments
                   </span>
                 </div>
               </div>
-
-              {saveAsTemplate && (
-                <div className="flex flex-col gap-4 pt-3 border-t border-purple-200/50 animate-in fade-in slide-in-from-top-2 duration-150">
-                  <div className="flex flex-col gap-2">
-                    <label className="text-[14px] font-bold text-[#303030] font-sans">
-                      Template Name
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="e.g. CBSE Term 1 Science Exam"
-                      value={templateName}
-                      onChange={(e) => setTemplateName(e.target.value)}
-                      className="w-full h-[40px] px-4 text-[14px] font-semibold text-[#303030] bg-white border border-gray-300 rounded-full outline-none focus:ring-1 focus:ring-purple-400 font-sans"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <label className="text-[14px] font-bold text-[#303030] font-sans">
-                      Template Description
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="e.g. Standard pattern with 5 MCQs and 3 short answers"
-                      value={templateDescription}
-                      onChange={(e) => setTemplateDescription(e.target.value)}
-                      className="w-full h-[40px] px-4 text-[14px] font-medium text-[#303030] bg-white border border-gray-300 rounded-full outline-none focus:ring-1 focus:ring-purple-400 font-sans"
-                    />
-                  </div>
-                </div>
-              )}
             </div>
 
           </div>
@@ -660,6 +660,159 @@ export function CreateAssignmentForm() {
           onClose={() => setIsTemplateModalOpen(false)}
           onSelectTemplate={handleSelectTemplate}
         />
+
+        {/* Validation Errors Modal Overlay */}
+        {isValidationErrorModalOpen && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            {/* Backdrop */}
+            <div 
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300"
+              onClick={() => setIsValidationErrorModalOpen(false)}
+            />
+            {/* Modal Box */}
+            <div className="relative bg-white border border-gray-200/80 rounded-[32px] w-full max-w-[450px] p-6 shadow-2xl z-10 animate-in fade-in zoom-in-95 duration-150">
+              <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-100">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-full bg-red-50 flex items-center justify-center text-red-500">
+                    <AlertCircle className="w-5 h-5" />
+                  </div>
+                  <h4 className="text-[18px] font-bold text-[#303030] font-sans">Form Validation Errors</h4>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsValidationErrorModalOpen(false)}
+                  className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              
+              <p className="text-[13px] text-gray-505 font-sans mb-3.5 leading-relaxed">
+                Please resolve the following issue(s) before generating the assignment:
+              </p>
+              
+              <div className="flex flex-col gap-2 mb-6 max-h-[200px] overflow-y-auto pr-1">
+                {errors.map((err, idx) => (
+                  <div key={idx} className="flex items-start gap-2 text-[13px] text-slate-700 font-sans font-medium">
+                    <span className="text-red-500 shrink-0 mt-0.5">•</span>
+                    <span>{err.message}</span>
+                  </div>
+                ))}
+              </div>
+              
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => setIsValidationErrorModalOpen(false)}
+                  className="px-6 py-2.5 text-[14px] font-bold text-white bg-[#181818] hover:bg-black rounded-full transition-all font-sans active:scale-95 shadow-md w-full text-center"
+                >
+                  Got it
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Save Template Modal Overlay */}
+        {isSaveTemplateModalOpen && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            {/* Backdrop */}
+            <div 
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300"
+              onClick={() => {
+                if (!templateName) {
+                  setSaveAsTemplate(false);
+                }
+                setIsSaveTemplateModalOpen(false);
+              }}
+            />
+            {/* Modal Box */}
+            <div className="relative bg-white border border-gray-250/80 rounded-[32px] w-full max-w-[450px] p-6 shadow-2xl z-10 animate-in fade-in zoom-in-95 duration-150">
+              <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-100">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-full bg-purple-50 flex items-center justify-center text-purple-650">
+                    <Sparkles className="w-4.5 h-4.5" />
+                  </div>
+                  <h4 className="text-[18px] font-bold text-[#303030] font-sans">Save Blueprint Template</h4>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!templateName) {
+                      setSaveAsTemplate(false);
+                    }
+                    setIsSaveTemplateModalOpen(false);
+                  }}
+                  className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              
+              <p className="text-[13px] text-gray-505 font-sans mb-4 leading-relaxed">
+                Define a name and description to save this blueprint layout for quick use in future assignments.
+              </p>
+              
+              <div className="flex flex-col gap-4 mb-6">
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[12px] font-bold text-[#303030] font-sans">
+                    Template Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. CBSE Term 1 Science Exam"
+                    value={tempTemplateName}
+                    onChange={(e) => setTempTemplateName(e.target.value)}
+                    className="w-full h-[40px] px-4 text-[14px] font-semibold text-[#303030] bg-gray-50 border border-gray-200 rounded-[20px] outline-none focus:bg-white focus:ring-1 focus:ring-purple-400 font-sans transition-all"
+                    autoFocus
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[12px] font-bold text-[#303030] font-sans">
+                    Template Description
+                  </label>
+                  <textarea
+                    placeholder="e.g. Standard pattern with 5 MCQs and 3 short answers"
+                    value={tempTemplateDescription}
+                    onChange={(e) => setTempTemplateDescription(e.target.value)}
+                    className="w-full p-4 text-[14px] font-medium text-[#303030] bg-gray-50 border border-gray-200 rounded-[20px] outline-none focus:bg-white focus:ring-1 focus:ring-purple-400 font-sans resize-none h-20 transition-all"
+                  />
+                </div>
+              </div>
+              
+              <div className="flex justify-end gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!templateName) {
+                      setSaveAsTemplate(false);
+                    }
+                    setIsSaveTemplateModalOpen(false);
+                  }}
+                  className="px-4 py-2 text-[14px] font-bold text-gray-500 hover:text-black transition-colors font-sans"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!tempTemplateName.trim()) {
+                      addToast('Please enter a template name', 'error');
+                      return;
+                    }
+                    setTemplateName(tempTemplateName);
+                    setTemplateDescription(tempTemplateDescription);
+                    setIsSaveTemplateModalOpen(false);
+                    addToast(`Template config saved: "${tempTemplateName}"`, 'success');
+                  }}
+                  className="px-5 py-2.5 text-[14px] font-bold text-white bg-[#181818] hover:bg-black rounded-full transition-all font-sans active:scale-95 shadow-md"
+                >
+                  Apply Blueprint
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

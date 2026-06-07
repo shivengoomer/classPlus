@@ -7,12 +7,20 @@ export interface Toast {
   duration?: number;
   onConfirm?: () => void;
   onCancel?: () => void;
+  confirmText?: string;
+  cancelText?: string;
 }
 
 interface ToastState {
   toasts: Toast[];
   addToast: (message: string, type: 'success' | 'error' | 'info', duration?: number) => void;
-  addConfirmToast: (message: string, onConfirm: () => void, onCancel?: () => void) => void;
+  addConfirmToast: (
+    message: string,
+    onConfirm: () => void,
+    onCancel?: () => void,
+    confirmText?: string,
+    cancelText?: string
+  ) => void;
   removeToast: (id: string) => void;
 }
 
@@ -25,12 +33,12 @@ export const useToastStore = create<ToastState>((set) => ({
       set((state) => ({ toasts: state.toasts.filter((t) => t.id !== id) }));
     }, duration);
   },
-  addConfirmToast: (message, onConfirm, onCancel) => {
+  addConfirmToast: (message, onConfirm, onCancel, confirmText, cancelText) => {
     const id = Math.random().toString(36).substring(2, 9);
     set((state) => ({
       toasts: [
         ...state.toasts,
-        { id, message, type: 'confirm', onConfirm, onCancel },
+        { id, message, type: 'confirm', onConfirm, onCancel, confirmText, cancelText },
       ],
     }));
   },

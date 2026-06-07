@@ -32,7 +32,7 @@ export function ToastContainer() {
                   }}
                   className="px-3 py-1.5 text-[11px] font-bold text-gray-500 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-all font-sans border border-gray-200 active:scale-95"
                 >
-                  Cancel
+                  {toast.cancelText || 'Cancel'}
                 </button>
                 <button
                   onClick={() => {
@@ -41,7 +41,7 @@ export function ToastContainer() {
                   }}
                   className="px-3 py-1.5 text-[11px] font-bold text-white bg-red-600 hover:bg-red-700 rounded-full transition-all font-sans shadow-sm active:scale-95"
                 >
-                  Delete
+                  {toast.confirmText || 'Delete'}
                 </button>
               </div>
             </div>
