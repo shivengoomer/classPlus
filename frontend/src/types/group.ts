@@ -92,6 +92,9 @@ export interface Template {
   description: string;
   isDefault: boolean;
   createdBy: string | null;
+  subject?: string;
+  grade?: string;
+  additionalInstructions?: string;
   blueprint: {
     sections: TemplateSection[];
   };

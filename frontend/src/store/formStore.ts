@@ -27,6 +27,7 @@ interface FormState {
   addRow: () => void;
   removeRow: (index: number) => void;
   updateRow: (index: number, field: 'type' | 'count' | 'marks' | 'rubric', value: any) => void;
+  setQuestionRows: (rows: QuestionConfigRow[]) => void;
   setInstructions: (s: string) => void;
   reset: () => void;
 }
@@ -66,6 +67,7 @@ export const useFormStore = create<FormState>((set) => ({
     });
     return { questionRows: updated };
   }),
+  setQuestionRows: (questionRows) => set({ questionRows }),
   setInstructions: (additionalInstructions) => set({ additionalInstructions }),
   reset: () => set({
     title: '',

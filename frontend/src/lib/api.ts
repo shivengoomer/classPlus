@@ -1,5 +1,6 @@
 // src/lib/api.ts
 import { Assignment, CreateAssignmentDTO } from '@/types/assignment';
+import { Template } from '@/types/group';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
 
@@ -301,4 +302,30 @@ export async function generateRubric(
   if (!res.ok) throw new Error('Failed to generate rubric');
   return res.json();
 }
+
+export async function listTemplates(): Promise<Template[]> {
+  const res = await authFetch(`${BASE_URL}/templates`);
+  if (!res.ok) throw new Error('Failed to fetch templates');
+  return res.json();
+}
+
+export async function createTemplate(data: Partial<Template>): Promise<Template> {
+  const res = await authFetch(`${BASE_URL}/templates`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error('Failed to create template');
+  return res.json();
+}
+
+export async function deleteTemplate(id: string): Promise<void> {
+  const res = await authFetch(`${BASE_URL}/templates/${id}`, {
+    method: 'DELETE',
+  });
+  if (!res.ok) throw new Error('Failed to delete template');
+}
+
 

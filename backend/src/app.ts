@@ -9,6 +9,7 @@ import libraryRoutes from './routes/library.routes';
 import notificationRoutes from './routes/notification.routes';
 import userRoutes from './routes/user.routes';
 import rubricRoutes from './routes/rubric.routes';
+import templateRoutes from './routes/template.routes';
 
 const app = express();
 
@@ -40,6 +41,9 @@ app.use('/api/users', userRoutes);
 
 // rubric routes under /api/rubrics
 app.use('/api/rubrics', rubricRoutes);
+
+// template routes under /api/templates
+app.use('/api/templates', templateRoutes);
 
 // global error handler
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

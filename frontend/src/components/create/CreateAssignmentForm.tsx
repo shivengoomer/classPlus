@@ -14,11 +14,21 @@ import { validateAssignmentForm, ValidationError } from '@/lib/validators';
 import { createAssignment } from '@/lib/api';
 import { Sparkles, ArrowLeft } from 'lucide-react';
 import { useToastStore } from '@/store/toastStore';
+import { TemplateModal } from './TemplateModal';
+import { useTemplateStore } from '@/store/templateStore';
+import { Template } from '@/types/group';
 
 export function CreateAssignmentForm() {
   const router = useRouter();
   const addAssignment = useAssignmentStore((state) => state.addAssignment);
   const { addToast } = useToastStore();
+  const saveTemplate = useTemplateStore((state) => state.saveTemplate);
+
+  // Template states
+  const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
+  const [saveAsTemplate, setSaveAsTemplate] = useState(false);
+  const [templateName, setTemplateName] = useState('');
+  const [templateDescription, setTemplateDescription] = useState('');
 
   // Zustand form state
   const {
@@ -40,8 +50,29 @@ export function CreateAssignmentForm() {
     removeRow,
     updateRow,
     setInstructions,
-    reset
+    reset,
+    setQuestionRows
   } = useFormStore();
+
+  const handleSelectTemplate = (template: Template) => {
+    setTitle(template.name);
+    if (template.subject) setSubject(template.subject);
+    if (template.grade) setGrade(template.grade);
+    if (template.additionalInstructions) setInstructions(template.additionalInstructions);
+    
+    if (template.blueprint?.sections) {
+      setQuestionRows(
+        template.blueprint.sections.map((sec) => ({
+          type: sec.type as any,
+          count: sec.count,
+          marks: sec.marks,
+        }))
+      );
+    }
+    
+    setIsTemplateModalOpen(false);
+    addToast(`Loaded blueprint template: ${template.name}`, 'success');
+  };
 
   const [errors, setErrors] = useState<ValidationError[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -103,6 +134,28 @@ export function CreateAssignmentForm() {
 
     setIsSubmitting(true);
     try {
+      if (saveAsTemplate) {
+        if (!templateName.trim()) {
+          addToast('Please enter a template name', 'error');
+          setIsSubmitting(false);
+          return;
+        }
+        await saveTemplate({
+          name: templateName,
+          description: templateDescription || `Custom template for ${subject}`,
+          subject,
+          grade,
+          additionalInstructions,
+          blueprint: {
+            sections: questionRows.map((r) => ({
+              type: r.type,
+              count: r.count,
+              marks: r.marks,
+            })),
+          },
+        });
+      }
+
       const result = await createAssignment(payload);
 
       // If in simulated offline mode, it adds the pending item directly to assignments store
@@ -317,6 +370,18 @@ export function CreateAssignmentForm() {
                 </p>
               </div>
 
+              {/* Template Library Button */}
+              <div className="flex justify-end -mb-2">
+                <button
+                  type="button"
+                  onClick={() => setIsTemplateModalOpen(true)}
+                  className="flex items-center gap-2 px-4 py-2 text-[14px] font-bold text-purple-650 hover:text-purple-800 transition-all bg-purple-50 hover:bg-purple-100/80 rounded-full font-sans border border-purple-200/50 shadow-sm active:scale-95"
+                >
+                  <Sparkles className="w-4 h-4 text-purple-500 animate-pulse" />
+                  <span>Start from Template</span>
+                </button>
+              </div>
+
               {/* Title Field */}
               <div className="flex flex-col gap-2">
                 <label className="text-[16px] font-bold text-[#303030] font-sans">
@@ -471,6 +536,56 @@ export function CreateAssignmentForm() {
               </div>
             </div>
 
+            {/* Template Option */}
+            <div className="flex flex-col gap-4 p-5 bg-purple-50/20 border border-purple-250/20 rounded-[28px]">
+              <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  id="saveAsTemplate"
+                  checked={saveAsTemplate}
+                  onChange={(e) => setSaveAsTemplate(e.target.checked)}
+                  className="w-5 h-5 rounded border-gray-300 text-purple-650 focus:ring-purple-400 cursor-pointer"
+                />
+                <div className="flex flex-col">
+                  <label htmlFor="saveAsTemplate" className="text-[15px] font-bold text-[#303030] font-sans cursor-pointer">
+                    Save blueprint as reusable template
+                  </label>
+                  <span className="text-[12px] text-gray-500 font-sans mt-0.5">
+                    Save this blueprint configuration to your library for future assignments
+                  </span>
+                </div>
+              </div>
+
+              {saveAsTemplate && (
+                <div className="flex flex-col gap-4 pt-3 border-t border-purple-200/50 animate-in fade-in slide-in-from-top-2 duration-150">
+                  <div className="flex flex-col gap-2">
+                    <label className="text-[14px] font-bold text-[#303030] font-sans">
+                      Template Name
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. CBSE Term 1 Science Exam"
+                      value={templateName}
+                      onChange={(e) => setTemplateName(e.target.value)}
+                      className="w-full h-[40px] px-4 text-[14px] font-semibold text-[#303030] bg-white border border-gray-300 rounded-full outline-none focus:ring-1 focus:ring-purple-400 font-sans"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <label className="text-[14px] font-bold text-[#303030] font-sans">
+                      Template Description
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Standard pattern with 5 MCQs and 3 short answers"
+                      value={templateDescription}
+                      onChange={(e) => setTemplateDescription(e.target.value)}
+                      className="w-full h-[40px] px-4 text-[14px] font-medium text-[#303030] bg-white border border-gray-300 rounded-full outline-none focus:ring-1 focus:ring-purple-400 font-sans"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
           </div>
 
           {/* --- FOOTER NAVIGATION / SUBMIT ACTIONS --- */}
@@ -538,6 +653,13 @@ export function CreateAssignmentForm() {
           </div>
 
         </form>
+
+        {/* Template Selection Library Modal */}
+        <TemplateModal
+          isOpen={isTemplateModalOpen}
+          onClose={() => setIsTemplateModalOpen(false)}
+          onSelectTemplate={handleSelectTemplate}
+        />
       </div>
     </div>
   );

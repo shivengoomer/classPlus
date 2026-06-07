@@ -24,6 +24,9 @@ export interface ITemplate extends Document {
   description: string;
   isDefault: boolean;
   createdBy: string | null;
+  subject?: string;
+  grade?: string;
+  additionalInstructions?: string;
   blueprint: {
     sections: ITemplateSection[];
   };
@@ -37,6 +40,9 @@ const TemplateSchema = new Schema(
     description: { type: String, required: true },
     isDefault: { type: Boolean, default: false },
     createdBy: { type: String, default: null },
+    subject: { type: String, default: '' },
+    grade: { type: String, default: '' },
+    additionalInstructions: { type: String, default: '' },
     blueprint: {
       sections: [TemplateSectionSchema],
     },
