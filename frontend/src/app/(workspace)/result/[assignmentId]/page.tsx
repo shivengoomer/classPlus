@@ -103,11 +103,7 @@ export default function ResultPage() {
         >
           {/* AI Response Message Banner */}
           {assignment.result && (
-            <DarkBanner 
-              assignmentId={assignment._id} 
-              aiMessage={assignment.result.aiMessage} 
-              assignmentTitle={assignment.title}
-            />
+            <DarkBanner assignment={assignment} />
           )}
 
           {/* Device Preview Switcher (Desktop, Laptop, Phone) */}
