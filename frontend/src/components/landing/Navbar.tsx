@@ -8,7 +8,7 @@ import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
 import { 
   Sparkles, BookOpen, MessageSquare, ClipboardList, BarChart3, Tag, Mail,
   Brain, FileSpreadsheet, ArrowRight, Star, Laptop, Phone,
-  Compass, Award, RefreshCw, Layers
+  Compass, Award, RefreshCw, Layers, Menu, X, ChevronDown
 } from 'lucide-react';
 import { Logo } from '@/components/shared/Logo';
 
@@ -23,6 +23,8 @@ interface DropdownItem {
 export default function Navbar() {
   const router = useRouter();
   const [hoveredTab, setHoveredTab] = useState<string | null>(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [activeMobileSubmenu, setActiveMobileSubmenu] = useState<string | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleMouseEnter = (tab: string) => {
@@ -92,7 +94,7 @@ export default function Navbar() {
       <motion.nav 
         className="w-full rounded-[24px] border border-slate-200/60 bg-white/85 backdrop-blur-2xl shadow-xl shadow-slate-200/50 overflow-hidden"
         animate={{
-          height: hoveredTab ? 'auto' : '64px'
+          height: isMobileMenuOpen ? 'auto' : (hoveredTab ? 'auto' : '64px')
         }}
         transition={{
           type: 'spring',
@@ -103,7 +105,10 @@ export default function Navbar() {
         <div className="px-6 h-[64px] flex items-center justify-between">
           {/* Logo */}
           <div 
-            onClick={() => router.push('/')} 
+            onClick={() => {
+              setIsMobileMenuOpen(false);
+              router.push('/');
+            }} 
             className="flex items-center gap-2 cursor-pointer group"
           >
             <Logo className="w-8 h-8 group-hover:scale-105 transition-transform" />
@@ -112,7 +117,7 @@ export default function Navbar() {
             </span>
           </div>
 
-          {/* Navigation links */}
+          {/* Navigation links (Desktop) */}
           <div className="hidden md:flex items-center gap-1">
             {navItems.map((item) => (
               <button
@@ -133,8 +138,8 @@ export default function Navbar() {
             ))}
           </div>
 
-          {/* Auth elements */}
-          <div className="flex items-center gap-4">
+          {/* Auth elements (Desktop) */}
+          <div className="hidden md:flex items-center gap-4">
             <SignedOut>
               <button 
                 onClick={() => router.push('/sign-in')}
@@ -163,9 +168,51 @@ export default function Navbar() {
               </div>
             </SignedIn>
           </div>
+
+          {/* Mobile Actions & Menu Button */}
+          <div className="flex md:hidden items-center gap-3">
+            <SignedOut>
+              <button
+                onClick={() => router.push('/sign-in')}
+                className="hidden sm:block text-xs font-semibold text-slate-650 hover:text-slate-900 transition-colors"
+              >
+                Sign In
+              </button>
+              <button
+                onClick={() => router.push('/sign-up')}
+                className="px-3.5 py-1.5 rounded-full text-[10px] font-bold bg-[#10375C] hover:bg-[#0d2f4f] text-white shadow-sm transition-all active:scale-95"
+              >
+                Get Started
+              </button>
+            </SignedOut>
+
+            <SignedIn>
+              <button
+                onClick={() => router.push('/home')}
+                className="px-3.5 py-1.5 rounded-full text-[10px] font-bold bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-800 transition-all active:scale-95"
+              >
+                Dashboard
+              </button>
+            </SignedIn>
+
+            <button
+              onClick={() => {
+                setIsMobileMenuOpen(!isMobileMenuOpen);
+                setActiveMobileSubmenu(null);
+              }}
+              className="p-2 rounded-xl hover:bg-slate-100 text-slate-700 active:scale-95 transition-all"
+              aria-label="Toggle menu"
+            >
+              {isMobileMenuOpen ? (
+                <X className="w-6 h-6 text-slate-800" />
+              ) : (
+                <Menu className="w-6 h-6 text-slate-800" />
+              )}
+            </button>
+          </div>
         </div>
 
-        {/* Dropdown Menu Container */}
+        {/* Desktop Dropdown Menu Container */}
         <AnimatePresence>
           {hoveredTab && (
             <motion.div
@@ -173,7 +220,7 @@ export default function Navbar() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.15 }}
-              className="px-8 pb-8 pt-4 border-t border-slate-100 bg-white/95"
+              className="hidden md:block px-8 pb-8 pt-4 border-t border-slate-100 bg-white/95"
             >
               <div className="grid grid-cols-2 gap-4">
                 {dropdownData[hoveredTab]?.map((item, idx) => (
@@ -205,6 +252,148 @@ export default function Navbar() {
                     </div>
                   </div>
                 ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Mobile Drawer Menu Container */}
+        <AnimatePresence>
+          {isMobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.25, ease: 'easeInOut' }}
+              className="px-6 pb-6 pt-2 border-t border-slate-100 md:hidden bg-white/95 max-h-[calc(100vh-120px)] overflow-y-auto"
+            >
+              <div className="flex flex-col gap-1">
+                {navItems.map((item) => {
+                  const hasDropdown = !!dropdownData[item];
+                  const isExpanded = activeMobileSubmenu === item;
+
+                  return (
+                    <div key={item} className="border-b border-slate-100/60 py-1 last:border-0">
+                      <button
+                        onClick={() => {
+                          if (hasDropdown) {
+                            setActiveMobileSubmenu(isExpanded ? null : item);
+                          } else {
+                            setIsMobileMenuOpen(false);
+                            router.push(routeMap[item]);
+                          }
+                        }}
+                        className="w-full py-2.5 flex items-center justify-between text-slate-800 hover:text-[#10375C] transition-colors text-left"
+                      >
+                        <span className="text-sm font-bold tracking-tight">{item}</span>
+                        {hasDropdown && (
+                          <motion.div
+                            animate={{ rotate: isExpanded ? 180 : 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="text-slate-400"
+                          >
+                            <ChevronDown className="w-4 h-4" />
+                          </motion.div>
+                        )}
+                      </button>
+
+                      {hasDropdown && (
+                        <AnimatePresence initial={false}>
+                          {isExpanded && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: 'auto', opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={{ duration: 0.2 }}
+                              className="overflow-hidden pl-2 pr-2 flex flex-col gap-2 pt-1 pb-3"
+                            >
+                              {dropdownData[item].map((subItem, idx) => (
+                                <div
+                                  key={idx}
+                                  onClick={() => {
+                                    setIsMobileMenuOpen(false);
+                                    router.push(subItem.href);
+                                  }}
+                                  className="flex items-center gap-3 p-3 rounded-xl bg-slate-50/50 hover:bg-slate-50 active:bg-slate-100/80 border border-slate-100/50 hover:border-slate-200/60 transition-colors cursor-pointer group"
+                                >
+                                  <div className="p-2 rounded-lg bg-white border border-slate-200 group-hover:scale-105 transition-transform shadow-sm flex-shrink-0">
+                                    {subItem.icon}
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-1.5 flex-wrap">
+                                      <span className="text-xs font-semibold text-slate-800 group-hover:text-[#10375C] transition-colors">
+                                        {subItem.title}
+                                      </span>
+                                      {subItem.badge && (
+                                        <span className="text-[8px] font-bold text-[#10375C] bg-[#10375C]/10 px-1 py-0.5 rounded-full border border-[#10375C]/20 uppercase tracking-wide">
+                                          {subItem.badge}
+                                        </span>
+                                      )}
+                                    </div>
+                                    <p className="text-[10px] text-slate-500 line-clamp-1 mt-0.5">
+                                      {subItem.desc}
+                                    </p>
+                                  </div>
+                                </div>
+                              ))}
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Divider */}
+              <div className="h-px bg-slate-100 my-4" />
+
+              {/* Auth section */}
+              <div className="flex flex-col gap-3">
+                <SignedOut>
+                  <button
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      router.push('/sign-in');
+                    }}
+                    className="w-full py-3 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-xs transition-colors text-center"
+                  >
+                    Sign In
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      router.push('/sign-up');
+                    }}
+                    className="w-full py-3 rounded-xl bg-[#10375C] hover:bg-[#0d2f4f] text-white font-semibold text-xs shadow-md shadow-[#10375C]/20 transition-colors text-center"
+                  >
+                    Get Started Free
+                  </button>
+                </SignedOut>
+
+                <SignedIn>
+                  <button
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      router.push('/home');
+                    }}
+                    className="w-full py-3 rounded-xl bg-[#10375C] hover:bg-[#0d2f4f] text-white font-semibold text-xs flex items-center justify-center gap-2 transition-colors shadow-md shadow-[#10375C]/20"
+                  >
+                    <span>Go to Dashboard</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                  
+                  {/* Styled user info row */}
+                  <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50/80 border border-slate-100/80 mt-1">
+                    <div className="w-8 h-8 rounded-full border border-slate-200 overflow-hidden flex items-center justify-center flex-shrink-0 bg-white">
+                      <UserButton afterSignOutUrl="/" />
+                    </div>
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-[11px] font-bold text-slate-800 leading-tight">Your Account</span>
+                      <span className="text-[9px] text-slate-500 leading-tight">Manage profile & sign out</span>
+                    </div>
+                  </div>
+                </SignedIn>
               </div>
             </motion.div>
           )}
