@@ -15,6 +15,7 @@ interface AuthLayoutProps {
   children: React.ReactNode;
   title: string;
   subtitle: string;
+  portalType?: 'teacher' | 'student';
 }
 
 type TabType = 'ai-gen' | 'grading' | 'analytics';
@@ -336,7 +337,7 @@ function AnalyticsSimulator() {
   );
 }
 
-export default function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
+export default function AuthLayout({ children, title, subtitle, portalType }: AuthLayoutProps) {
   const [activeTab, setActiveTab] = useState<TabType>('ai-gen');
   const [autoplay, setAutoplay] = useState(true);
   const autoplayTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -595,7 +596,9 @@ export default function AuthLayout({ children, title, subtitle }: AuthLayoutProp
           <div className="w-full text-center max-w-sm mb-2 select-none">
             <div className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-slate-200/60 bg-slate-50 text-[10px] font-bold text-slate-500 mb-3.5">
               <Sparkle className="w-3 h-3 text-[#10375C] fill-[#10375C]/20" />
-              <span>Official Educator & school Portal</span>
+              <span>
+                {portalType === 'teacher' ? '🎓 Teacher & School Portal' : portalType === 'student' ? '📚 Student Portal' : 'Official Educator & school Portal'}
+              </span>
             </div>
             <h1 className="text-2xl font-black text-slate-900 tracking-tight leading-none">
               {title}

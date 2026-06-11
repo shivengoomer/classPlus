@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   Activity,
@@ -262,7 +263,8 @@ export default function ReportsPage() {
   };
 
   return (
-    <AppShell>
+    <>
+      <AppShell>
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-5 pb-16">
         <div className="mt-2 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
@@ -379,9 +381,12 @@ export default function ReportsPage() {
         </div>
       </div>
 
+      </AppShell>
+
+      {typeof document !== 'undefined' && createPortal(
       <AnimatePresence>
         {selectedStudent && (
-          <div className="fixed inset-0 z-[999] flex items-center justify-center p-3 md:p-6">
+          <div className="fixed inset-0 z-[10000] flex items-center justify-center p-3 md:p-6">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -575,7 +580,9 @@ export default function ReportsPage() {
             </motion.div>
           </div>
         )}
-      </AnimatePresence>
-    </AppShell>
+      </AnimatePresence>,
+      document.body
+      )}
+    </>
   );
 }

@@ -121,22 +121,28 @@ export default function LandingPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, ease: 'easeOut', delay: 0.3 }}
-              className="flex flex-wrap items-center gap-4 mt-2"
+              className="flex flex-wrap items-center gap-3 mt-2"
             >
               <SignedOut>
                 <button
-                  onClick={() => router.push('/sign-up')}
-                  className="px-6 py-3.5 rounded-2xl text-xs font-semibold bg-[#10375C] hover:bg-[#0d2f4f] text-white shadow-lg shadow-[#10375C]/20 active:scale-95 flex items-center gap-2 transition-all group"
+                  onClick={() => router.push('/sign-in')}
+                  className="px-5 py-3 rounded-2xl text-xs font-bold bg-[#10375C] hover:bg-[#0d2f4f] text-white shadow-lg shadow-[#10375C]/20 active:scale-95 flex items-center gap-2 transition-all group"
                 >
-                  <span>Get Started Free</span>
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  <span>🎓 Teacher Login</span>
+                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                </button>
+                <button
+                  onClick={() => router.push('/student')}
+                  className="px-5 py-3 rounded-2xl text-xs font-bold bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 shadow-sm active:scale-95 flex items-center gap-2 transition-all"
+                >
+                  <span>📚 Student Login</span>
                 </button>
               </SignedOut>
 
               <SignedIn>
                 <button
                   onClick={() => router.push('/home')}
-                  className="px-6 py-3.5 rounded-2xl text-xs font-semibold bg-[#10375C] hover:bg-[#0d2f4f] text-white shadow-lg shadow-[#10375C]/20 active:scale-95 flex items-center gap-2 transition-all group"
+                  className="px-5 py-3 rounded-2xl text-xs font-bold bg-[#10375C] hover:bg-[#0d2f4f] text-white shadow-lg shadow-[#10375C]/20 active:scale-95 flex items-center gap-2 transition-all group"
                 >
                   <span>Go to Dashboard</span>
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -145,9 +151,9 @@ export default function LandingPage() {
 
               <button
                 onClick={() => setShowDemoModal(true)}
-                className="px-6 py-3.5 rounded-2xl text-xs font-semibold bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 shadow-sm active:scale-95 flex items-center gap-2 transition-all"
+                className="px-5 py-3 rounded-2xl text-xs font-semibold bg-white/70 hover:bg-white text-slate-700 border border-slate-200/80 shadow-sm active:scale-95 flex items-center gap-2 transition-all"
               >
-                <Play className="w-4 h-4 text-[#10375C] fill-[#10375C]/20" />
+                <Play className="w-3.5 h-3.5 text-[#10375C] fill-[#10375C]/20" />
                 <span>Watch Demo</span>
               </button>
             </motion.div>

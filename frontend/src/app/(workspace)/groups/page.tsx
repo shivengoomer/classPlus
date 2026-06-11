@@ -1,15 +1,16 @@
-// src/app/(workspace)/groups/page.tsx — Real API Groups Page
+// src/app/(workspace)/groups/page.tsx — Redesigned Groups Page
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AppShell } from '@/components/layout/AppShell';
-import { PillButton } from '@/components/shared/PillButton';
 import {
   Folder, Users, Plus, ShieldCheck, User, X, Search, Trash2, ChevronDown,
   CheckCircle2, Copy, ClipboardCheck, AlertCircle, Loader2, CalendarDays,
-  Brain, Trophy, XCircle, Upload, Edit3, BookOpen, FileText, Check, ChevronUp
+  Brain, Trophy, XCircle, Upload, Edit3, BookOpen, FileText, Check, ChevronUp,
+  GraduationCap, Sparkles, Zap, MoreVertical, ArrowRight, ClipboardList,
+  Hash, Star, TrendingUp, Badge, Info, Clock
 } from 'lucide-react';
 import { useFormStore } from '@/store/formStore';
 import {
@@ -31,6 +32,20 @@ const RUBRICS = [
 const GRADES = ['5th','6th','7th','8th','9th','10th','11th','12th'];
 const SUBJECTS = ['Science','Mathematics','English','History','Physics','Chemistry','Biology'];
 
+const SUBJECT_COLORS: Record<string, { bg: string; text: string; border: string; dot: string }> = {
+  Science: { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200', dot: 'bg-emerald-500' },
+  Mathematics: { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200', dot: 'bg-blue-500' },
+  English: { bg: 'bg-purple-50', text: 'text-purple-700', border: 'border-purple-200', dot: 'bg-purple-500' },
+  History: { bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-200', dot: 'bg-amber-500' },
+  Physics: { bg: 'bg-sky-50', text: 'text-sky-700', border: 'border-sky-200', dot: 'bg-sky-500' },
+  Chemistry: { bg: 'bg-rose-50', text: 'text-rose-700', border: 'border-rose-200', dot: 'bg-rose-500' },
+  Biology: { bg: 'bg-teal-50', text: 'text-teal-700', border: 'border-teal-200', dot: 'bg-teal-500' },
+};
+
+function getSubjectStyle(subject: string) {
+  return SUBJECT_COLORS[subject] || { bg: 'bg-slate-50', text: 'text-slate-700', border: 'border-slate-200', dot: 'bg-slate-500' };
+}
+
 export default function GroupsPage() {
   const router = useRouter();
   const { setSubject, setGrade, setTitle, setInstructions } = useFormStore();
@@ -40,6 +55,7 @@ export default function GroupsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [activeDetailTab, setActiveDetailTab] = useState<'overview' | 'students' | 'assessments' | 'actions'>('overview');
 
   // Create Group Modal
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -79,7 +95,6 @@ export default function GroupsPage() {
   const [gradingAnswers, setGradingAnswers] = useState<Record<string, { marks: number; isCorrect: boolean; aiFeedback: string; answer?: string }>>({});
   const [gradingTotalScore, setGradingTotalScore] = useState<number | null>(null);
   const [savingGrade, setSavingGrade] = useState(false);
-  const [teacherUploadingName, setTeacherUploadingName] = useState<string | null>(null);
   const [uploadingPaper, setUploadingPaper] = useState(false);
 
   const fetchGroups = useCallback(async () => {
@@ -135,16 +150,13 @@ export default function GroupsPage() {
   };
 
   const handleOpenGrading = async (studentName: string) => {
-    // Check if there is an existing submission
     const sub = submissions.find(s => s.studentName === studentName);
     if (sub) {
-      // Fetch detailed results using studentResults endpoint
       try {
         setSubmissionsLoading(true);
         const res = await fetch(`http://localhost:4000/api/student/results/${activeAssigned?._id}?studentName=${encodeURIComponent(studentName)}`);
         if (!res.ok) throw new Error('Failed to fetch details');
         const detailed = await res.json();
-        
         setSelectedStudentSubmission(detailed);
         setGradingTotalScore(detailed.totalScore);
         const answersMap: Record<string, any> = {};
@@ -158,8 +170,6 @@ export default function GroupsPage() {
         }
         setGradingAnswers(answersMap);
       } catch (err) {
-        console.error('Failed to load detailed submission', err);
-        // Fallback to simple list view data
         setSelectedStudentSubmission({
           studentName,
           totalScore: sub.totalScore,
@@ -170,7 +180,6 @@ export default function GroupsPage() {
         setSubmissionsLoading(false);
       }
     } else {
-      // Create new manual template for grading
       setSelectedStudentSubmission({
         studentName,
         totalScore: 0,
@@ -193,24 +202,16 @@ export default function GroupsPage() {
         aiFeedback: val.aiFeedback,
         answer: val.answer || '',
       }));
-
       const finalTotalScore = gradingTotalScore !== null ? gradingTotalScore : answersList.reduce((sum, a) => sum + (a.marks || 0), 0);
-
-      const updated = await updateSubmission(activeAssigned._id, selectedStudentSubmission.studentName, {
+      await updateSubmission(activeAssigned._id, selectedStudentSubmission.studentName, {
         totalScore: finalTotalScore,
         answers: answersList,
         totalMarks: selectedStudentSubmission.totalMarks,
       });
-
-      // Refresh submissions list
       await fetchSubmissions(activeAssigned._id);
-
-      // Re-trigger grading layout load
       handleOpenGrading(selectedStudentSubmission.studentName);
-
       alert('Grade saved successfully!');
     } catch (err) {
-      console.error('Failed to save grade', err);
       alert('Failed to save grade. Please try again.');
     } finally {
       setSavingGrade(false);
@@ -225,18 +226,14 @@ export default function GroupsPage() {
       const formData = new FormData();
       formData.append('studentName', studentName);
       formData.append('paper', file);
-
       const res = await fetch(`http://localhost:4000/api/student/upload/${activeAssigned._id}`, {
         method: 'POST',
         body: formData,
       });
-
       if (!res.ok) throw new Error('Upload failed');
-      
-      alert('Paper uploaded successfully! You can now grade it manually.');
+      alert('Paper uploaded successfully!');
       fetchSubmissions(activeAssigned._id);
     } catch (err) {
-      console.error('Upload failed', err);
       alert('Failed to upload paper.');
     } finally {
       setUploadingPaper(false);
@@ -253,7 +250,6 @@ export default function GroupsPage() {
     }
   };
 
-  // Fetch assignments when assign modal opens
   useEffect(() => {
     if (showAssignModal) {
       listAssignments()
@@ -354,6 +350,7 @@ export default function GroupsPage() {
         setAssignSuccess(false);
         setSelectedAssignmentId('');
         setAssignDueDate('');
+        fetchAssigned();
       }, 1500);
     } catch (err: any) {
       setAssignError(err.message || 'Failed to assign. Try again.');
@@ -371,122 +368,169 @@ export default function GroupsPage() {
     router.push('/create');
   };
 
+  const groupAssigned = selectedGroup
+    ? allAssigned.filter(a => a.groupId?._id === selectedGroup._id || a.groupId === selectedGroup._id)
+    : [];
+
+  const subjectStyle = selectedGroup ? getSubjectStyle(selectedGroup.subject) : getSubjectStyle('');
+
   return (
     <AppShell>
-      <div className="w-full max-w-6xl mx-auto flex flex-col gap-6 pb-16 px-[2px] relative z-10">
+      <div className="w-full h-full flex flex-col gap-4 relative z-10">
 
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex flex-col gap-1">
-            <h2 className="text-[20px] font-bold text-veda-text-primary flex items-center gap-2">
-              <Folder className="w-5 h-5 text-indigo-600" />
-              <span>My Class Groups</span>
-            </h2>
-            <p className="text-[13px] text-veda-text-secondary">
-              Manage students, rubrics, and assign assessments to your classes.
+        {/* Page Header */}
+        <div className="flex items-center justify-between flex-shrink-0">
+          <div className="flex flex-col gap-0.5">
+            <h1 className="text-lg font-black text-slate-900 tracking-tight flex items-center gap-2">
+              <span className="w-7 h-7 rounded-lg bg-[#10375C] flex items-center justify-center">
+                <Users className="w-3.5 h-3.5 text-white" />
+              </span>
+              My Class Groups
+            </h1>
+            <p className="text-xs text-slate-500 ml-9">
+              {groups.length} {groups.length === 1 ? 'class' : 'classes'} · manage rosters, assessments & grading
             </p>
           </div>
-          <PillButton
-            variant="primary"
-            icon={<Plus className="w-4 h-4 text-white" />}
-            onClick={() => setShowCreateModal(true)}
-          >
-            Create Class Group
-          </PillButton>
+
+          <div className="flex items-center gap-2">
+            {/* Search */}
+            <div className="hidden sm:flex items-center gap-2 bg-white border border-slate-200/80 rounded-xl px-3 py-2 shadow-sm w-56">
+              <Search className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
+              <input
+                type="text"
+                placeholder="Search classes…"
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                className="w-full text-xs outline-none text-slate-700 placeholder-slate-400 bg-transparent font-sans"
+              />
+              {searchQuery && (
+                <button onClick={() => setSearchQuery('')} className="text-slate-400 hover:text-slate-600">
+                  <X className="w-3 h-3" />
+                </button>
+              )}
+            </div>
+
+            <button
+              onClick={() => setShowCreateModal(true)}
+              className="flex items-center gap-1.5 bg-[#10375C] hover:bg-[#0d2f4f] text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow-md shadow-[#10375C]/20 transition-all active:scale-95"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              New Class
+            </button>
+          </div>
         </div>
 
         {/* Error Banner */}
         {error && (
-          <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600">
-            <AlertCircle className="w-4 h-4 flex-shrink-0" />
+          <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-600 flex-shrink-0">
+            <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
             {error}
           </div>
         )}
 
-        {/* Search */}
-        <div className="bg-white border border-veda-card-border rounded-xl p-3 shadow-sm w-full flex items-center gap-2">
-          <Search className="w-4 h-4 text-slate-400 flex-shrink-0" />
-          <input
-            type="text"
-            placeholder="Search class groups by name, subject, or grade..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full text-sm outline-none text-veda-text-primary placeholder-veda-text-hint bg-transparent font-sans"
-          />
-          {searchQuery && (
-            <button onClick={() => setSearchQuery('')} className="text-slate-400 hover:text-slate-600">
-              <X className="w-4 h-4" />
-            </button>
-          )}
-        </div>
+        {/* Main Two-Panel Layout */}
+        <div className="flex-1 grid grid-cols-1 lg:grid-cols-5 gap-4 min-h-0">
 
-        {/* Core Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+          {/* LEFT: Class Cards Grid */}
+          <div className="lg:col-span-2 flex flex-col gap-3 min-h-0">
+            <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">
+              {filteredGroups.length} class {filteredGroups.length === 1 ? 'group' : 'groups'}
+            </div>
 
-          {/* Group Cards */}
-          <div className="lg:col-span-2 flex flex-col gap-4">
-            {loading ? (
-              <div className="flex items-center justify-center py-16">
-                <Loader2 className="w-6 h-6 animate-spin text-slate-400" />
-              </div>
-            ) : filteredGroups.length === 0 ? (
-              <div className="bg-white border border-veda-card-border rounded-xl p-8 text-center text-sm text-veda-text-secondary">
-                {groups.length === 0 ? 'No class groups yet. Create one to get started!' : 'No groups match your search.'}
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {filteredGroups.map((g, i) => {
-                  const isSelected = selectedGroup?._id === g._id;
-                  return (
-                    <motion.div
-                      key={g._id}
-                      layout
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: i * 0.04 }}
-                      onClick={() => setSelectedGroup(g)}
-                      className={`bg-white border rounded-xl p-5 shadow-sm transition-all cursor-pointer flex flex-col justify-between gap-4 hover:scale-[1.01] ${
-                        isSelected
-                          ? 'border-indigo-500 ring-1 ring-indigo-400/30 shadow-md'
-                          : 'border-veda-card-border hover:border-gray-300'
-                      }`}
-                    >
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="flex items-start gap-3">
-                          <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 bg-indigo-50 text-indigo-600">
-                            <Users className="w-4.5 h-4.5" />
+            <div className="flex-1 overflow-y-auto pr-1 -mr-1">
+              {loading ? (
+                <div className="flex items-center justify-center h-40">
+                  <Loader2 className="w-5 h-5 animate-spin text-slate-400" />
+                </div>
+              ) : filteredGroups.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-40 gap-3 text-center">
+                  <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center">
+                    <Folder className="w-6 h-6 text-slate-400" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-slate-600">No classes yet</p>
+                    <p className="text-xs text-slate-400 mt-0.5">Create your first class group to get started</p>
+                  </div>
+                  <button
+                    onClick={() => setShowCreateModal(true)}
+                    className="text-xs font-bold text-[#10375C] hover:underline flex items-center gap-1"
+                  >
+                    <Plus className="w-3 h-3" /> Create Class
+                  </button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-3">
+                  {filteredGroups.map((g, i) => {
+                    const isSelected = selectedGroup?._id === g._id;
+                    const style = getSubjectStyle(g.subject);
+                    const assignedCount = allAssigned.filter(
+                      a => a.groupId?._id === g._id || a.groupId === g._id
+                    ).length;
+
+                    return (
+                      <motion.button
+                        key={g._id}
+                        layout
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: i * 0.04 }}
+                        onClick={() => { setSelectedGroup(g); setActiveDetailTab('overview'); }}
+                        className={`text-left w-full group relative bg-white border rounded-2xl p-4 shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5 cursor-pointer ${
+                          isSelected
+                            ? 'border-[#10375C] ring-2 ring-[#10375C]/10 shadow-md'
+                            : 'border-slate-200/80 hover:border-slate-300'
+                        }`}
+                      >
+                        {/* Active indicator */}
+                        {isSelected && (
+                          <motion.div
+                            layoutId="activeGroupIndicator"
+                            className="absolute left-0 top-4 bottom-4 w-1 rounded-full bg-[#10375C]"
+                          />
+                        )}
+
+                        <div className="flex items-start justify-between gap-2 mb-3">
+                          <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${style.bg} border ${style.border}`}>
+                            <GraduationCap className={`w-4.5 h-4.5 ${style.text}`} />
                           </div>
-                          <div>
-                            <span className="text-sm font-bold text-veda-text-primary">{g.name}</span>
-                            <p className="text-[11px] text-veda-text-secondary mt-0.5">{g.subject} • CBSE Grade {g.grade}</p>
-                          </div>
-                        </div>
-                        <button
-                          onClick={(e) => { e.stopPropagation(); handleDeleteGroup(g._id); }}
-                          className="p-1 text-slate-400 hover:text-red-500 transition-colors"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-
-                      <div className="flex flex-col gap-2 border-t border-gray-50 pt-3">
-                        <div className="flex justify-between text-xs">
-                          <span className="text-gray-400">Students</span>
-                          <span className="font-semibold text-veda-text-primary">{g.students.length} enrolled</span>
-                        </div>
-                        <div className="flex justify-between text-xs">
-                          <span className="text-gray-400">Rubric</span>
-                          <span className="font-semibold text-indigo-600 truncate max-w-[140px] flex items-center gap-1">
-                            <ShieldCheck className="w-3 h-3" />
-                            {(g.rubric || 'NCERT CBSE').replace('NCERT CBSE ', '')}
-                          </span>
-                        </div>
-                        {/* Class Code */}
-                        <div className="flex justify-between text-xs items-center mt-0.5">
-                          <span className="text-gray-400">Class Code</span>
                           <button
-                            onClick={(e) => { e.stopPropagation(); handleCopyCode(g.classCode); }}
-                            className="flex items-center gap-1 font-black text-[#10375C] hover:text-indigo-700 transition-colors tracking-widest"
+                            onClick={e => { e.stopPropagation(); handleDeleteGroup(g._id); }}
+                            className="opacity-0 group-hover:opacity-100 p-1 text-slate-400 hover:text-red-500 transition-all rounded-lg hover:bg-red-50"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+
+                        <div className="mb-3">
+                          <h3 className="text-sm font-black text-slate-900 leading-tight">{g.name}</h3>
+                          <p className="text-[11px] text-slate-500 mt-0.5">CBSE · Grade {g.grade}</p>
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full border ${style.bg} ${style.text} ${style.border}`}>
+                            <span className={`w-1.5 h-1.5 rounded-full ${style.dot}`} />
+                            {g.subject}
+                          </span>
+                          <div className="flex items-center gap-2 text-[10px] text-slate-400">
+                            <span className="flex items-center gap-0.5">
+                              <User className="w-3 h-3" />
+                              {g.students.length}
+                            </span>
+                            {assignedCount > 0 && (
+                              <span className="flex items-center gap-0.5">
+                                <ClipboardList className="w-3 h-3" />
+                                {assignedCount}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Class Code */}
+                        <div className="mt-2.5 pt-2.5 border-t border-slate-100 flex items-center justify-between">
+                          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Code</span>
+                          <button
+                            onClick={e => { e.stopPropagation(); handleCopyCode(g.classCode); }}
+                            className="flex items-center gap-1 font-black text-[11px] tracking-[0.15em] text-[#10375C] hover:text-indigo-700"
                           >
                             {g.classCode}
                             {copiedCode === g.classCode
@@ -494,209 +538,455 @@ export default function GroupsPage() {
                               : <Copy className="w-3 h-3" />}
                           </button>
                         </div>
-                      </div>
-                    </motion.div>
-                  );
-                })}
-              </div>
-            )}
+                      </motion.button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* Sidebar */}
-          <div className="flex flex-col gap-4">
+          {/* RIGHT: Detail Panel */}
+          <div className="lg:col-span-3 min-h-0">
             <AnimatePresence mode="wait">
               {selectedGroup ? (
                 <motion.div
                   key={selectedGroup._id}
-                  initial={{ opacity: 0, x: 10 }}
+                  initial={{ opacity: 0, x: 12 }}
                   animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -10 }}
-                  className="bg-white border border-veda-card-border rounded-xl shadow-sm overflow-hidden"
+                  exit={{ opacity: 0, x: -12 }}
+                  transition={{ duration: 0.2 }}
+                  className="h-full bg-white border border-slate-200/80 rounded-2xl shadow-sm flex flex-col overflow-hidden"
                 >
-                  <div className="bg-gray-50 p-5 border-b border-veda-card-border">
-                    <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">Class Overview</span>
-                    <h3 className="text-[16px] font-bold text-veda-text-primary mt-2">{selectedGroup.name}</h3>
+                  {/* Panel Header */}
+                  <div className={`px-5 pt-5 pb-0 border-b border-slate-100 flex-shrink-0`}>
+                    <div className="flex items-start justify-between gap-3 mb-4">
+                      <div className="flex items-start gap-3">
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${subjectStyle.bg} border ${subjectStyle.border}`}>
+                          <GraduationCap className={`w-5 h-5 ${subjectStyle.text}`} />
+                        </div>
+                        <div>
+                          <h2 className="text-base font-black text-slate-900">{selectedGroup.name}</h2>
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${subjectStyle.bg} ${subjectStyle.text} ${subjectStyle.border}`}>
+                              {selectedGroup.subject}
+                            </span>
+                            <span className="text-[10px] text-slate-400">Grade {selectedGroup.grade}</span>
+                            <span className="text-[10px] text-slate-400">·</span>
+                            <span className="text-[10px] text-slate-400">{selectedGroup.students.length} students</span>
+                          </div>
+                        </div>
+                      </div>
 
-                    {/* Share code */}
-                    <div className="flex items-center gap-2 mt-2">
-                      <span className="text-[11px] text-gray-400">Share with students:</span>
+                      {/* Copy Class Code */}
                       <button
                         onClick={() => handleCopyCode(selectedGroup.classCode)}
-                        className="flex items-center gap-1 text-xs font-black tracking-[0.2em] text-[#10375C] bg-[#10375C]/5 border border-[#10375C]/20 px-2 py-0.5 rounded hover:bg-[#10375C]/10 transition-colors"
+                        className="flex items-center gap-1.5 text-[11px] font-black tracking-[0.18em] text-[#10375C] bg-[#10375C]/5 border border-[#10375C]/15 px-2.5 py-1.5 rounded-lg hover:bg-[#10375C]/10 transition-colors flex-shrink-0"
                       >
                         {selectedGroup.classCode}
                         {copiedCode === selectedGroup.classCode
-                          ? <ClipboardCheck className="w-3 h-3 text-emerald-500" />
-                          : <Copy className="w-3 h-3" />}
+                          ? <ClipboardCheck className="w-3.5 h-3.5 text-emerald-500" />
+                          : <Copy className="w-3.5 h-3.5" />}
                       </button>
                     </div>
 
-                    {/* Rubric Selector */}
-                    <div className="relative mt-2">
-                      <button
-                        onClick={() => setShowRubricDropdown(!showRubricDropdown)}
-                        className="flex items-center gap-1 text-[11px] text-veda-text-secondary hover:text-indigo-600 transition-colors"
-                      >
-                        Rubric: <strong className="text-gray-700 ml-1">{(selectedGroup.rubric || 'NCERT CBSE').replace('NCERT CBSE ', '')}</strong>
-                        <ChevronDown className={`w-3 h-3 transition-transform ${showRubricDropdown ? 'rotate-180' : ''}`} />
-                      </button>
-                      <AnimatePresence>
-                        {showRubricDropdown && (
-                          <motion.div
-                            initial={{ opacity: 0, y: -6 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -6 }}
-                            className="absolute left-0 top-7 z-20 bg-white border border-slate-200 rounded-xl shadow-xl p-2 flex flex-col gap-1 w-64"
-                          >
-                            {RUBRICS.map(r => (
-                              <button
-                                key={r}
-                                onClick={() => handleChangeRubric(r)}
-                                className={`text-left text-xs px-3 py-2 rounded-lg transition-colors ${
-                                  selectedGroup.rubric === r ? 'bg-indigo-50 text-indigo-700 font-bold' : 'hover:bg-gray-50 text-gray-700'
-                                }`}
-                              >
-                                {r}
-                              </button>
-                            ))}
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
+                    {/* Tab Bar */}
+                    <div className="flex items-center gap-0.5">
+                      {([ 'overview', 'students', 'assessments', 'actions'] as const).map(tab => (
+                        <button
+                          key={tab}
+                          onClick={() => setActiveDetailTab(tab)}
+                          className={`relative px-3 py-2 text-xs font-bold capitalize transition-colors rounded-t-lg ${
+                            activeDetailTab === tab
+                              ? 'text-[#10375C]'
+                              : 'text-slate-500 hover:text-slate-700'
+                          }`}
+                        >
+                          {tab}
+                          {activeDetailTab === tab && (
+                            <motion.div
+                              layoutId="detailTabUnderline"
+                              className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#10375C] rounded-full"
+                            />
+                          )}
+                        </button>
+                      ))}
                     </div>
                   </div>
 
-                  <div className="p-5 flex flex-col gap-4">
-                    <span className="text-xs font-bold text-veda-text-primary tracking-wider uppercase">
-                      Roster ({selectedGroup.students.length})
-                    </span>
+                  {/* Tab Content */}
+                  <div className="flex-1 overflow-y-auto">
+                    <AnimatePresence mode="wait">
 
-                    <div className="flex flex-col gap-1 max-h-[240px] overflow-y-auto pr-1">
-                      {selectedGroup.students.length === 0 ? (
-                        <p className="text-xs text-slate-400 text-center py-4">No students yet. Add one below.</p>
-                      ) : (
-                        selectedGroup.students.map((s, idx) => (
-                          <div key={idx} className="flex items-center justify-between py-2 px-2.5 rounded hover:bg-gray-50 transition-colors text-xs group">
-                            <div className="flex items-center gap-2 text-veda-text-primary">
-                              <User className="w-3.5 h-3.5 text-gray-400" />
-                              <span className="font-medium">{s}</span>
+                      {/* OVERVIEW TAB */}
+                      {activeDetailTab === 'overview' && (
+                        <motion.div
+                          key="overview"
+                          initial={{ opacity: 0, y: 6 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0 }}
+                          className="p-5 flex flex-col gap-5"
+                        >
+                          {/* Stats Row */}
+                          <div className="grid grid-cols-3 gap-3">
+                            {[
+                              { label: 'Students', value: selectedGroup.students.length, icon: <Users className="w-4 h-4" />, color: 'text-blue-600 bg-blue-50 border-blue-100' },
+                              { label: 'Assessments', value: groupAssigned.length, icon: <ClipboardList className="w-4 h-4" />, color: 'text-emerald-600 bg-emerald-50 border-emerald-100' },
+                              { label: 'Grade', value: selectedGroup.grade, icon: <GraduationCap className="w-4 h-4" />, color: 'text-purple-600 bg-purple-50 border-purple-100' },
+                            ].map(stat => (
+                              <div key={stat.label} className={`rounded-xl border p-3 flex flex-col gap-1.5 ${stat.color.split(' ').slice(1).join(' ')}`}>
+                                <span className={`${stat.color.split(' ')[0]}`}>{stat.icon}</span>
+                                <p className="text-lg font-black text-slate-900">{stat.value}</p>
+                                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{stat.label}</p>
+                              </div>
+                            ))}
+                          </div>
+
+                          {/* Info Cards */}
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="bg-slate-50 border border-slate-200/60 rounded-xl p-3 flex flex-col gap-1">
+                              <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Subject</span>
+                              <span className="text-sm font-bold text-slate-800">{selectedGroup.subject}</span>
                             </div>
+                            <div className="bg-slate-50 border border-slate-200/60 rounded-xl p-3 flex flex-col gap-1">
+                              <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Class Code</span>
+                              <button
+                                onClick={() => handleCopyCode(selectedGroup.classCode)}
+                                className="text-sm font-black text-[#10375C] tracking-[0.12em] flex items-center gap-1.5 text-left"
+                              >
+                                {selectedGroup.classCode}
+                                {copiedCode === selectedGroup.classCode
+                                  ? <ClipboardCheck className="w-3.5 h-3.5 text-emerald-500" />
+                                  : <Copy className="w-3.5 h-3.5 text-slate-400" />}
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Rubric */}
+                          <div className="bg-slate-50 border border-slate-200/60 rounded-xl p-3">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Evaluation Rubric</span>
+                              <div className="relative">
+                                <button
+                                  onClick={() => setShowRubricDropdown(!showRubricDropdown)}
+                                  className="text-xs text-[#10375C] font-bold hover:underline flex items-center gap-1"
+                                >
+                                  Change <ChevronDown className={`w-3 h-3 transition-transform ${showRubricDropdown ? 'rotate-180' : ''}`} />
+                                </button>
+                                <AnimatePresence>
+                                  {showRubricDropdown && (
+                                    <motion.div
+                                      initial={{ opacity: 0, y: -4 }}
+                                      animate={{ opacity: 1, y: 0 }}
+                                      exit={{ opacity: 0, y: -4 }}
+                                      className="absolute right-0 top-7 z-20 bg-white border border-slate-200 rounded-xl shadow-xl p-2 flex flex-col gap-1 w-64"
+                                    >
+                                      {RUBRICS.map(r => (
+                                        <button
+                                          key={r}
+                                          onClick={() => handleChangeRubric(r)}
+                                          className={`text-left text-xs px-3 py-2 rounded-lg transition-colors ${
+                                            selectedGroup.rubric === r ? 'bg-[#10375C]/10 text-[#10375C] font-bold' : 'hover:bg-gray-50 text-gray-700'
+                                          }`}
+                                        >
+                                          {r}
+                                        </button>
+                                      ))}
+                                    </motion.div>
+                                  )}
+                                </AnimatePresence>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2 mt-1.5">
+                              <ShieldCheck className="w-3.5 h-3.5 text-[#10375C] flex-shrink-0" />
+                              <span className="text-sm font-bold text-slate-800">{selectedGroup.rubric || 'NCERT CBSE Rubric v2.1'}</span>
+                            </div>
+                          </div>
+
+                          {/* Quick Action Buttons */}
+                          <div className="grid grid-cols-2 gap-2">
                             <button
-                              onClick={() => handleRemoveStudent(s)}
-                              className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 transition-all"
+                              onClick={() => setActiveDetailTab('students')}
+                              className="flex items-center gap-2 text-xs font-bold text-slate-700 border border-slate-200 hover:border-[#10375C]/30 hover:bg-[#10375C]/5 rounded-xl p-3 transition-all"
                             >
-                              <Trash2 className="w-3 h-3" />
+                              <Users className="w-4 h-4 text-slate-500" />
+                              Manage Roster
+                              <ArrowRight className="w-3 h-3 ml-auto" />
+                            </button>
+                            <button
+                              onClick={() => setActiveDetailTab('assessments')}
+                              className="flex items-center gap-2 text-xs font-bold text-slate-700 border border-slate-200 hover:border-emerald-300 hover:bg-emerald-50 rounded-xl p-3 transition-all"
+                            >
+                              <ClipboardList className="w-4 h-4 text-slate-500" />
+                              Assessments
+                              <ArrowRight className="w-3 h-3 ml-auto" />
                             </button>
                           </div>
-                        ))
+                        </motion.div>
                       )}
-                    </div>
 
-                    {/* Add Student */}
-                    <div className="flex gap-2 border-t border-gray-100 pt-3">
-                      <input
-                        type="text"
-                        value={newStudentName}
-                        onChange={(e) => setNewStudentName(e.target.value)}
-                        onKeyDown={(e) => e.key === 'Enter' && handleAddStudent()}
-                        placeholder="Add student name..."
-                        className="flex-1 text-xs border border-slate-200 rounded-lg px-3 py-2 outline-none focus:border-indigo-400 font-sans"
-                      />
-                      <button
-                        onClick={handleAddStudent}
-                        className="p-2 rounded-lg bg-indigo-500 hover:bg-indigo-600 text-white transition-colors"
-                      >
-                        <Plus className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
+                      {/* STUDENTS TAB */}
+                      {activeDetailTab === 'students' && (
+                        <motion.div
+                          key="students"
+                          initial={{ opacity: 0, y: 6 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0 }}
+                          className="p-5 flex flex-col gap-4"
+                        >
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <h3 className="text-sm font-black text-slate-900">Student Roster</h3>
+                              <p className="text-xs text-slate-500">{selectedGroup.students.length} students enrolled</p>
+                            </div>
+                            <span className="text-[10px] font-bold bg-slate-100 text-slate-600 px-2.5 py-1 rounded-full">
+                              {selectedGroup.students.length} / ∞
+                            </span>
+                          </div>
 
-                    {/* Active Assessments */}
-                    <div className="flex flex-col gap-2 border-t border-gray-100 pt-4">
-                      <span className="text-xs font-bold text-veda-text-primary tracking-wider uppercase mb-1">
-                        Active Assessments
-                      </span>
-                      {assignedLoading ? (
-                        <div className="flex justify-center py-4">
-                          <Loader2 className="w-5 h-5 animate-spin text-slate-400" />
-                        </div>
-                      ) : (() => {
-                        const groupAssigned = allAssigned.filter(
-                          (a) => a.groupId?._id === selectedGroup._id || a.groupId === selectedGroup._id
-                        );
-                        if (groupAssigned.length === 0) {
-                          return <p className="text-xs text-slate-400 text-center py-4">No assessments assigned yet.</p>;
-                        }
-                        return (
-                          <div className="flex flex-col gap-2.5 max-h-[220px] overflow-y-auto pr-1">
-                            {groupAssigned.map((a) => {
-                              const title = a.assignmentId?.title || 'Untitled Assessment';
-                              const total = selectedGroup.students.length;
-                              const submitted = (a as any).submissionCount || 0;
-                              const dueDateStr = a.dueDate ? new Date(a.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'No due date';
-                              return (
-                                <div key={a._id} className="bg-slate-50 border border-slate-200/60 rounded-xl p-3 flex flex-col gap-2 hover:bg-slate-100/40 transition-colors">
-                                  <div className="flex justify-between items-start gap-2">
-                                    <div className="min-w-0">
-                                      <h4 className="text-xs font-bold text-slate-850 truncate">{title}</h4>
-                                      <p className="text-[10px] text-slate-400 mt-0.5">Due: {dueDateStr}</p>
+                          {/* Add Student Input */}
+                          <div className="flex gap-2">
+                            <input
+                              type="text"
+                              value={newStudentName}
+                              onChange={e => setNewStudentName(e.target.value)}
+                              onKeyDown={e => e.key === 'Enter' && handleAddStudent()}
+                              placeholder="Add student name and press Enter…"
+                              className="flex-1 text-xs border border-slate-200 rounded-xl px-3 py-2.5 outline-none focus:border-[#10375C]/50 font-sans bg-slate-50"
+                            />
+                            <button
+                              onClick={handleAddStudent}
+                              className="p-2.5 rounded-xl bg-[#10375C] hover:bg-[#0d2f4f] text-white transition-colors"
+                            >
+                              <Plus className="w-4 h-4" />
+                            </button>
+                          </div>
+
+                          {/* Student List */}
+                          <div className="flex flex-col gap-1">
+                            {selectedGroup.students.length === 0 ? (
+                              <div className="flex flex-col items-center justify-center py-10 gap-2 text-center">
+                                <div className="w-10 h-10 rounded-2xl bg-slate-100 flex items-center justify-center">
+                                  <User className="w-5 h-5 text-slate-400" />
+                                </div>
+                                <p className="text-xs text-slate-500 font-medium">No students yet. Add some above.</p>
+                              </div>
+                            ) : (
+                              selectedGroup.students.map((s, idx) => (
+                                <motion.div
+                                  key={idx}
+                                  initial={{ opacity: 0, x: -8 }}
+                                  animate={{ opacity: 1, x: 0 }}
+                                  transition={{ delay: idx * 0.02 }}
+                                  className="flex items-center justify-between py-2.5 px-3 rounded-xl hover:bg-slate-50 group transition-colors"
+                                >
+                                  <div className="flex items-center gap-2.5">
+                                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-slate-200 to-slate-100 flex items-center justify-center text-[10px] font-black text-slate-600 flex-shrink-0 border border-slate-200/60">
+                                      {s.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase()}
                                     </div>
-                                    <button
-                                      onClick={() => handleUnassign(a._id)}
-                                      className="text-slate-400 hover:text-red-500 transition-colors flex-shrink-0 p-0.5"
-                                      title="Unassign"
-                                    >
-                                      <X className="w-3 h-3" />
-                                    </button>
-                                  </div>
-                                  <div className="flex items-center justify-between mt-1 gap-4">
-                                    <div className="flex-1 bg-slate-200 h-1.5 rounded-full overflow-hidden">
-                                      <div
-                                        className="bg-emerald-500 h-full rounded-full"
-                                        style={{ width: `${total > 0 ? (submitted / total) * 100 : 0}%` }}
-                                      />
-                                    </div>
-                                    <span className="text-[10px] font-bold text-slate-600 whitespace-nowrap">
-                                      {submitted}/{total} Sub
-                                    </span>
+                                    <span className="text-xs font-semibold text-slate-800">{s}</span>
                                   </div>
                                   <button
-                                    onClick={() => handleOpenSubmissions(a)}
-                                    className="w-full mt-1 py-1.5 text-[10px] font-bold text-[#10375C] bg-[#10375C]/5 border border-[#10375C]/15 rounded-lg hover:bg-[#10375C]/10 transition-colors text-center"
+                                    onClick={() => handleRemoveStudent(s)}
+                                    className="opacity-0 group-hover:opacity-100 p-1 text-slate-400 hover:text-red-500 transition-all rounded-lg hover:bg-red-50"
                                   >
-                                    Submissions & Grading
+                                    <X className="w-3.5 h-3.5" />
                                   </button>
-                                </div>
-                              );
-                            })}
+                                </motion.div>
+                              ))
+                            )}
                           </div>
-                        );
-                      })()}
-                    </div>
+                        </motion.div>
+                      )}
 
-                    {/* Action Buttons */}
-                    <div className="flex flex-col gap-2 mt-1">
-                      <motion.button
-                        onClick={() => setShowAssignModal(true)}
-                        whileTap={{ scale: 0.97 }}
-                        className="w-full text-xs py-2.5 rounded-xl font-semibold bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center gap-2 transition-colors"
-                      >
-                        <CalendarDays className="w-4 h-4" />
-                        Assign Existing Assessment
-                      </motion.button>
-                      <motion.button
-                        onClick={handleComposerRedirect}
-                        whileTap={{ scale: 0.97 }}
-                        className="w-full text-xs py-2.5 rounded-xl font-semibold bg-[#10375C] hover:bg-[#0d2f4f] text-white flex items-center justify-center gap-2 transition-colors"
-                      >
-                        <Plus className="w-4 h-4" />
-                        Create New Assessment
-                      </motion.button>
-                    </div>
+                      {/* ASSESSMENTS TAB */}
+                      {activeDetailTab === 'assessments' && (
+                        <motion.div
+                          key="assessments"
+                          initial={{ opacity: 0, y: 6 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0 }}
+                          className="p-5 flex flex-col gap-4"
+                        >
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <h3 className="text-sm font-black text-slate-900">Active Assessments</h3>
+                              <p className="text-xs text-slate-500">{groupAssigned.length} assigned to this class</p>
+                            </div>
+                            <button
+                              onClick={() => setShowAssignModal(true)}
+                              className="flex items-center gap-1.5 text-xs font-bold text-white bg-emerald-500 hover:bg-emerald-600 px-3 py-2 rounded-xl transition-colors"
+                            >
+                              <Plus className="w-3.5 h-3.5" />
+                              Assign
+                            </button>
+                          </div>
+
+                          {assignedLoading ? (
+                            <div className="flex justify-center py-8">
+                              <Loader2 className="w-5 h-5 animate-spin text-slate-400" />
+                            </div>
+                          ) : groupAssigned.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center py-12 gap-3 text-center">
+                              <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center">
+                                <ClipboardList className="w-6 h-6 text-slate-400" />
+                              </div>
+                              <div>
+                                <p className="text-sm font-bold text-slate-600">No assessments assigned</p>
+                                <p className="text-xs text-slate-400 mt-0.5">Assign an existing assessment or create a new one</p>
+                              </div>
+                              <button
+                                onClick={() => setShowAssignModal(true)}
+                                className="text-xs font-bold text-emerald-600 hover:underline flex items-center gap-1"
+                              >
+                                <Plus className="w-3 h-3" /> Assign Assessment
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="flex flex-col gap-3">
+                              {groupAssigned.map(a => {
+                                const title = a.assignmentId?.title || 'Untitled Assessment';
+                                const total = selectedGroup.students.length;
+                                const submitted = (a as any).submissionCount || 0;
+                                const pct = total > 0 ? (submitted / total) * 100 : 0;
+                                const dueDateStr = a.dueDate
+                                  ? new Date(a.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                                  : 'No due date';
+
+                                return (
+                                  <div key={a._id} className="bg-slate-50 border border-slate-200/70 rounded-xl p-4 flex flex-col gap-3">
+                                    <div className="flex items-start justify-between gap-2">
+                                      <div className="min-w-0 flex-1">
+                                        <h4 className="text-xs font-black text-slate-800 truncate">{title}</h4>
+                                        <div className="flex items-center gap-2 mt-1">
+                                          <Clock className="w-3 h-3 text-slate-400" />
+                                          <span className="text-[10px] text-slate-400 font-semibold">Due {dueDateStr}</span>
+                                        </div>
+                                      </div>
+                                      <button
+                                        onClick={() => handleUnassign(a._id)}
+                                        className="p-1 text-slate-400 hover:text-red-500 transition-colors rounded-lg hover:bg-red-50 flex-shrink-0"
+                                        title="Unassign"
+                                      >
+                                        <X className="w-3.5 h-3.5" />
+                                      </button>
+                                    </div>
+
+                                    {/* Progress bar */}
+                                    <div className="flex items-center gap-3">
+                                      <div className="flex-1 bg-slate-200 h-1.5 rounded-full overflow-hidden">
+                                        <div
+                                          className="bg-emerald-500 h-full rounded-full transition-all duration-500"
+                                          style={{ width: `${pct}%` }}
+                                        />
+                                      </div>
+                                      <span className="text-[10px] font-bold text-slate-600 whitespace-nowrap">
+                                        {submitted}/{total}
+                                      </span>
+                                    </div>
+
+                                    <button
+                                      onClick={() => handleOpenSubmissions(a)}
+                                      className="w-full py-2 text-xs font-bold text-[#10375C] bg-[#10375C]/5 border border-[#10375C]/15 rounded-xl hover:bg-[#10375C]/10 transition-colors"
+                                    >
+                                      View Submissions & Grade
+                                    </button>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </motion.div>
+                      )}
+
+                      {/* ACTIONS TAB */}
+                      {activeDetailTab === 'actions' && (
+                        <motion.div
+                          key="actions"
+                          initial={{ opacity: 0, y: 6 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0 }}
+                          className="p-5 flex flex-col gap-3"
+                        >
+                          <h3 className="text-sm font-black text-slate-900">Class Actions</h3>
+
+                          <button
+                            onClick={() => setShowAssignModal(true)}
+                            className="flex items-center gap-3 w-full border border-slate-200 rounded-xl p-4 hover:border-emerald-300 hover:bg-emerald-50 transition-all group"
+                          >
+                            <div className="w-9 h-9 rounded-xl bg-emerald-100 flex items-center justify-center group-hover:bg-emerald-200 transition-colors">
+                              <CalendarDays className="w-4.5 h-4.5 text-emerald-600" />
+                            </div>
+                            <div className="text-left">
+                              <p className="text-xs font-black text-slate-800">Assign Existing Assessment</p>
+                              <p className="text-[10px] text-slate-500 mt-0.5">Schedule a generated paper for this class</p>
+                            </div>
+                            <ArrowRight className="w-4 h-4 text-slate-400 ml-auto" />
+                          </button>
+
+                          <button
+                            onClick={handleComposerRedirect}
+                            className="flex items-center gap-3 w-full border border-slate-200 rounded-xl p-4 hover:border-[#10375C]/30 hover:bg-[#10375C]/5 transition-all group"
+                          >
+                            <div className="w-9 h-9 rounded-xl bg-[#10375C]/10 flex items-center justify-center group-hover:bg-[#10375C]/15 transition-colors">
+                              <Sparkles className="w-4.5 h-4.5 text-[#10375C]" />
+                            </div>
+                            <div className="text-left">
+                              <p className="text-xs font-black text-slate-800">Create New Assessment</p>
+                              <p className="text-[10px] text-slate-500 mt-0.5">AI-generate a customized paper for this class</p>
+                            </div>
+                            <ArrowRight className="w-4 h-4 text-slate-400 ml-auto" />
+                          </button>
+
+                          <button
+                            onClick={() => setActiveDetailTab('students')}
+                            className="flex items-center gap-3 w-full border border-slate-200 rounded-xl p-4 hover:border-blue-300 hover:bg-blue-50 transition-all group"
+                          >
+                            <div className="w-9 h-9 rounded-xl bg-blue-100 flex items-center justify-center group-hover:bg-blue-200 transition-colors">
+                              <Users className="w-4.5 h-4.5 text-blue-600" />
+                            </div>
+                            <div className="text-left">
+                              <p className="text-xs font-black text-slate-800">Manage Student Roster</p>
+                              <p className="text-[10px] text-slate-500 mt-0.5">Add or remove students from this class</p>
+                            </div>
+                            <ArrowRight className="w-4 h-4 text-slate-400 ml-auto" />
+                          </button>
+
+                          <div className="pt-2 border-t border-slate-100">
+                            <button
+                              onClick={() => handleDeleteGroup(selectedGroup._id)}
+                              className="flex items-center gap-3 w-full border border-red-200 rounded-xl p-4 hover:bg-red-50 transition-all group"
+                            >
+                              <div className="w-9 h-9 rounded-xl bg-red-100 flex items-center justify-center group-hover:bg-red-200 transition-colors">
+                                <Trash2 className="w-4.5 h-4.5 text-red-500" />
+                              </div>
+                              <div className="text-left">
+                                <p className="text-xs font-black text-red-600">Delete Class Group</p>
+                                <p className="text-[10px] text-red-400 mt-0.5">This action cannot be undone</p>
+                              </div>
+                            </button>
+                          </div>
+                        </motion.div>
+                      )}
+
+                    </AnimatePresence>
                   </div>
                 </motion.div>
               ) : (
-                <div className="bg-white border border-veda-card-border rounded-xl p-8 text-center text-xs text-veda-text-secondary">
-                  Select a group to view roster and actions.
-                </div>
+                <motion.div
+                  key="empty"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="h-full bg-white/60 border border-dashed border-slate-300 rounded-2xl flex flex-col items-center justify-center gap-4 text-center p-8"
+                >
+                  <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center">
+                    <Folder className="w-7 h-7 text-slate-400" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-slate-600">No class selected</p>
+                    <p className="text-xs text-slate-400 mt-1">Select a class from the left panel to view details</p>
+                  </div>
+                </motion.div>
               )}
             </AnimatePresence>
           </div>
@@ -722,11 +1012,11 @@ export default function GroupsPage() {
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600">
+                  <div className="w-9 h-9 rounded-2xl bg-[#10375C]/10 flex items-center justify-center text-[#10375C]">
                     <Users className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="text-base font-bold text-slate-900">Create Class Group</h3>
+                    <h3 className="text-base font-black text-slate-900">Create Class Group</h3>
                     <p className="text-xs text-slate-500">A class code will be auto-generated</p>
                   </div>
                 </div>
@@ -743,26 +1033,26 @@ export default function GroupsPage() {
                     value={newGroupName}
                     onChange={e => setNewGroupName(e.target.value)}
                     placeholder="e.g. Grade 8 Science - Sec A"
-                    className="w-full text-sm border border-slate-200 rounded-xl px-3 py-2.5 outline-none focus:border-indigo-400 font-sans"
+                    className="w-full text-sm border border-slate-200 rounded-xl px-3 py-2.5 outline-none focus:border-[#10375C]/50 font-sans"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Grade</label>
-                    <select value={newGroupGrade} onChange={e => setNewGroupGrade(e.target.value)} className="w-full text-sm border border-slate-200 rounded-xl px-3 py-2.5 outline-none focus:border-indigo-400 bg-white cursor-pointer">
+                    <select value={newGroupGrade} onChange={e => setNewGroupGrade(e.target.value)} className="w-full text-sm border border-slate-200 rounded-xl px-3 py-2.5 outline-none focus:border-[#10375C]/50 bg-white cursor-pointer">
                       {GRADES.map(g => <option key={g}>{g}</option>)}
                     </select>
                   </div>
                   <div>
                     <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Subject</label>
-                    <select value={newGroupSubject} onChange={e => setNewGroupSubject(e.target.value)} className="w-full text-sm border border-slate-200 rounded-xl px-3 py-2.5 outline-none focus:border-indigo-400 bg-white cursor-pointer">
+                    <select value={newGroupSubject} onChange={e => setNewGroupSubject(e.target.value)} className="w-full text-sm border border-slate-200 rounded-xl px-3 py-2.5 outline-none focus:border-[#10375C]/50 bg-white cursor-pointer">
                       {SUBJECTS.map(s => <option key={s}>{s}</option>)}
                     </select>
                   </div>
                 </div>
                 <div>
                   <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Evaluation Rubric</label>
-                  <select value={newGroupRubric} onChange={e => setNewGroupRubric(e.target.value)} className="w-full text-sm border border-slate-200 rounded-xl px-3 py-2.5 outline-none focus:border-indigo-400 bg-white cursor-pointer">
+                  <select value={newGroupRubric} onChange={e => setNewGroupRubric(e.target.value)} className="w-full text-sm border border-slate-200 rounded-xl px-3 py-2.5 outline-none focus:border-[#10375C]/50 bg-white cursor-pointer">
                     {RUBRICS.map(r => <option key={r}>{r}</option>)}
                   </select>
                 </div>
@@ -773,7 +1063,7 @@ export default function GroupsPage() {
                     onChange={e => setNewGroupStudents(e.target.value)}
                     placeholder="Aarav Sharma, Aditi Verma, Rahul Singh..."
                     rows={3}
-                    className="w-full text-sm border border-slate-200 rounded-xl px-3 py-2.5 outline-none focus:border-indigo-400 font-sans resize-none"
+                    className="w-full text-sm border border-slate-200 rounded-xl px-3 py-2.5 outline-none focus:border-[#10375C]/50 font-sans resize-none"
                   />
                   <p className="text-[10px] text-slate-400 mt-1">{newGroupStudents.split(',').filter(s => s.trim()).length} students added</p>
                 </div>
@@ -784,9 +1074,9 @@ export default function GroupsPage() {
                 <button
                   onClick={handleCreateGroup}
                   disabled={!newGroupName.trim() || creating}
-                  className="flex-1 py-2.5 text-xs font-semibold bg-[#10375C] hover:bg-[#0d2f4f] disabled:bg-slate-300 text-white rounded-xl transition-colors flex items-center justify-center gap-1.5"
+                  className="flex-1 py-2.5 text-xs font-bold bg-[#10375C] hover:bg-[#0d2f4f] disabled:bg-slate-300 text-white rounded-xl transition-colors flex items-center justify-center gap-1.5"
                 >
-                  {creating ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Creating…</> : 'Create Group'}
+                  {creating ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Creating…</> : 'Create Class'}
                 </button>
               </div>
             </motion.div>
@@ -825,7 +1115,7 @@ export default function GroupsPage() {
                 <div className="flex flex-col items-center gap-3 py-6">
                   <CheckCircle2 className="w-12 h-12 text-emerald-500" />
                   <p className="text-sm font-bold text-slate-800">Assigned Successfully!</p>
-                  <p className="text-xs text-slate-500">Students can now see this in their dashboard using class code: <strong>{selectedGroup.classCode}</strong></p>
+                  <p className="text-xs text-slate-500 text-center">Students can now see this using class code: <strong>{selectedGroup.classCode}</strong></p>
                 </div>
               ) : (
                 <>
@@ -839,11 +1129,11 @@ export default function GroupsPage() {
                       >
                         <option value="">-- Choose a completed assessment --</option>
                         {assignments.map(a => (
-                          <option key={a._id} value={a._id}>{a.title} • {a.subject}</option>
+                          <option key={a._id} value={a._id}>{a.title} · {a.subject}</option>
                         ))}
                       </select>
                       {assignments.length === 0 && (
-                        <p className="text-[10px] text-amber-500 mt-1">No generated assessments found. Create one first in the Assessments tab.</p>
+                        <p className="text-[10px] text-amber-500 mt-1">No generated assessments found. Create one first.</p>
                       )}
                     </div>
                     <div>
@@ -866,7 +1156,7 @@ export default function GroupsPage() {
                     <button
                       onClick={handleAssignToGroup}
                       disabled={!selectedAssignmentId || !assignDueDate || assigning}
-                      className="flex-1 py-2.5 text-xs font-semibold bg-emerald-500 hover:bg-emerald-600 disabled:bg-slate-300 text-white rounded-xl transition-colors flex items-center justify-center gap-1.5"
+                      className="flex-1 py-2.5 text-xs font-bold bg-emerald-500 hover:bg-emerald-600 disabled:bg-slate-300 text-white rounded-xl transition-colors flex items-center justify-center gap-1.5"
                     >
                       {assigning ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Assigning…</> : <><CalendarDays className="w-3.5 h-3.5" /> Assign</>}
                     </button>
@@ -878,323 +1168,225 @@ export default function GroupsPage() {
         )}
       </AnimatePresence>
 
-    {/* Submissions & Grading Modal */}
-    <AnimatePresence>
-      {showSubmissionsModal && activeAssigned && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4"
-          onClick={() => {
-            setShowSubmissionsModal(false);
-            setSelectedStudentSubmission(null);
-          }}
-        >
+      {/* Submissions & Grading Modal */}
+      <AnimatePresence>
+        {showSubmissionsModal && activeAssigned && (
           <motion.div
-            initial={{ scale: 0.95, y: 16 }}
-            animate={{ scale: 1, y: 0 }}
-            exit={{ scale: 0.95, y: 16 }}
-            className="w-full max-w-5xl bg-white rounded-3xl shadow-2xl flex flex-col md:flex-row overflow-hidden min-h-[550px] max-h-[85vh]"
-            onClick={(e) => e.stopPropagation()}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4"
+            onClick={() => { setShowSubmissionsModal(false); setSelectedStudentSubmission(null); }}
           >
-            {/* Left Column: Student Roster List */}
-            <div className="w-full md:w-80 border-r border-slate-200 bg-slate-50/50 flex flex-col max-h-[35vh] md:max-h-none overflow-hidden">
-              <div className="p-5 border-b border-slate-200">
-                <h3 className="text-sm font-black text-slate-800 tracking-tight">Student Submissions</h3>
-                <p className="text-[11px] text-slate-400 mt-1 truncate">
-                  {activeAssigned.assignmentId?.title || 'Untitled Assessment'}
-                </p>
-              </div>
-
-              <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-2">
-                {selectedGroup?.students.map((studentName) => {
-                  const sub = submissions.find(s => s.studentName.toLowerCase() === studentName.toLowerCase());
-                  const isSelected = selectedStudentSubmission?.studentName.toLowerCase() === studentName.toLowerCase();
-                  const hasSubmitted = !!sub;
-
-                  return (
-                    <button
-                      key={studentName}
-                      onClick={() => handleOpenGrading(studentName)}
-                      className={`text-left p-3 rounded-2xl border transition-all flex items-center justify-between gap-3 ${
-                        isSelected
-                          ? 'bg-[#10375C] border-[#10375C] text-white shadow-lg shadow-[#10375C]/10'
-                          : 'bg-white border-slate-200/80 text-slate-700 hover:bg-slate-100/50'
-                      }`}
-                    >
-                      <div className="min-w-0">
-                        <p className="text-xs font-bold truncate">{studentName}</p>
+            <motion.div
+              initial={{ scale: 0.95, y: 16 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 16 }}
+              className="w-full max-w-5xl bg-white rounded-3xl shadow-2xl flex flex-col md:flex-row overflow-hidden min-h-[550px] max-h-[85vh]"
+              onClick={e => e.stopPropagation()}
+            >
+              {/* Left Column */}
+              <div className="w-full md:w-80 border-r border-slate-200 bg-slate-50/50 flex flex-col max-h-[35vh] md:max-h-none overflow-hidden">
+                <div className="p-5 border-b border-slate-200">
+                  <h3 className="text-sm font-black text-slate-800 tracking-tight">Student Submissions</h3>
+                  <p className="text-[11px] text-slate-400 mt-1 truncate">
+                    {activeAssigned.assignmentId?.title || 'Untitled Assessment'}
+                  </p>
+                </div>
+                <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-2">
+                  {selectedGroup?.students.map(studentName => {
+                    const sub = submissions.find(s => s.studentName.toLowerCase() === studentName.toLowerCase());
+                    const isSelected = selectedStudentSubmission?.studentName.toLowerCase() === studentName.toLowerCase();
+                    const hasSubmitted = !!sub;
+                    return (
+                      <button
+                        key={studentName}
+                        onClick={() => handleOpenGrading(studentName)}
+                        className={`text-left p-3 rounded-2xl border transition-all flex items-center justify-between gap-3 ${
+                          isSelected
+                            ? 'bg-[#10375C] border-[#10375C] text-white shadow-lg shadow-[#10375C]/10'
+                            : 'bg-white border-slate-200/80 text-slate-700 hover:bg-slate-100/50'
+                        }`}
+                      >
+                        <div className="min-w-0">
+                          <p className="text-xs font-bold truncate">{studentName}</p>
+                          {hasSubmitted ? (
+                            <p className={`text-[10px] font-semibold mt-0.5 ${isSelected ? 'text-indigo-200' : 'text-slate-400'}`}>
+                              {new Date(sub.submittedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                            </p>
+                          ) : (
+                            <p className={`text-[10px] font-semibold mt-0.5 ${isSelected ? 'text-amber-200' : 'text-amber-500'}`}>Pending</p>
+                          )}
+                        </div>
                         {hasSubmitted ? (
-                          <p className={`text-[10px] font-semibold mt-0.5 ${isSelected ? 'text-indigo-250' : 'text-slate-400'}`}>
-                            Submitted: {new Date(sub.submittedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                          </p>
-                        ) : (
-                          <p className={`text-[10px] font-semibold mt-0.5 ${isSelected ? 'text-amber-200' : 'text-amber-500'}`}>
-                            Pending
-                          </p>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-2 flex-shrink-0">
-                        {hasSubmitted ? (
-                          <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
-                            isSelected ? 'bg-white/20 text-white' : 'bg-emerald-55 text-emerald-600 border border-emerald-100'
-                          }`}>
+                          <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${isSelected ? 'bg-white/20 text-white' : 'text-emerald-600 border border-emerald-100 bg-emerald-50'}`}>
                             {sub.totalScore}/{sub.totalMarks || activeAssigned.assignmentId?.totalMarks || 10}
                           </span>
                         ) : (
-                          <span className={`text-[10px] font-bold ${isSelected ? 'text-white/60' : 'text-slate-400'}`}>
-                            —
-                          </span>
+                          <span className={`text-[10px] font-bold ${isSelected ? 'text-white/60' : 'text-slate-400'}`}>—</span>
                         )}
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Right Column: Submission Grading Console */}
-            <div className="flex-1 flex flex-col overflow-hidden bg-white">
-              {submissionsLoading ? (
-                <div className="flex-1 flex flex-col items-center justify-center gap-2 p-12">
-                  <Loader2 className="w-8 h-8 animate-spin text-slate-400" />
-                  <p className="text-xs text-slate-500">Loading student submission...</p>
+                      </button>
+                    );
+                  })}
                 </div>
-              ) : selectedStudentSubmission ? (
-                <div className="flex-1 flex flex-col overflow-hidden">
-                  {/* Header */}
-                  <div className="p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50/20">
-                    <div>
-                      <h4 className="text-sm font-black text-slate-800">{selectedStudentSubmission.studentName}</h4>
-                      <p className="text-[10px] text-slate-400 mt-0.5">
-                        Grade Override Console • Maximum Marks: {selectedStudentSubmission.totalMarks}
-                      </p>
-                    </div>
-                    
-                    {/* Overall Score display */}
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-slate-500">Overall Score:</span>
-                      <input
-                        type="number"
-                        value={gradingTotalScore ?? 0}
-                        onChange={(e) => setGradingTotalScore(Number(e.target.value))}
-                        className="w-16 text-center text-sm font-black border-2 border-slate-200 rounded-lg px-2 py-1 focus:border-[#10375C] outline-none"
-                      />
-                      <span className="text-xs font-bold text-slate-400">/ {selectedStudentSubmission.totalMarks}</span>
-                    </div>
-                  </div>
+              </div>
 
-                  {/* Content Scroll */}
-                  <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6">
-                    
-                    {/* Hand-written Scanned Paper Upload section */}
-                    {selectedStudentSubmission.answers?.length === 1 && selectedStudentSubmission.answers[0].questionId === 'upload' ? (
-                      <div className="flex flex-col gap-4">
-                        <div className="p-4 bg-indigo-50 border border-indigo-100 rounded-2xl flex items-start gap-3">
-                          <FileText className="w-5 h-5 text-indigo-500 flex-shrink-0 mt-0.5" />
-                          <div className="min-w-0">
-                            <h5 className="text-xs font-bold text-indigo-800">Scanned Submission Paper</h5>
-                            <p className="text-[11px] text-indigo-600 mt-1">This student submitted their work as a scanned document.</p>
-                            <a
-                              href={`http://localhost:4000${selectedStudentSubmission.answers[0].studentAnswer}`}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="inline-flex items-center gap-1 mt-2.5 text-xs font-black text-[#10375C] hover:underline"
-                            >
-                              <Upload className="w-3.5 h-3.5" />
-                              View Uploaded Document
-                            </a>
+              {/* Right Column */}
+              <div className="flex-1 flex flex-col overflow-hidden bg-white">
+                {submissionsLoading ? (
+                  <div className="flex-1 flex flex-col items-center justify-center gap-2 p-12">
+                    <Loader2 className="w-8 h-8 animate-spin text-slate-400" />
+                    <p className="text-xs text-slate-500">Loading submission...</p>
+                  </div>
+                ) : selectedStudentSubmission ? (
+                  <div className="flex-1 flex flex-col overflow-hidden">
+                    <div className="p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50/20">
+                      <div>
+                        <h4 className="text-sm font-black text-slate-800">{selectedStudentSubmission.studentName}</h4>
+                        <p className="text-[10px] text-slate-400 mt-0.5">Grade Override · Max: {selectedStudentSubmission.totalMarks}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-slate-500">Score:</span>
+                        <input
+                          type="number"
+                          value={gradingTotalScore ?? 0}
+                          onChange={e => setGradingTotalScore(Number(e.target.value))}
+                          className="w-16 text-center text-sm font-black border-2 border-slate-200 rounded-lg px-2 py-1 focus:border-[#10375C] outline-none"
+                        />
+                        <span className="text-xs font-bold text-slate-400">/ {selectedStudentSubmission.totalMarks}</span>
+                      </div>
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6">
+                      {selectedStudentSubmission.answers?.length === 1 && selectedStudentSubmission.answers[0].questionId === 'upload' ? (
+                        <div className="flex flex-col gap-4">
+                          <div className="p-4 bg-indigo-50 border border-indigo-100 rounded-2xl flex items-start gap-3">
+                            <FileText className="w-5 h-5 text-indigo-500 flex-shrink-0 mt-0.5" />
+                            <div className="min-w-0">
+                              <h5 className="text-xs font-bold text-indigo-800">Scanned Submission Paper</h5>
+                              <a
+                                href={`http://localhost:4000${selectedStudentSubmission.answers[0].studentAnswer}`}
+                                target="_blank" rel="noreferrer"
+                                className="inline-flex items-center gap-1 mt-2 text-xs font-black text-[#10375C] hover:underline"
+                              >
+                                <Upload className="w-3.5 h-3.5" /> View Document
+                              </a>
+                            </div>
+                          </div>
+                          <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 flex flex-col gap-3">
+                            <h5 className="text-xs font-black text-slate-700 uppercase tracking-wider">Evaluation Comments</h5>
+                            <textarea
+                              rows={4}
+                              value={gradingAnswers['upload']?.aiFeedback || ''}
+                              onChange={e => setGradingAnswers({ ...gradingAnswers, 'upload': { marks: gradingTotalScore ?? 0, isCorrect: (gradingTotalScore ?? 0) >= (selectedStudentSubmission.totalMarks * 0.5), aiFeedback: e.target.value, answer: selectedStudentSubmission.answers[0].studentAnswer }})}
+                              placeholder="Write feedback..."
+                              className="w-full text-xs border border-slate-200 rounded-xl p-3 outline-none focus:border-[#10375C] font-sans resize-none bg-white"
+                            />
                           </div>
                         </div>
-                        
-                        {/* Manual entry for grading paper */}
-                        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 flex flex-col gap-4">
-                          <h5 className="text-xs font-black text-slate-700 uppercase tracking-wider">Evaluation Comments</h5>
-                          <textarea
-                            rows={4}
-                            value={gradingAnswers['upload']?.aiFeedback || ''}
-                            onChange={(e) => setGradingAnswers({
-                              ...gradingAnswers,
-                              'upload': { marks: gradingTotalScore ?? 0, isCorrect: (gradingTotalScore ?? 0) >= (selectedStudentSubmission.totalMarks * 0.5), aiFeedback: e.target.value, answer: selectedStudentSubmission.answers[0].studentAnswer }
-                            })}
-                            placeholder="Write feedback/remarks for the student's paper..."
-                            className="w-full text-xs border border-slate-200 rounded-xl p-3 outline-none focus:border-[#10375C] font-sans resize-none bg-white"
-                          />
-                        </div>
-                      </div>
-                    ) : selectedStudentSubmission.answers?.length > 0 ? (
-                      /* Question details (Digital MCQ & Short Answers) */
-                      <div className="flex flex-col gap-4">
-                        <h5 className="text-xs font-black text-slate-700 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                          <Trophy className="w-4 h-4 text-[#10375C]" />
-                          Graded Question Breakdown
-                        </h5>
-
-                        {selectedStudentSubmission.answers.map((ans: any, idx: number) => {
-                          const localGrading = gradingAnswers[ans.questionId] || { marks: ans.marksAwarded, isCorrect: ans.isCorrect, aiFeedback: ans.aiFeedback };
-                          return (
-                            <div key={ans.questionId} className={`border rounded-2xl overflow-hidden p-4 flex flex-col gap-3.5 ${
-                              localGrading.isCorrect ? 'border-emerald-100 bg-emerald-50/10' : 'border-red-100 bg-rose-50/5'
-                            }`}>
-                              <div className="flex justify-between items-start gap-4">
-                                <div className="flex items-start gap-2.5 min-w-0">
-                                  <span className="text-xs font-bold text-slate-400 flex-shrink-0 mt-0.5">Q{idx + 1}.</span>
-                                  <div className="min-w-0">
+                      ) : selectedStudentSubmission.answers?.length > 0 ? (
+                        <div className="flex flex-col gap-4">
+                          {selectedStudentSubmission.answers.map((ans: any, idx: number) => {
+                            const localGrading = gradingAnswers[ans.questionId] || { marks: ans.marksAwarded, isCorrect: ans.isCorrect, aiFeedback: ans.aiFeedback };
+                            return (
+                              <div key={ans.questionId} className={`border rounded-2xl overflow-hidden p-4 flex flex-col gap-3.5 ${localGrading.isCorrect ? 'border-emerald-100 bg-emerald-50/10' : 'border-red-100 bg-rose-50/5'}`}>
+                                <div className="flex justify-between items-start gap-4">
+                                  <div className="flex items-start gap-2.5 min-w-0">
+                                    <span className="text-xs font-bold text-slate-400 flex-shrink-0 mt-0.5">Q{idx + 1}.</span>
                                     <p className="text-xs font-bold text-slate-800 leading-relaxed">{ans.questionText}</p>
-                                    <div className="flex gap-2 mt-1 flex-wrap">
-                                      <span className="text-[9px] font-black uppercase text-slate-400 tracking-wider">{ans.questionType}</span>
-                                      {ans.conceptTag && <span className="text-[9px] font-black uppercase text-indigo-400 tracking-wider">{ans.conceptTag}</span>}
-                                    </div>
+                                  </div>
+                                  <div className="flex items-center gap-1.5 flex-shrink-0">
+                                    <input
+                                      type="number"
+                                      value={localGrading.marks}
+                                      max={ans.questionMarks}
+                                      min={0}
+                                      step={0.5}
+                                      onChange={e => {
+                                        const newMarks = Math.min(Math.max(Number(e.target.value), 0), ans.questionMarks);
+                                        const updatedAnswers = { ...gradingAnswers, [ans.questionId]: { ...localGrading, marks: newMarks, isCorrect: newMarks >= (ans.questionMarks * 0.5) } };
+                                        setGradingAnswers(updatedAnswers);
+                                        setGradingTotalScore(Object.values(updatedAnswers).reduce((acc: number, item: any) => acc + (item.marks || 0), 0));
+                                      }}
+                                      className="w-12 text-center text-xs font-bold border border-slate-300 rounded px-1.5 py-0.5 focus:border-[#10375C] outline-none bg-white"
+                                    />
+                                    <span className="text-[10px] font-bold text-slate-400">/ {ans.questionMarks}</span>
                                   </div>
                                 </div>
-                                
-                                {/* Score adjustment */}
-                                <div className="flex items-center gap-1.5 flex-shrink-0">
-                                  <input
-                                    type="number"
-                                    value={localGrading.marks}
-                                    max={ans.questionMarks}
-                                    min={0}
-                                    step={0.5}
-                                    onChange={(e) => {
-                                      const newMarks = Math.min(Math.max(Number(e.target.value), 0), ans.questionMarks);
-                                      const isCorrect = newMarks >= (ans.questionMarks * 0.5);
-                                      const updatedAnswers = {
-                                        ...gradingAnswers,
-                                        [ans.questionId]: { ...localGrading, marks: newMarks, isCorrect }
-                                      };
-                                      setGradingAnswers(updatedAnswers);
-                                      const sum = Object.values(updatedAnswers).reduce((acc: number, item: any) => acc + (item.marks || 0), 0);
-                                      setGradingTotalScore(sum);
-                                    }}
-                                    className="w-12 text-center text-xs font-bold border border-slate-300 rounded px-1.5 py-0.5 focus:border-[#10375C] outline-none bg-white"
-                                  />
-                                  <span className="text-[10px] font-bold text-slate-400">/ {ans.questionMarks}</span>
+                                <div className="grid grid-cols-2 gap-3">
+                                  <div>
+                                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-wide">Student's Answer</span>
+                                    <p className="text-xs text-slate-700 bg-white border border-slate-200/80 rounded-lg p-2 mt-1 min-h-[40px]">{ans.studentAnswer || <span className="text-slate-400 italic">No answer</span>}</p>
+                                  </div>
+                                  <div>
+                                    <span className="text-[9px] font-black text-emerald-600 uppercase tracking-wide">Model Answer</span>
+                                    <p className="text-xs text-emerald-800 bg-emerald-50/50 border border-emerald-100/60 rounded-lg p-2 mt-1 min-h-[40px]">{ans.correctAnswer || 'N/A'}</p>
+                                  </div>
+                                </div>
+                                <div className="mt-1 bg-slate-50 border border-slate-150 p-2.5 rounded-xl flex gap-2">
+                                  <Brain className="w-3.5 h-3.5 text-indigo-500 mt-0.5 flex-shrink-0" />
+                                  <div className="flex-1">
+                                    <span className="text-[9px] font-black text-indigo-600 uppercase tracking-wide">Remarks</span>
+                                    <textarea
+                                      rows={2}
+                                      value={localGrading.aiFeedback || ''}
+                                      onChange={e => setGradingAnswers({ ...gradingAnswers, [ans.questionId]: { ...localGrading, aiFeedback: e.target.value } })}
+                                      className="w-full mt-1 text-xs border-0 outline-none bg-transparent p-0 resize-none font-sans text-slate-700"
+                                      placeholder="Leave remarks..."
+                                    />
+                                  </div>
                                 </div>
                               </div>
-
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-1">
-                                <div>
-                                  <span className="text-[9px] font-black text-slate-400 uppercase tracking-wide">Student's Answer</span>
-                                  <p className="text-xs text-slate-700 bg-white border border-slate-200/80 rounded-lg p-2 mt-1 min-h-[40px]">
-                                    {ans.studentAnswer || <span className="text-slate-350 italic">No answer provided</span>}
-                                  </p>
-                                </div>
-                                <div>
-                                  <span className="text-[9px] font-black text-emerald-600 uppercase tracking-wide">Model Answer</span>
-                                  <p className="text-xs text-emerald-800 bg-emerald-50/50 border border-emerald-100/60 rounded-lg p-2 mt-1 min-h-[40px]">
-                                    {ans.correctAnswer || 'N/A'}
-                                  </p>
-                                </div>
-                              </div>
-
-                              {/* Feedback block */}
-                              <div className="mt-1 bg-slate-50 border border-slate-150 p-2.5 rounded-xl flex gap-2">
-                                <Brain className="w-3.5 h-3.5 text-indigo-505 mt-0.5 flex-shrink-0" />
-                                <div className="flex-1">
-                                  <span className="text-[9px] font-black text-indigo-600 uppercase tracking-wide">Evaluation remarks</span>
-                                  <textarea
-                                    rows={2}
-                                    value={localGrading.aiFeedback || ''}
-                                    onChange={(e) => setGradingAnswers({
-                                      ...gradingAnswers,
-                                      [ans.questionId]: { ...localGrading, aiFeedback: e.target.value }
-                                    })}
-                                    className="w-full mt-1 text-xs border-0 outline-none bg-transparent p-0 resize-none font-sans text-slate-700 focus:ring-0 focus:outline-none"
-                                    placeholder="Leave remarks or corrections..."
-                                  />
-                                </div>
-                              </div>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <div className="flex flex-col gap-6 py-4">
+                          <div className="p-8 border border-dashed border-slate-200 rounded-3xl text-center flex flex-col items-center gap-4 bg-slate-50/20">
+                            <div className="w-12 h-12 bg-[#10375C]/5 text-[#10375C] rounded-2xl flex items-center justify-center">
+                              <Upload className="w-6 h-6" />
                             </div>
-                          );
-                        })}
-                      </div>
-                    ) : (
-                      /* Not submitted yet - actions: manual entry or scanned upload */
-                      <div className="flex flex-col gap-6 py-4">
-                        <div className="p-8 border border-dashed border-slate-200 rounded-3xl text-center flex flex-col items-center gap-4 bg-slate-50/20">
-                          <div className="w-12 h-12 bg-[#10375C]/5 text-[#10375C] rounded-2xl flex items-center justify-center">
-                            <Upload className="w-6 h-6" />
-                          </div>
-                          <div>
-                            <h5 className="text-sm font-bold text-slate-800">Upload Student's Test Sheet</h5>
-                            <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto">
-                              If this student submitted a physical, written test paper, you can scan it and upload it here on their behalf.
-                            </p>
-                          </div>
-                          
-                          <label className="cursor-pointer py-2.5 px-5 text-xs font-bold text-white bg-[#10375C] hover:bg-[#0c2e4f] rounded-xl transition-all shadow-sm">
-                            {uploadingPaper ? 'Uploading...' : 'Select scanned paper (PDF/JPG)'}
-                            <input
-                              type="file"
-                              accept="image/*,application/pdf"
-                              className="hidden"
-                              disabled={uploadingPaper}
-                              onChange={(e) => handleTeacherUpload(e, selectedStudentSubmission.studentName)}
-                            />
-                          </label>
-                        </div>
-
-                        <div className="bg-slate-50 border border-slate-200 rounded-3xl p-6 flex flex-col gap-4">
-                          <h5 className="text-xs font-black text-slate-750 uppercase tracking-wider">Manual Score Entry</h5>
-                          <p className="text-[11px] text-slate-400">
-                            Alternatively, grade the paper directly and key in the final marks and feedback below.
-                          </p>
-                          <div className="flex flex-col gap-1.5">
-                            <label className="text-[10px] font-bold text-slate-500 uppercase">General Evaluation Remarks</label>
-                            <textarea
-                              rows={3}
-                              value={gradingAnswers['upload']?.aiFeedback || ''}
-                              onChange={(e) => setGradingAnswers({
-                                ...gradingAnswers,
-                                'upload': { marks: gradingTotalScore ?? 0, isCorrect: (gradingTotalScore ?? 0) >= (selectedStudentSubmission.totalMarks * 0.5), aiFeedback: e.target.value }
-                              })}
-                              placeholder="Excellent performance, good understanding of chapter 4..."
-                              className="w-full text-xs border border-slate-200 rounded-xl p-3 outline-none focus:border-[#10375C] font-sans bg-white resize-none"
-                            />
+                            <div>
+                              <h5 className="text-sm font-bold text-slate-800">Upload Student's Test Sheet</h5>
+                              <p className="text-xs text-slate-400 mt-1">Upload a scanned copy of the physical paper</p>
+                            </div>
+                            <label className="cursor-pointer py-2.5 px-5 text-xs font-bold text-white bg-[#10375C] hover:bg-[#0c2e4f] rounded-xl transition-all shadow-sm">
+                              {uploadingPaper ? 'Uploading...' : 'Select File (PDF/JPG)'}
+                              <input type="file" accept="image/*,application/pdf" className="hidden" disabled={uploadingPaper} onChange={e => handleTeacherUpload(e, selectedStudentSubmission.studentName)} />
+                            </label>
                           </div>
                         </div>
-                      </div>
-                    )}
+                      )}
+                    </div>
 
+                    <div className="p-4 border-t border-slate-200 bg-slate-50 flex items-center justify-between">
+                      <button onClick={() => setSelectedStudentSubmission(null)} className="py-2.5 px-4 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors">
+                        ← Back to roster
+                      </button>
+                      <button
+                        onClick={handleSaveGrade}
+                        disabled={savingGrade}
+                        className="py-2.5 px-6 text-xs font-bold text-white bg-emerald-500 hover:bg-emerald-600 rounded-xl transition-colors flex items-center gap-1.5 shadow-sm"
+                      >
+                        {savingGrade ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
+                        Save Grade
+                      </button>
+                    </div>
                   </div>
-
-                  {/* Bottom Action Footer */}
-                  <div className="p-4 border-t border-slate-200 bg-slate-50 flex items-center justify-between">
-                    <button
-                      onClick={() => setSelectedStudentSubmission(null)}
-                      className="py-2.5 px-4 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors"
-                    >
-                      Back to roster
-                    </button>
-                    <button
-                      onClick={handleSaveGrade}
-                      disabled={savingGrade}
-                      className="py-2.5 px-6 text-xs font-bold text-white bg-emerald-500 hover:bg-emerald-600 rounded-xl transition-colors flex items-center gap-1.5 shadow-sm"
-                    >
-                      {savingGrade ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
-                      Save Grade Override
-                    </button>
+                ) : (
+                  <div className="flex-1 flex flex-col items-center justify-center gap-3 p-12 text-center text-slate-400">
+                    <User className="w-12 h-12 text-slate-300 animate-pulse" />
+                    <div>
+                      <h4 className="font-bold text-slate-500">Grading Console</h4>
+                      <p className="text-xs text-slate-400 mt-1 max-w-xs mx-auto">Select a student from the roster to grade their submission</p>
+                    </div>
                   </div>
-                </div>
-              ) : (
-                <div className="flex-1 flex flex-col items-center justify-center gap-3 p-12 text-center text-slate-400">
-                  <User className="w-12 h-12 text-slate-300 animate-pulse" />
-                  <div>
-                    <h4 className="font-bold text-slate-500">Grading Console</h4>
-                    <p className="text-xs text-slate-400 mt-1 max-w-xs mx-auto">
-                      Select a student from the class roster on the left to grade, review AI marks, or upload scanned sheets.
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
-
+                )}
+              </div>
+            </motion.div>
           </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  </AppShell>
-);
+        )}
+      </AnimatePresence>
+    </AppShell>
+  );
 }
