@@ -139,13 +139,19 @@ export default function Navbar() {
           </div>
 
           {/* Auth elements (Desktop) */}
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-4">
             <SignedOut>
-              <button
+              <button 
                 onClick={() => router.push('/sign-in')}
-                className="px-4 py-2 rounded-full text-xs font-semibold bg-[#10375C] hover:bg-[#0d2f4f] text-white shadow-md shadow-[#10375C]/20 active:scale-95 transition-all"
+                className="hidden sm:block text-slate-600 hover:text-slate-950 text-sm font-medium transition-colors"
               >
                 Sign In
+              </button>
+              <button
+                onClick={() => router.push('/sign-in')}
+                className="px-4 py-2 rounded-full text-xs font-semibold bg-[#10375C] hover:bg-[#0d2f4f] text-white shadow-md shadow-[#10375C]/20 hover:shadow-[#10375C]/30 active:scale-95 transition-all"
+              >
+                Get Started Free
               </button>
             </SignedOut>
 
@@ -164,13 +170,19 @@ export default function Navbar() {
           </div>
 
           {/* Mobile Actions & Menu Button */}
-          <div className="flex md:hidden items-center gap-2">
+          <div className="flex md:hidden items-center gap-3">
             <SignedOut>
               <button
                 onClick={() => router.push('/sign-in')}
-                className="px-3 py-1.5 rounded-full text-[10px] font-bold bg-[#10375C] hover:bg-[#0d2f4f] text-white shadow-sm transition-all active:scale-95"
+                className="hidden sm:block text-xs font-semibold text-slate-600 hover:text-slate-900 transition-colors"
               >
                 Sign In
+              </button>
+              <button
+                onClick={() => router.push('/sign-in')}
+                className="px-3.5 py-1.5 rounded-full text-[10px] font-bold bg-[#10375C] hover:bg-[#0d2f4f] text-white shadow-sm transition-all active:scale-95"
+              >
+                Get Started
               </button>
             </SignedOut>
 
@@ -344,9 +356,18 @@ export default function Navbar() {
                       setIsMobileMenuOpen(false);
                       router.push('/sign-in');
                     }}
-                    className="w-full py-3 rounded-xl bg-[#10375C] hover:bg-[#0d2f4f] text-white font-semibold text-xs shadow-md shadow-[#10375C]/20 transition-colors text-center"
+                    className="w-full py-3 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-xs transition-colors text-center"
                   >
                     Sign In
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      router.push('/sign-in');
+                    }}
+                    className="w-full py-3 rounded-xl bg-[#10375C] hover:bg-[#0d2f4f] text-white font-semibold text-xs shadow-md shadow-[#10375C]/20 transition-colors text-center"
+                  >
+                    Get Started Free
                   </button>
                 </SignedOut>
 

@@ -111,9 +111,9 @@ export default function SignInPage() {
             borderRadius: "1rem",
           },
           elements: {
-            cardBox: "shadow-none border-0 w-full bg-transparent",
-            card: "shadow-[0_24px_60px_rgba(16,55,92,0.06)] border border-slate-200/50 bg-white/90 backdrop-blur-xl rounded-[24px] px-8 py-7 w-full max-w-xl mx-auto",
-            header: "hidden",
+  cardBox: "w-full max-w-5xl mx-auto",
+  card: "shadow-[0_24px_60px_rgba(16,55,92,0.06)] border border-slate-200/50 bg-white/90 backdrop-blur-xl rounded-[24px] px-10 py-8 w-full max-w-3xl mx-auto",
+  header: "hidden",
             socialButtonsBlockButton: "border border-slate-200 hover:border-slate-300 hover:bg-slate-50/50 text-slate-700 font-bold shadow-sm transition-all rounded-xl h-11 flex justify-center items-center gap-2",
             socialButtonsBlockButtonText: "text-slate-600 font-bold text-xs font-sans",
             formButtonPrimary: "bg-[#10375C] hover:bg-[#0d2f4f] text-white font-bold text-xs tracking-wider shadow-md shadow-[#10375C]/10 active:scale-[0.98] transition-all rounded-xl h-11 border-0 w-full mt-2 cursor-pointer uppercase font-sans",
