@@ -150,7 +150,7 @@ export default function StudentLoginPage() {
         </div>
 
         {/* Login/Register Card */}
-        <div className="bg-white/80 backdrop-blur-md border border-slate-200/80 rounded-3xl shadow-xl shadow-slate-200/50 p-5 sm:p-8 min-h-[380px] flex flex-col justify-between">
+        <div className="bg-white/80 backdrop-blur-md border border-slate-200/80 rounded-3xl shadow-xl shadow-slate-200/50 p-5 sm:p-8 flex flex-col gap-5">
           <AnimatePresence mode="wait">
             {step === 'info' ? (
               <motion.div
@@ -159,7 +159,7 @@ export default function StudentLoginPage() {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 15 }}
                 transition={{ duration: 0.2 }}
-                className="flex flex-col justify-between h-full"
+                className="flex flex-col gap-5"
               >
                 <form onSubmit={handleVerifyEmailOrDetails} className="flex flex-col gap-4">
                   {flow === 'login' ? (
@@ -259,7 +259,7 @@ export default function StudentLoginPage() {
                 </form>
 
                 {/* Switch Flow Links */}
-                <div className="text-center mt-6 border-t border-slate-100 pt-4">
+                <div className="text-center border-t border-slate-100 pt-4">
                   {flow === 'login' ? (
                     <button
                       onClick={() => switchFlow('register')}
