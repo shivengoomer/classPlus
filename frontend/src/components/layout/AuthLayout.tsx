@@ -566,7 +566,7 @@ export default function AuthLayout({ children, title, subtitle, portalType, onBa
       </div>
 
       {/* RIGHT SIDE PANEL - Auth Forms (Light Clean Aesthetics) */}
-      <div className="w-full lg:w-[52%] xl:w-[50%] min-h-screen flex flex-col justify-center items-center p-6 relative bg-white z-10 overflow-y-auto">
+      <div className="w-full lg:w-[52%] xl:w-[55%] min-h-screen flex flex-col justify-center items-center p-6 relative bg-white z-10 overflow-y-auto">
         
         {/* Subtle decorative background detail for the form screen */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_20%,rgba(249,115,22,0.03),transparent_40%)] pointer-events-none" />
@@ -589,7 +589,7 @@ export default function AuthLayout({ children, title, subtitle, portalType, onBa
         </div>
 
         {/* Form Container Wrapper with colorful glowing backing */}
-        <div className="relative w-full max-w-lg flex flex-col items-center justify-center py-10 z-10">
+        <div className="relative w-full max-w-xl flex flex-col items-center justify-center py-10 z-10">
           
           {/* Subtle colored glow backing */}
           <div className="absolute w-[80%] h-[80%] -z-10 rounded-full bg-gradient-to-tr from-orange-500/5 to-[#10375C]/5 blur-[70px] pointer-events-none opacity-80" />
