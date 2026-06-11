@@ -1,7 +1,7 @@
 // src/app/student/upload/[id]/page.tsx — Paper Upload
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Upload, FileText, Image, X, CheckCircle2, AlertCircle, ArrowLeft } from 'lucide-react';
@@ -11,8 +11,9 @@ import { uploadPaper } from '@/lib/studentApi';
 export default function UploadPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
-  const { studentName } = useStudentStore();
+  const { studentName, _hasHydrated } = useStudentStore();
 
+  const [loading, setLoading] = useState(true);
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [dragging, setDragging] = useState(false);
@@ -20,6 +21,26 @@ export default function UploadPage() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!_hasHydrated) return;
+    if (!studentName) {
+      router.push('/student');
+      return;
+    }
+    setLoading(false);
+  }, [_hasHydrated, studentName, router]);
+
+  if (!_hasHydrated || loading) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 border-2 border-[#10375C]/30 border-t-[#10375C] rounded-full animate-spin" />
+          <p className="text-sm text-slate-500">Initializing upload portal…</p>
+        </div>
+      </div>
+    );
+  }
 
   const handleFile = (f: File) => {
     setError('');

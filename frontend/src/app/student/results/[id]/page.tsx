@@ -21,9 +21,7 @@ export default function ResultsPage() {
   const { id } = useParams<{ id: string }>();
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { studentName } = useStudentStore();
-
-  const name = searchParams.get('studentName') || studentName || '';
+  const { studentName, _hasHydrated } = useStudentStore();
 
   const [results, setResults] = useState<StudentResults | null>(null);
   const [loading, setLoading] = useState(true);
@@ -31,24 +29,30 @@ export default function ResultsPage() {
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
+    if (!_hasHydrated) return;
+    const name = searchParams.get('studentName') || studentName || '';
     if (!name) { router.push('/student'); return; }
     getStudentResults(id, name)
       .then(setResults)
       .catch(err => setError(err.message))
       .finally(() => setLoading(false));
-  }, [id, name, router]);
+  }, [id, searchParams, studentName, router, _hasHydrated]);
 
   const toggleExpand = (qId: string) => {
     setExpandedIds(prev => {
       const s = new Set(prev);
-      s.has(qId) ? s.delete(qId) : s.add(qId);
+      if (s.has(qId)) {
+        s.delete(qId);
+      } else {
+        s.add(qId);
+      }
       return s;
     });
   };
 
   const handlePrint = () => window.print();
 
-  if (loading) return (
+  if (!_hasHydrated || loading) return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center">
       <div className="flex flex-col items-center gap-3">
         <div className="w-8 h-8 border-2 border-[#10375C]/30 border-t-[#10375C] rounded-full animate-spin" />

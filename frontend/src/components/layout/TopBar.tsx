@@ -20,7 +20,8 @@ import {
   Users, 
   Cpu, 
   BookOpen,
-  LayoutGrid
+  LayoutGrid,
+  TrendingUp
 } from 'lucide-react';
 import { Badge } from '../shared/Badge';
 import { useNotificationStore } from '@/store/notificationStore';
@@ -129,6 +130,7 @@ export function TopBar({ onMenuToggle }: TopBarProps) {
     if (pathname === '/home') return { parent: 'Workspace', current: 'Dashboard' };
     if (pathname === '/groups') return { parent: 'Workspace', current: 'Classrooms' };
     if (pathname === '/assignments') return { parent: 'Workspace', current: 'Assessments' };
+    if (pathname === '/reports') return { parent: 'Workspace', current: 'Student Reports' };
     if (pathname === '/toolkit') return { parent: 'Workspace', current: 'AI Toolkit' };
     if (pathname === '/library') return { parent: 'Workspace', current: 'Library' };
     if (pathname === '/create') return { parent: 'Assessments', current: 'New Assessment' };
@@ -171,6 +173,16 @@ export function TopBar({ onMenuToggle }: TopBarProps) {
       icon: <Users className="w-4 h-4 text-slate-500" />,
       action: () => {
         router.push('/groups');
+        setIsCommandMenuOpen(false);
+      }
+    },
+    {
+      id: 'nav-reports',
+      title: 'Go to Student Reports',
+      category: 'Navigation',
+      icon: <TrendingUp className="w-4 h-4 text-slate-500" />,
+      action: () => {
+        router.push('/reports');
         setIsCommandMenuOpen(false);
       }
     },

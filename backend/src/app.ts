@@ -14,6 +14,7 @@ import templateRoutes from './routes/template.routes';
 import groupRoutes from './routes/group.routes';
 import assignedRoutes from './routes/assigned.routes';
 import studentRoutes from './routes/student.routes';
+import reportRoutes from './routes/report.routes';
 
 const app = express();
 
@@ -60,6 +61,9 @@ app.use('/api/assigned', assignedRoutes);
 
 // student-facing routes (no auth) under /api/student
 app.use('/api/student', studentRoutes);
+
+// report/analytics routes under /api/reports
+app.use('/api/reports', reportRoutes);
 
 // global error handler
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

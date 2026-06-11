@@ -10,7 +10,14 @@ import { useStudentStore } from '@/store/studentStore';
 
 export default function StudentLoginPage() {
   const router = useRouter();
-  const { setSession } = useStudentStore();
+  const { setSession, studentName: storedStudentName, studentEmail: storedStudentEmail, _hasHydrated } = useStudentStore();
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (_hasHydrated && storedStudentName && storedStudentEmail) {
+      router.push('/student/dashboard');
+    }
+  }, [_hasHydrated, storedStudentName, storedStudentEmail, router]);
 
   const [flow, setFlow] = useState<'login' | 'register'>('login');
   const [step, setStep] = useState<'info' | 'pin'>('info');

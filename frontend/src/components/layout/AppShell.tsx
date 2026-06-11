@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
 import { MobileBottomNav } from './MobileBottomNav';
-import { X, Home, Users, ClipboardList, Cpu, BookOpen, Settings } from 'lucide-react';
+import { X, Home, Users, ClipboardList, Cpu, BookOpen, Settings, TrendingUp } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -77,6 +77,7 @@ export function AppShell({ children }: AppShellProps) {
     { label: 'Home', path: '/home', icon: <Home className="w-5 h-5" /> },
     { label: 'My Groups', path: '/groups', icon: <Users className="w-5 h-5" /> },
     { label: 'Assignments', path: '/assignments', icon: <ClipboardList className="w-5 h-5" /> },
+    { label: 'Student Reports', path: '/reports', icon: <TrendingUp className="w-5 h-5" /> },
     { label: "AI Teacher's Toolkit", path: '/toolkit', icon: <Cpu className="w-5 h-5" /> },
     { label: 'My Library', path: '/library', icon: <BookOpen className="w-5 h-5" /> },
     { label: 'Settings', path: '/settings', icon: <Settings className="w-5 h-5" /> },

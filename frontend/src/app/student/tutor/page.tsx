@@ -27,10 +27,9 @@ const SUGGESTED_QUESTIONS = [
 
 export default function TutorPage() {
   const router = useRouter();
-  const { studentName, groups } = useStudentStore();
-  const [selectedGroupId, setSelectedGroupId] = useState<string>(
-    groups && groups.length > 0 ? groups[0]._id : 'all'
-  );
+  const { studentName, groups, _hasHydrated } = useStudentStore();
+  const [selectedGroupId, setSelectedGroupId] = useState<string>('all');
+  const [authLoading, setAuthLoading] = useState(true);
 
   const activeGroup = groups.find(g => g._id === selectedGroupId) || null;
 
@@ -40,6 +39,25 @@ export default function TutorPage() {
   const [error, setError] = useState('');
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const hasSelectedDefaultRef = useRef(false);
+
+  useEffect(() => {
+    if (!_hasHydrated) return;
+    if (!studentName) {
+      router.push('/student');
+      return;
+    }
+    setAuthLoading(false);
+  }, [_hasHydrated, studentName, router]);
+
+  useEffect(() => {
+    if (_hasHydrated && !hasSelectedDefaultRef.current) {
+      hasSelectedDefaultRef.current = true;
+      if (groups && groups.length > 0) {
+        setSelectedGroupId(groups[0]._id);
+      }
+    }
+  }, [_hasHydrated, groups]);
 
   // Load chat history from sessionStorage
   useEffect(() => {
@@ -59,6 +77,17 @@ export default function TutorPage() {
     }
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  if (!_hasHydrated || authLoading) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 border-2 border-[#10375C]/30 border-t-[#10375C] rounded-full animate-spin" />
+          <p className="text-sm text-slate-500">Loading AI tutor workspace…</p>
+        </div>
+      </div>
+    );
+  }
 
   const sendMessage = async (text: string) => {
     if (!text.trim() || loading) return;

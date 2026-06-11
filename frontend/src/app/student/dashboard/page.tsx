@@ -7,7 +7,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   GraduationCap, ClipboardList, CheckCircle2, Clock, Brain, ArrowRight,
   BookOpen, LogOut, Trophy, Upload, Star, Search, Sparkles, AlertCircle,
-  RefreshCw, Check, X, FileText, ChevronRight, MessageSquare, History, Play, Send, Trash2, PlusCircle
+  RefreshCw, Check, X, FileText, ChevronRight, MessageSquare, History, Play, Send, Trash2, PlusCircle,
+  Calendar, Award
 } from 'lucide-react';
 import { useStudentStore, StudentGroup } from '@/store/studentStore';
 import {
@@ -34,6 +35,51 @@ function gradeFromPct(pct: number) {
   return { letter: 'D', color: 'text-red-500 bg-red-50 border-red-200' };
 }
 
+function formatDueDate(dateStr: string) {
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return dateStr;
+    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+  } catch {
+    return dateStr;
+  }
+}
+
+function getDueDateProximity(dateStr: string) {
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return 'normal';
+    const now = new Date();
+    const diffTime = d.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    if (diffDays <= 0) return 'overdue';
+    if (diffDays <= 1) return 'urgent';
+    if (diffDays <= 3) return 'warning';
+    return 'normal';
+  } catch {
+    return 'normal';
+  }
+}
+
+function getBorderColorClass(dateStr: string) {
+  const prox = getDueDateProximity(dateStr);
+  if (prox === 'overdue') return 'border-l-4 border-l-rose-500 hover:border-l-rose-600';
+  if (prox === 'urgent') return 'border-l-4 border-l-amber-500 hover:border-l-amber-600';
+  if (prox === 'warning') return 'border-l-4 border-l-yellow-500 hover:border-l-yellow-600';
+  return 'border-l-4 border-l-indigo-500 hover:border-l-indigo-600';
+}
+
+function formatSubmittedAt(dateStr: string | null) {
+  if (!dateStr) return '';
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return '';
+    return 'Submitted ' + d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) + ' at ' + d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+  } catch {
+    return '';
+  }
+}
+
 interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
@@ -51,7 +97,7 @@ const SUGGESTED_QUESTIONS = [
 
 export default function StudentDashboard() {
   const router = useRouter();
-  const { studentName, studentEmail, groups, setSession, clearSession } = useStudentStore();
+  const { studentName, studentEmail, groups, setSession, clearSession, _hasHydrated } = useStudentStore();
   
   // Tab State
   const [activeTab, setActiveTab] = useState<TabType>('assignments');
@@ -100,6 +146,8 @@ export default function StudentDashboard() {
 
   // Session validation and load initial assignments
   useEffect(() => {
+    if (!_hasHydrated) return;
+
     if (!studentName || !studentEmail) {
       router.push('/student');
       return;
@@ -131,7 +179,7 @@ export default function StudentDashboard() {
     return () => {
       isMounted = false;
     };
-  }, [studentName, studentEmail, router, setSession]);
+  }, [_hasHydrated, studentName, studentEmail, router, setSession]);
 
   // Load practice history when switching to practice tab
   useEffect(() => {
@@ -343,7 +391,7 @@ export default function StudentDashboard() {
       }, 0) / completed.length)
     : 0;
 
-  if (loading) {
+  if (!_hasHydrated || loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30 flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-[#10375C]/30 border-t-[#10375C] rounded-full animate-spin" />
@@ -486,7 +534,7 @@ export default function StudentDashboard() {
                 className="flex flex-col gap-6"
               >
                 {/* Stats Row */}
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {[
                     { label: 'Pending Tests', value: pending.length, icon: <Clock className="w-4 h-4 text-amber-500" />, color: 'bg-amber-50 border-amber-100 text-amber-700' },
                     { label: 'Completed Tests', value: completed.length, icon: <CheckCircle2 className="w-4 h-4 text-emerald-500" />, color: 'bg-emerald-50 border-emerald-100 text-emerald-700' },
@@ -516,47 +564,74 @@ export default function StudentDashboard() {
                     </div>
                   ) : (
                     <div className="flex flex-col gap-3">
-                      {pending.map((item, i) => (
-                        <motion.div
-                          key={item._id}
-                          initial={{ opacity: 0, y: 8 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: i * 0.05 }}
-                          className="bg-white border border-slate-200 rounded-2xl p-4.5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-indigo-300 hover:shadow-md transition-all shadow-sm"
-                        >
-                          <div className="flex items-start gap-3.5">
-                            <div className="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center flex-shrink-0">
-                              <BookOpen className="w-4 h-4 text-indigo-500" />
+                      {pending.map((item, i) => {
+                        const borderClass = getBorderColorClass(item.dueDate);
+                        return (
+                          <motion.div
+                            key={item._id}
+                            initial={{ opacity: 0, y: 8 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: i * 0.05 }}
+                            className={`bg-white border border-slate-200 rounded-2xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-5 hover:border-indigo-350 hover:shadow-lg hover:shadow-indigo-500/5 transition-all shadow-sm duration-200 relative overflow-hidden ${borderClass}`}
+                          >
+                            <div className="flex items-start gap-4 min-w-0 flex-1">
+                              <div className="w-11 h-11 rounded-2xl bg-indigo-55 border border-indigo-100 flex items-center justify-center flex-shrink-0">
+                                <BookOpen className="w-5 h-5 text-indigo-600" />
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <h3 className="text-base font-bold text-slate-850 tracking-tight leading-snug truncate">
+                                  {item.assignment.title}
+                                </h3>
+                                <div className="flex flex-wrap items-center gap-2 mt-2.5">
+                                  <span className="inline-flex items-center text-[10px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-100 px-2.5 py-0.5 rounded-md">
+                                    {item.assignment.subject} • {item.assignment.grade}
+                                  </span>
+                                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-slate-600 bg-slate-50 border border-slate-200/70 px-2.5 py-0.5 rounded-md">
+                                    <Award className="w-3 h-3 text-slate-400" /> {item.assignment.totalMarks} Marks
+                                  </span>
+                                  {(() => {
+                                    const prox = getDueDateProximity(item.dueDate);
+                                    const formatted = formatDueDate(item.dueDate);
+                                    let colorClasses = "text-slate-650 bg-slate-50 border-slate-200/70";
+                                    if (prox === 'overdue') {
+                                      colorClasses = "text-rose-700 bg-rose-50 border-rose-200 font-extrabold animate-pulse";
+                                    } else if (prox === 'urgent') {
+                                      colorClasses = "text-amber-700 bg-amber-50 border-amber-205 font-extrabold";
+                                    } else if (prox === 'warning') {
+                                      colorClasses = "text-yellow-800 bg-yellow-50 border-yellow-200 font-bold";
+                                    }
+                                    return (
+                                      <span className={`inline-flex items-center gap-1 text-[10px] px-2.5 py-0.5 rounded-md border ${colorClasses}`}>
+                                        <Calendar className="w-3 h-3 text-current" />
+                                        {prox === 'overdue' ? `Overdue: ${formatted}` : `Due: ${formatted}`}
+                                      </span>
+                                    );
+                                  })()}
+                                  {item.durationMinutes && (
+                                    <span className="inline-flex items-center gap-1 text-[10px] text-amber-600 bg-amber-50 border border-amber-200/50 px-2.5 py-0.5 rounded-md font-bold">
+                                      <Clock className="w-3 h-3 text-amber-500" /> {item.durationMinutes} mins
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
                             </div>
-                            <div>
-                              <h3 className="text-sm font-bold text-slate-800">{item.assignment.title}</h3>
-                              <p className="text-xs text-slate-500 mt-1">
-                                <span className="font-bold text-[#10375C] mr-1.5">{item.assignment.subject} ({item.assignment.grade})</span>
-                                • {item.assignment.totalMarks} Marks • Due: {item.dueDate}
-                              </p>
-                              {item.durationMinutes && (
-                                <span className="inline-flex items-center gap-1 text-[10px] text-amber-600 bg-amber-50 px-2 py-0.5 rounded font-bold border border-amber-200/50 mt-1.5">
-                                  ⏱ Timed Test: {item.durationMinutes} mins
-                                </span>
-                              )}
+                            <div className="flex gap-3 items-center self-stretch md:self-auto justify-end">
+                              <button
+                                onClick={() => router.push(`/student/upload/${item._id}`)}
+                                className="flex-1 md:flex-initial flex items-center justify-center gap-1.5 text-xs border border-slate-250 hover:border-slate-350 text-slate-600 hover:text-slate-800 px-4 py-2.5 rounded-xl font-bold transition-all hover:bg-slate-50 active:scale-[0.98]"
+                              >
+                                <Upload className="w-3.5 h-3.5" /> Upload Scan
+                              </button>
+                              <button
+                                onClick={() => router.push(`/student/assignment/${item._id}`)}
+                                className="flex-1 md:flex-initial flex items-center justify-center gap-1.5 text-xs bg-[#10375C] hover:bg-[#0d2f4f] text-white px-5 py-2.5 rounded-xl font-bold transition-all shadow-md shadow-[#10375C]/15 active:scale-[0.98]"
+                              >
+                                Start <ArrowRight className="w-3.5 h-3.5" />
+                              </button>
                             </div>
-                          </div>
-                          <div className="flex gap-2.5 sm:self-center">
-                            <button
-                              onClick={() => router.push(`/student/upload/${item._id}`)}
-                              className="flex items-center gap-1 text-xs border border-slate-200 text-slate-600 hover:border-slate-300 px-3.5 py-2 rounded-xl font-bold transition-all hover:bg-slate-50"
-                            >
-                              <Upload className="w-3.5 h-3.5" /> Upload Scan
-                            </button>
-                            <button
-                              onClick={() => router.push(`/student/assignment/${item._id}`)}
-                              className="flex items-center gap-1 text-xs bg-[#10375C] hover:bg-[#0d2f4f] text-white px-4 py-2 rounded-xl font-bold transition-all shadow-md shadow-[#10375C]/10"
-                            >
-                              Start <ArrowRight className="w-3.5 h-3.5" />
-                            </button>
-                          </div>
-                        </motion.div>
-                      ))}
+                          </motion.div>
+                        );
+                      })}
                     </div>
                   )}
                 </section>
@@ -577,26 +652,40 @@ export default function StudentDashboard() {
                         return (
                           <div
                             key={item._id}
-                            className="bg-white border border-slate-200 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm"
+                            className="bg-white border border-slate-200 rounded-2xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-5 shadow-sm border-l-4 border-l-emerald-500 hover:border-l-emerald-600 transition-all duration-200"
                           >
-                            <div className="flex items-center gap-3.5">
-                              <div className={`w-9 h-9 rounded-xl border flex items-center justify-center flex-shrink-0 text-xs font-black ${color}`}>
+                            <div className="flex items-center gap-4 min-w-0 flex-1">
+                              <div className={`w-11 h-11 rounded-2xl border flex items-center justify-center flex-shrink-0 text-sm font-black shadow-sm ${color}`}>
                                 {letter}
                               </div>
-                              <div>
-                                <h3 className="text-sm font-bold text-slate-800">{item.assignment.title}</h3>
-                                <p className="text-xs text-slate-400 mt-0.5">
-                                  <span className="font-bold text-[#10375C] mr-1.5">{item.assignment.subject}</span>
-                                  • Score: {item.submission!.totalScore}/{item.submission!.totalMarks} ({pct}%)
-                                </p>
+                              <div className="min-w-0 flex-1">
+                                <h3 className="text-base font-bold text-slate-850 tracking-tight leading-snug truncate">
+                                  {item.assignment.title}
+                                </h3>
+                                <div className="flex flex-wrap items-center gap-2 mt-2.5">
+                                  <span className="inline-flex items-center text-[10px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-100 px-2.5 py-0.5 rounded-md">
+                                    {item.assignment.subject}
+                                  </span>
+                                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-md">
+                                    Score: {item.submission!.totalScore}/{item.submission!.totalMarks} ({pct}%)
+                                  </span>
+                                  {item.submission?.submittedAt && (
+                                    <span className="inline-flex items-center gap-1 text-[10px] text-slate-500 bg-slate-50 border border-slate-200/70 px-2.5 py-0.5 rounded-md">
+                                      <CheckCircle2 className="w-3 h-3 text-emerald-500" />
+                                      {formatSubmittedAt(item.submission.submittedAt)}
+                                    </span>
+                                  )}
+                                </div>
                               </div>
                             </div>
-                            <button
-                              onClick={() => router.push(`/student/results/${item._id}`)}
-                              className="flex items-center gap-1 text-xs border border-slate-200 text-slate-600 hover:border-indigo-300 hover:text-indigo-600 px-4 py-2 rounded-xl font-bold transition-all"
-                            >
-                              <Star className="w-3.5 h-3.5" /> Review Scorecard
-                            </button>
+                            <div className="flex gap-3 items-center self-stretch md:self-auto justify-end">
+                              <button
+                                onClick={() => router.push(`/student/results/${item._id}`)}
+                                className="w-full md:w-auto flex items-center justify-center gap-1.5 text-xs bg-emerald-50 text-emerald-700 hover:bg-emerald-100/70 border border-emerald-200 px-4 py-2.5 rounded-xl font-bold transition-all active:scale-[0.98]"
+                              >
+                                <Star className="w-3.5 h-3.5 text-emerald-600" /> Review Scorecard
+                              </button>
+                            </div>
                           </div>
                         );
                       })}
@@ -617,7 +706,7 @@ export default function StudentDashboard() {
               >
                 {/* 2A. ACTIVE QUIZ TAKING VIEW */}
                 {activeQuiz && !quizResult && (
-                  <div className="bg-white border border-slate-200 rounded-3xl p-6.5 shadow-xl shadow-slate-200/50 flex flex-col gap-6">
+                  <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-xl shadow-slate-200/50 flex flex-col gap-6">
                     {/* Header */}
                     <div className="flex justify-between items-center border-b border-slate-100 pb-4">
                       <div>
@@ -752,7 +841,7 @@ export default function StudentDashboard() {
 
                 {/* 2B. QUIZ RESULT CONSOLE */}
                 {quizResult && (
-                  <div className="bg-white border border-slate-200 rounded-3xl p-6.5 shadow-xl shadow-slate-200/50 flex flex-col gap-6">
+                  <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-xl shadow-slate-200/50 flex flex-col gap-6">
                     {/* Header */}
                     <div className="text-center pb-4 border-b border-slate-100 flex flex-col items-center gap-2">
                       <div className="w-12 h-12 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center">
@@ -831,7 +920,7 @@ export default function StudentDashboard() {
 
                 {/* 2C. PAST HISTORY DETAIL POPUP */}
                 {viewHistoryQuiz && (
-                  <div className="bg-white border border-slate-200 rounded-3xl p-6.5 shadow-xl shadow-slate-200/50 flex flex-col gap-6">
+                  <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-xl shadow-slate-200/50 flex flex-col gap-6">
                     {/* Header */}
                     <div className="flex justify-between items-center border-b border-slate-100 pb-3">
                       <div>
@@ -847,7 +936,7 @@ export default function StudentDashboard() {
                     </div>
 
                     {/* Score */}
-                    <div className="bg-slate-50 border border-slate-150 rounded-2xl p-4.5 text-center flex flex-col gap-1.5">
+                    <div className="bg-slate-50 border border-slate-150 rounded-2xl p-4 text-center flex flex-col gap-1.5">
                       <span className="text-2xl font-black text-emerald-600">{viewHistoryQuiz.score} / {viewHistoryQuiz.totalMarks} Marks</span>
                       <p className="text-xs text-slate-500 font-semibold">{viewHistoryQuiz.feedback}</p>
                     </div>
@@ -1325,7 +1414,7 @@ export default function StudentDashboard() {
               initial={{ opacity: 0, scale: 0.95, y: 15 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 15 }}
-              className="bg-white rounded-3xl p-6.5 w-full max-w-sm border border-slate-200 shadow-2xl relative z-10"
+              className="bg-white rounded-3xl p-6 w-full max-w-sm border border-slate-200 shadow-2xl relative z-10"
             >
               <h3 className="text-sm font-bold text-[#10375C] mb-1.5 uppercase tracking-wider flex items-center gap-1.5">
                 <PlusCircle className="w-4 h-4 text-emerald-500" /> Join Class Group

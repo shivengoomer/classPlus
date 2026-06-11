@@ -441,3 +441,60 @@ export async function updateSubmission(
   if (!res.ok) throw new Error('Failed to update submission');
   return res.json();
 }
+
+// ── Reports API ─────────────────────────────────────────────────────────────
+
+export interface StudentReportSummary {
+  studentName: string;
+  email: string | null;
+  isRegistered: boolean;
+  groups: { id: string; name: string; grade: string; subject: string }[];
+  assignmentsAssigned: number;
+  assignmentsCompleted: number;
+  assignmentAverageScore: number | null;
+  practicesCount: number;
+  practicesAverageScore: number | null;
+}
+
+export interface DetailedStudentReport {
+  studentName: string;
+  email: string | null;
+  isRegistered: boolean;
+  groups: { id: string; name: string; grade: string; subject: string }[];
+  weakTopics: { topic: string; accuracy: number; totalMarks: number; source: 'assignment' | 'practice' | 'both' }[];
+  strongTopics: { topic: string; accuracy: number; totalMarks: number; source: 'assignment' | 'practice' | 'both' }[];
+  timeline: { type: 'assignment' | 'practice'; title: string; score: number; totalMarks: number; percentage: number; date: string }[];
+  struggleNotes: { type: 'assignment' | 'practice'; topic: string; scoreText: string; questionText?: string; feedback: string; date: string }[];
+  logs: {
+    assignments: {
+      title: string;
+      subject: string;
+      dueDate: string;
+      score: number;
+      totalMarks: number;
+      percentage: number | null;
+      submittedAt: string | null;
+      autoSubmitted: boolean;
+    }[];
+    practices: {
+      topic: string;
+      subject: string;
+      score: number;
+      totalMarks: number;
+      percentage: number | null;
+      submittedAt: string;
+    }[];
+  };
+}
+
+export async function listStudentReports(): Promise<StudentReportSummary[]> {
+  const res = await authFetch(`${BASE_URL}/reports/students`);
+  if (!res.ok) throw new Error('Failed to fetch student reports');
+  return res.json();
+}
+
+export async function getDetailedStudentReport(email: string): Promise<DetailedStudentReport> {
+  const res = await authFetch(`${BASE_URL}/reports/student/${encodeURIComponent(email)}`);
+  if (!res.ok) throw new Error('Failed to fetch detailed student report');
+  return res.json();
+}
