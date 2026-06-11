@@ -16,6 +16,8 @@ interface AuthLayoutProps {
   title: string;
   subtitle: string;
   portalType?: 'teacher' | 'student';
+  onBack?: () => void;
+  backLabel?: string;
 }
 
 type TabType = 'ai-gen' | 'grading' | 'analytics';
@@ -337,7 +339,7 @@ function AnalyticsSimulator() {
   );
 }
 
-export default function AuthLayout({ children, title, subtitle, portalType }: AuthLayoutProps) {
+export default function AuthLayout({ children, title, subtitle, portalType, onBack, backLabel = 'Change role' }: AuthLayoutProps) {
   const [activeTab, setActiveTab] = useState<TabType>('ai-gen');
   const [autoplay, setAutoplay] = useState(true);
   const autoplayTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -593,7 +595,7 @@ export default function AuthLayout({ children, title, subtitle, portalType }: Au
           <div className="absolute w-[80%] h-[80%] -z-10 rounded-full bg-gradient-to-tr from-orange-500/5 to-[#10375C]/5 blur-[70px] pointer-events-none opacity-80" />
 
           {/* Form Header Info (Educator / School Portal Info) */}
-          <div className="w-full text-center mb-2 select-none">
+          <div className="w-full text-center mb-4 select-none">
             <div className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-slate-200/60 bg-slate-50 text-[10px] font-bold text-slate-500 mb-3.5">
               <Sparkle className="w-3 h-3 text-[#10375C] fill-[#10375C]/20" />
               <span>
@@ -606,6 +608,14 @@ export default function AuthLayout({ children, title, subtitle, portalType }: Au
             <p className="text-slate-500 text-xs mt-2 leading-relaxed">
               {subtitle}
             </p>
+            {onBack && (
+              <button
+                onClick={onBack}
+                className="mt-3 inline-flex items-center gap-1 text-[11px] font-semibold text-slate-400 hover:text-[#10375C] transition-colors"
+              >
+                <span>←</span> {backLabel}
+              </button>
+            )}
           </div>
 
           {/* Child Clerk Form */}

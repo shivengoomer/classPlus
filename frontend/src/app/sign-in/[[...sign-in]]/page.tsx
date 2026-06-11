@@ -4,16 +4,15 @@ import { SignIn } from "@clerk/nextjs";
 import AuthLayout from "@/components/layout/AuthLayout";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
-import { GraduationCap, Users, ChevronDown, ArrowRight, BookOpen } from "lucide-react";
+import { motion } from "framer-motion";
+import { GraduationCap, Users, ArrowRight } from "lucide-react";
 import { Logo } from "@/components/shared/Logo";
 
 export default function SignInPage() {
   const router = useRouter();
-  const [selectedRole, setSelectedRole] = useState<'teacher' | 'student' | null>(null);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [selectedRole, setSelectedRole] = useState<'teacher' | null>(null);
 
-  // If no role chosen yet, show the role picker landing
+  // Role picker screen
   if (!selectedRole) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#EAF0F8] via-[#EEF2F8] to-[#E6ECF5] flex flex-col items-center justify-center p-4 sm:p-6 relative overflow-hidden">
@@ -92,22 +91,15 @@ export default function SignInPage() {
     );
   }
 
-  // Teacher selected — show Clerk sign-in
+  // Teacher selected — show Clerk sign-in via AuthLayout
   return (
     <AuthLayout
       title="Teacher Sign In"
-      subtitle="Sign in to your classPlus teacher account to manage classrooms, create assessments, and track student progress."
+      subtitle="Sign in to manage classrooms, create assessments, and track student progress."
       portalType="teacher"
+      onBack={() => setSelectedRole(null)}
+      backLabel="Change role"
     >
-      {/* Back to role picker */}
-      <div className="mb-3 flex justify-center">
-        <button
-          onClick={() => setSelectedRole(null)}
-          className="text-xs text-slate-400 hover:text-slate-600 font-semibold transition-colors flex items-center gap-1"
-        >
-          ← Switch role
-        </button>
-      </div>
       <SignIn
         appearance={{
           variables: {
@@ -120,7 +112,7 @@ export default function SignInPage() {
           },
           elements: {
             cardBox: "shadow-none border-0 w-full bg-transparent",
-            card: "shadow-[0_24px_60px_rgba(16,55,92,0.06)] border border-slate-200/50 bg-white/90 backdrop-blur-xl rounded-[24px] p-8 w-full max-w-lg mx-auto",
+            card: "shadow-[0_24px_60px_rgba(16,55,92,0.06)] border border-slate-200/50 bg-white/90 backdrop-blur-xl rounded-[24px] px-8 py-7 w-full max-w-lg mx-auto",
             header: "hidden",
             socialButtonsBlockButton: "border border-slate-200 hover:border-slate-300 hover:bg-slate-50/50 text-slate-700 font-bold shadow-sm transition-all rounded-xl h-11 flex justify-center items-center gap-2",
             socialButtonsBlockButtonText: "text-slate-600 font-bold text-xs font-sans",
