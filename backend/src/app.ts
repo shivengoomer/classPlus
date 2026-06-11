@@ -3,6 +3,7 @@
 
 import express from 'express';
 import cors from 'cors';
+import path from 'path';
 import { clerkMiddleware } from '@clerk/express';
 import assignmentRoutes from './routes/assignment.routes';
 import libraryRoutes from './routes/library.routes';
@@ -10,8 +11,14 @@ import notificationRoutes from './routes/notification.routes';
 import userRoutes from './routes/user.routes';
 import rubricRoutes from './routes/rubric.routes';
 import templateRoutes from './routes/template.routes';
+import groupRoutes from './routes/group.routes';
+import assignedRoutes from './routes/assigned.routes';
+import studentRoutes from './routes/student.routes';
 
 const app = express();
+
+// serve uploads statically
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // middleware
 app.use(cors({
@@ -44,6 +51,15 @@ app.use('/api/rubrics', rubricRoutes);
 
 // template routes under /api/templates
 app.use('/api/templates', templateRoutes);
+
+// group routes under /api/groups
+app.use('/api/groups', groupRoutes);
+
+// assigned assessment routes under /api/assigned
+app.use('/api/assigned', assignedRoutes);
+
+// student-facing routes (no auth) under /api/student
+app.use('/api/student', studentRoutes);
 
 // global error handler
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

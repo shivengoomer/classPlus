@@ -1,7 +1,6 @@
 // src/models/group.model.ts
-// Mongoose schema for class groups — organizes students by class/section
-
 import mongoose, { Schema, Document } from 'mongoose';
+import crypto from 'crypto';
 
 export interface IGroup extends Document {
   name: string;
@@ -9,6 +8,7 @@ export interface IGroup extends Document {
   subject: string;
   students: string[];
   rubric?: string;
+  classCode: string;
   userId?: string;
   createdAt: Date;
   updatedAt: Date;
@@ -21,6 +21,11 @@ const GroupSchema = new Schema(
     subject: { type: String, required: true },
     students: [{ type: String }],
     rubric: { type: String },
+    classCode: {
+      type: String,
+      unique: true,
+      default: () => crypto.randomBytes(3).toString('hex').toUpperCase(), // 6-char e.g. "A3F9BC"
+    },
     userId: { type: String },
   },
   { timestamps: true }
