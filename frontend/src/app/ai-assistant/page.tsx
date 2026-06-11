@@ -125,7 +125,7 @@ export default function AIAssistantPage() {
                         <Cpu className="w-3.5 h-3.5 text-white animate-pulse" />
                       </div>
                       <div className="flex flex-col leading-none">
-                        <span className="text-[9px] font-black">ClassPilot Tutor</span>
+                        <span className="text-[9px] font-black">classPlus Tutor</span>
                         <span className="text-[7px] text-emerald-500 font-bold mt-0.5">Online Helper</span>
                       </div>
                     </div>

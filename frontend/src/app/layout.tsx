@@ -13,8 +13,8 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "ClassPilot - AI Assessment Creator (By Shiven Goomer)",
-  description: "Create and grade premium assessments with the power of ClassPilot.",
+  title: "classPlus - AI Assessment Creator (By Shiven Goomer)",
+  description: "Create and grade premium assessments with the power of classPlus.",
   icons: {
     icon: '/logo.svg',
   },

@@ -4,7 +4,7 @@ import AuthLayout from "@/components/layout/AuthLayout";
 export default function SignInPage() {
   return (
     <AuthLayout 
-      title="Welcome Back to ClassPilot"
+      title="Welcome Back to classPlus"
       subtitle="Sign in to your account to manage assignments, view classroom performance metrics, and prepare interactive lesson plans."
     >
       <SignIn

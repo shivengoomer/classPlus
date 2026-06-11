@@ -4,14 +4,18 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Check, Sparkles } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useUser } from '@clerk/nextjs';
 
 export default function PricingSection() {
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'annual'>('monthly');
+  const router = useRouter();
+  const { isSignedIn } = useUser();
 
   const plans = [
     {
       name: 'Free Trial',
-      desc: 'Perfect for trying out ClassPilot worksheets.',
+      desc: 'Perfect for trying out classPlus worksheets.',
       price: { monthly: 0, annual: 0 },
       features: [
         '10 AI credits limit',
@@ -21,7 +25,8 @@ export default function PricingSection() {
         'Community support'
       ],
       cta: 'Get Started Free',
-      highlighted: false
+      highlighted: false,
+      action: () => router.push(isSignedIn ? '/home' : '/sign-up'),
     },
     {
       name: 'Teacher Pro',
@@ -37,7 +42,8 @@ export default function PricingSection() {
       ],
       cta: 'Upgrade to Pro',
       highlighted: true,
-      badge: 'Best Value'
+      badge: 'Best Value',
+      action: () => router.push(isSignedIn ? '/billing' : '/sign-up'),
     },
     {
       name: 'School Plan',
@@ -52,7 +58,8 @@ export default function PricingSection() {
         'SSO/SAML integration & SLA'
       ],
       cta: 'Contact Sales',
-      highlighted: false
+      highlighted: false,
+      action: () => router.push('/contact'),
     }
   ];
 
@@ -165,6 +172,7 @@ export default function PricingSection() {
 
               {/* Call To Action */}
               <button
+                onClick={plan.action}
                 className={`w-full py-3.5 rounded-2xl text-xs font-semibold mt-8 transition-all active:scale-95 ${
                   plan.highlighted
                     ? 'bg-[#10375C] hover:bg-[#0d2f4f] text-white shadow-md shadow-[#10375C]/20'

@@ -81,7 +81,7 @@ export default function Navbar() {
     ],
     Contact: [
       { icon: <Mail className="w-5 h-5 text-blue-500" />, title: 'Tech Support', desc: '24/7 dedicated helpdesk assistance', href: '/contact' },
-      { icon: <Award className="w-5 h-5 text-[#10375C]" />, title: 'School Partnership', desc: 'Pilot ClassPilot in your school district', href: '/contact' },
+      { icon: <Award className="w-5 h-5 text-[#10375C]" />, title: 'School Partnership', desc: 'Pilot classPlus in your school district', href: '/contact' },
       { icon: <MessageSquare className="w-5 h-5 text-purple-500" />, title: 'Schedule Demo', desc: '1-on-1 walkthrough with an expert', href: '/contact' }
     ]
   };
@@ -113,7 +113,7 @@ export default function Navbar() {
           >
             <Logo className="w-8 h-8 group-hover:scale-105 transition-transform" />
             <span className="font-bold text-lg tracking-tight text-slate-900 group-hover:text-[#10375C] transition-colors">
-              ClassPilot
+              classPlus
             </span>
           </div>
 

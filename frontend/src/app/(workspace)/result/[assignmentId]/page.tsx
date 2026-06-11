@@ -36,7 +36,7 @@ export default function ResultPage() {
     try {
       const fileName = assignment.title 
         ? `${assignment.title.replace(/[^a-zA-Z0-9]/g, '_')}_paper.pdf`
-        : `ClassPilot_Assessment_${assignmentId}.pdf`;
+        : `classPlus_Assessment_${assignmentId}.pdf`;
 
       const blob = await exportAssignmentPDF(assignmentId);
       const url = window.URL.createObjectURL(blob);

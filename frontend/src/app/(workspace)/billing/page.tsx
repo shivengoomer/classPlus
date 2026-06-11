@@ -66,7 +66,7 @@ export default function BillingPage() {
       name: 'Free Trial',
       price: '$0',
       period: 'forever',
-      description: 'Test ClassPilot capabilities with mock elements.',
+      description: 'Test classPlus capabilities with mock elements.',
       features: [
         'Up to 10 total assignments',
         'Standard generation speed',
@@ -126,7 +126,7 @@ export default function BillingPage() {
             <span>Billing & Subscription</span>
           </h2>
           <p className="text-[13px] text-veda-text-secondary">
-            Manage your ClassPilot subscription plan, track your assignment usage limits, and view pricing options.
+            Manage your classPlus subscription plan, track your assignment usage limits, and view pricing options.
           </p>
         </div>
 

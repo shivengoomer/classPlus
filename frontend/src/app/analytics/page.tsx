@@ -359,7 +359,7 @@ export default function AnalyticsPage() {
                     </div>
 
                     <div className="border-t border-slate-100 pt-2 flex justify-between items-center text-[6px] font-bold text-slate-400 uppercase tracking-wider">
-                      <span>Generated via ClassPilot</span>
+                      <span>Generated via classPlus</span>
                       <span className="text-[#10375C] font-black">2026 Metrics</span>
                     </div>
                   </div>

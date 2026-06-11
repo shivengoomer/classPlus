@@ -76,7 +76,7 @@ export default function DeviceShowcase() {
                   <div className="w-5 h-5 rounded-md bg-slate-100/80 border border-slate-200/50 flex items-center justify-center shadow-sm flex-shrink-0">
                     <Logo className="w-3.5 h-3.5" />
                   </div>
-                  <span className="text-[10px] font-black text-slate-900 leading-tight">ClassPilot</span>
+                  <span className="text-[10px] font-black text-slate-900 leading-tight">classPlus</span>
                 </div>
                 <div className="flex flex-col gap-1">
                   <div className="h-6 rounded-lg bg-[#10375C]/10 text-[#10375C] text-[9px] font-bold flex items-center gap-1.5 px-2 border border-[#10375C]/15">
@@ -218,7 +218,7 @@ export default function DeviceShowcase() {
                     <Cpu className="w-3.5 h-3.5 text-white" />
                   </div>
                   <div className="flex flex-col leading-none">
-                    <span className="text-[9px] font-black text-slate-900">ClassPilot AI</span>
+                    <span className="text-[9px] font-black text-slate-900">classPlus AI</span>
                     <span className="text-[7px] text-emerald-600 flex items-center gap-0.5 mt-0.5">
                       <span className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" /> Online
                     </span>

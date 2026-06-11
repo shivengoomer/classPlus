@@ -102,7 +102,7 @@ export default function LandingPage() {
             >
               Learn Smarter with{' '}
               <span className="text-[#10375C]">
-                ClassPilot
+                classPlus
               </span>
             </motion.h1>
 
@@ -250,7 +250,7 @@ export default function LandingPage() {
                   <Play className="w-8 h-8 fill-current translate-x-0.5" />
                 </div>
                 
-                <h3 className="text-xl font-bold text-slate-800 relative z-10">ClassPilot Platform Walkthrough</h3>
+                <h3 className="text-xl font-bold text-slate-800 relative z-10">classPlus Platform Walkthrough</h3>
                 <p className="text-slate-500 text-xs max-w-sm mt-2 relative z-10">
                   Watch how teachers create curriculum-aligned questions, generate worksheets, and auto-evaluate student works in 2 minutes.
                 </p>
@@ -263,7 +263,7 @@ export default function LandingPage() {
                     }}
                     className="px-5 py-2.5 rounded-xl bg-slate-950 hover:bg-slate-850 text-white font-bold text-xs shadow-sm transition-all"
                   >
-                    Try ClassPilot Now
+                    Try classPlus Now
                   </button>
                   <button 
                     onClick={() => setShowDemoModal(false)}

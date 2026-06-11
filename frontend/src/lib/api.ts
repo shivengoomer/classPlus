@@ -328,4 +328,116 @@ export async function deleteTemplate(id: string): Promise<void> {
   if (!res.ok) throw new Error('Failed to delete template');
 }
 
+// ── Groups API ─────────────────────────────────────────────────────────────
 
+export interface Group {
+  _id: string;
+  name: string;
+  grade: string;
+  subject: string;
+  students: string[];
+  rubric?: string;
+  classCode: string;
+  userId?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export async function listGroups(): Promise<Group[]> {
+  const res = await authFetch(`${BASE_URL}/groups`);
+  if (!res.ok) throw new Error('Failed to fetch groups');
+  return res.json();
+}
+
+export async function createGroup(data: {
+  name: string;
+  grade: string;
+  subject: string;
+  rubric?: string;
+  students?: string[];
+}): Promise<Group> {
+  const res = await authFetch(`${BASE_URL}/groups`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error('Failed to create group');
+  return res.json();
+}
+
+export async function updateGroup(id: string, data: Partial<Group>): Promise<Group> {
+  const res = await authFetch(`${BASE_URL}/groups/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error('Failed to update group');
+  return res.json();
+}
+
+export async function deleteGroup(id: string): Promise<void> {
+  const res = await authFetch(`${BASE_URL}/groups/${id}`, { method: 'DELETE' });
+  if (!res.ok) throw new Error('Failed to delete group');
+}
+
+// ── Assigned Assignments API ───────────────────────────────────────────────
+
+export interface AssignedAssignment {
+  _id: string;
+  assignmentId: any; // populated Assignment
+  groupId: any;       // populated Group
+  dueDate: string;
+  hintsEnabled: boolean;
+  durationMinutes: number | null;
+  createdAt: string;
+}
+
+export async function listAssigned(): Promise<AssignedAssignment[]> {
+  const res = await authFetch(`${BASE_URL}/assigned`);
+  if (!res.ok) throw new Error('Failed to fetch assigned assignments');
+  return res.json();
+}
+
+export async function createAssigned(data: {
+  assignmentId: string;
+  groupId: string;
+  dueDate: string;
+  hintsEnabled?: boolean;
+  durationMinutes?: number | null;
+}): Promise<AssignedAssignment> {
+  const res = await authFetch(`${BASE_URL}/assigned`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || 'Failed to assign assessment');
+  }
+  return res.json();
+}
+
+export async function deleteAssigned(id: string): Promise<void> {
+  const res = await authFetch(`${BASE_URL}/assigned/${id}`, { method: 'DELETE' });
+  if (!res.ok) throw new Error('Failed to delete assigned assignment');
+}
+
+export async function listSubmissions(assignedId: string): Promise<any[]> {
+  const res = await authFetch(`${BASE_URL}/assigned/${assignedId}/submissions`);
+  if (!res.ok) throw new Error('Failed to fetch submissions');
+  return res.json();
+}
+
+export async function updateSubmission(
+  assignedId: string,
+  studentName: string,
+  data: { totalScore?: number; totalMarks?: number; answers?: any[] }
+): Promise<any> {
+  const res = await authFetch(`${BASE_URL}/assigned/${assignedId}/submissions/${encodeURIComponent(studentName)}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error('Failed to update submission');
+  return res.json();
+}

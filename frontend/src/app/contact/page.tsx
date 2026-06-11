@@ -39,7 +39,7 @@ export default function ContactPage() {
       icon: <MessageSquare className="w-5 h-5" />,
       title: 'Schedule a Demo',
       desc: 'Book a 1-on-1 walkthrough session with an onboarding expert.',
-      info: 'demos@classpilot.io',
+      info: 'demos@classPlus.io',
       color: 'text-purple-500 bg-purple-50 border-purple-100'
     },
     {
@@ -47,15 +47,15 @@ export default function ContactPage() {
       icon: <Mail className="w-5 h-5" />,
       title: 'Support Helpdesk',
       desc: 'Got billing questions, login issues, or require assistance?',
-      info: 'support@classpilot.io',
+      info: 'support@classPlus.io',
       color: 'text-blue-500 bg-blue-50 border-blue-100'
     },
     {
       id: 'partner',
       icon: <Award className="w-5 h-5" />,
       title: 'School Partnerships',
-      desc: 'Pilot ClassPilot across your school district or campus network.',
-      info: 'partnerships@classpilot.io',
+      desc: 'Pilot classPlus across your school district or campus network.',
+      info: 'partnerships@classPlus.io',
       color: 'text-[#10375C] bg-slate-50 border-slate-200'
     }
   ];
@@ -123,7 +123,7 @@ export default function ContactPage() {
                     </div>
                     <h2 className="text-2xl font-bold text-slate-900">Message Received!</h2>
                     <p className="text-slate-500 text-xs md:text-sm max-w-sm leading-relaxed font-medium">
-                      Thank you for contacting ClassPilot. Our partnership support team will review your details and follow up within 24 hours.
+                      Thank you for contacting classPlus. Our partnership support team will review your details and follow up within 24 hours.
                     </p>
                   </motion.div>
                 ) : (

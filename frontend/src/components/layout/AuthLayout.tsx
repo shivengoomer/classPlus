@@ -65,7 +65,7 @@ function AIGenSimulator() {
           <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
         </div>
         <div className="px-3 py-0.5 rounded-md bg-[#090d1a] text-[10px] text-slate-500 border border-slate-800/40 select-none">
-          classpilot.ai/generator
+          classPlus.ai/generator
         </div>
         <div className="w-8" />
       </div>
@@ -92,7 +92,7 @@ function AIGenSimulator() {
             className="flex items-center gap-3 px-3 py-2 bg-slate-900/40 border border-slate-800/40 rounded-xl text-slate-400 self-start"
           >
             <div className="w-4 h-4 border-2 border-orange-500 border-t-transparent rounded-full animate-spin flex-shrink-0" />
-            <span className="text-[10px] animate-pulse">ClassPilot AI generating CBSE-aligned worksheet...</span>
+            <span className="text-[10px] animate-pulse">classPlus AI generating CBSE-aligned worksheet...</span>
           </motion.div>
         )}
 
@@ -177,7 +177,7 @@ function GradingSimulator() {
           <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
         </div>
         <div className="px-3 py-0.5 rounded-md bg-[#090d1a] text-[10px] text-slate-500 border border-slate-800/40 select-none">
-          classpilot.ai/auto-grader
+          classPlus.ai/auto-grader
         </div>
         <div className="w-8" />
       </div>
@@ -238,7 +238,7 @@ function GradingSimulator() {
                 <Brain className="w-3.5 h-3.5" />
               </div>
               <div className="flex-1">
-                <h5 className="text-[10.5px] font-bold text-emerald-400">ClassPilot AI Grading Feedback</h5>
+                <h5 className="text-[10.5px] font-bold text-emerald-400">classPlus AI Grading Feedback</h5>
                 <p className="text-[10px] text-slate-400 leading-relaxed mt-1">
                   Excellent! The response correctly lists all necessary reactants (water, carbon dioxide, sunlight) and the primary product (glucose) as well as the byproduct (oxygen). High conceptual clarity.
                 </p>
@@ -270,7 +270,7 @@ function AnalyticsSimulator() {
           <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
         </div>
         <div className="px-3 py-0.5 rounded-md bg-[#090d1a] text-[10px] text-slate-500 border border-slate-800/40 select-none">
-          classpilot.ai/analytics
+          classPlus.ai/analytics
         </div>
         <div className="w-8" />
       </div>
@@ -372,7 +372,7 @@ export default function AuthLayout({ children, title, subtitle }: AuthLayoutProp
       avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=100&auto=format&fit=crop&q=80"
     },
     'grading': {
-      quote: "ClassPilot grading is a total lifesaver. It doesn't just grade standard true/false; it reads handwritten student answers, highlights key concepts they missed, and generates personalized reports.",
+      quote: "classPlus grading is a total lifesaver. It doesn't just grade standard true/false; it reads handwritten student answers, highlights key concepts they missed, and generates personalized reports.",
       author: "David Miller",
       role: "Mathematics Educator @ Pinecrest Academy",
       avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80"
@@ -429,7 +429,7 @@ export default function AuthLayout({ children, title, subtitle }: AuthLayoutProp
             </div>
             <div>
               <span className="text-2xl font-black tracking-tight text-white font-sans flex items-center gap-2">
-                ClassPilot
+                classPlus
                 <span className="px-2 py-0.5 rounded-md bg-orange-500/10 text-[9px] text-orange-400 border border-orange-500/20 uppercase font-semibold">AI v2.0</span>
               </span>
               <p className="text-[9px] text-slate-500 font-bold tracking-widest uppercase">Assessments Redefined</p>
@@ -450,7 +450,7 @@ export default function AuthLayout({ children, title, subtitle }: AuthLayoutProp
               Assessments, Grading & Insights
             </h2>
             <p className="text-slate-400 text-xs mt-2 leading-relaxed">
-              Explore how ClassPilot supercharges educator workflows. Watch the live mock dashboard update in real time or select a tab to explore options.
+              Explore how classPlus supercharges educator workflows. Watch the live mock dashboard update in real time or select a tab to explore options.
             </p>
           </div>
 
@@ -575,7 +575,7 @@ export default function AuthLayout({ children, title, subtitle }: AuthLayoutProp
             <div className="w-8 h-8 rounded-xl bg-slate-50 border border-slate-200/50 flex items-center justify-center shadow-sm flex-shrink-0">
               <Logo className="w-5.5 h-5.5 text-[#10375C]" />
             </div>
-            <span className="text-lg font-black text-slate-900">ClassPilot</span>
+            <span className="text-lg font-black text-slate-900">classPlus</span>
           </div>
           <Link 
             href="/" 

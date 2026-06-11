@@ -191,7 +191,7 @@ export default function AssignmentsSuitePage() {
                 </div>
                 
                 <p className="text-slate-600 text-xs md:text-sm leading-relaxed">
-                  ClassPilot maps directly to CBSE curriculum rules and textbooks. Generate worksheets containing chapter-aligned queries, competency review questions, and exam-pattern assessments.
+                  classPlus maps directly to CBSE curriculum rules and textbooks. Generate worksheets containing chapter-aligned queries, competency review questions, and exam-pattern assessments.
                 </p>
 
                 <ul className="flex flex-col gap-2 mt-2">
@@ -353,7 +353,7 @@ export default function AssignmentsSuitePage() {
                     {/* Header elements */}
                     <div className="flex items-center justify-between border-b border-slate-200 pb-1.5">
                       <div className="flex flex-col">
-                        <span className="text-[6px] font-black text-slate-900 uppercase tracking-tight">ClassPilot Academy</span>
+                        <span className="text-[6px] font-black text-slate-900 uppercase tracking-tight">classPlus Academy</span>
                         <span className="text-[4px] text-slate-400 font-semibold">Weekly Dynamics Quiz</span>
                       </div>
                       <Printer className="w-2.5 h-2.5 text-slate-450" />

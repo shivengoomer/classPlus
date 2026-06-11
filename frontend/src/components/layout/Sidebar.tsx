@@ -112,7 +112,7 @@ export function Sidebar({
                 className="flex flex-col min-w-0"
               >
                 <span className="text-md font-black tracking-tight text-slate-900 font-sans leading-none">
-                  ClassPilot
+                  classPlus
                 </span>
                 <span className="text-[8px] text-slate-400 font-bold uppercase tracking-wider mt-0.5 whitespace-nowrap">SaaS Workspace</span>
               </motion.div>

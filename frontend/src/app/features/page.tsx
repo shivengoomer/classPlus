@@ -173,7 +173,7 @@ export default function FeaturesPage() {
               {/* Visual Representation Area (Left for alternate balance) */}
               <div className="lg:col-span-6 bg-white/75 backdrop-blur-md rounded-3xl p-6 border border-slate-200 shadow-lg relative min-h-[340px] flex flex-col justify-between overflow-hidden order-last lg:order-first">
                 <div className="flex justify-between items-center border-b border-slate-100 pb-3 mb-6">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">ClassPilot Tutor Simulator</span>
+                  <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">classPlus Tutor Simulator</span>
                   <span className="text-[10px] font-bold bg-purple-50 border border-purple-100 text-purple-600 px-2 py-0.5 rounded">Scaffolding Dialogue</span>
                 </div>
 
@@ -415,7 +415,7 @@ export default function FeaturesPage() {
                 </div>
                 
                 <p className="text-slate-600 text-xs md:text-sm leading-relaxed">
-                  ClassPilot maps class activity, highlighting trends and topic mastery. Understand where your students are struggling before the exam, track completion rates, and extract comprehensive metrics instantly.
+                  classPlus maps class activity, highlighting trends and topic mastery. Understand where your students are struggling before the exam, track completion rates, and extract comprehensive metrics instantly.
                 </p>
 
                 <ul className="flex flex-col gap-2 mt-2">
@@ -451,7 +451,7 @@ export default function FeaturesPage() {
             <div className="relative z-10 max-w-xl mx-auto flex flex-col items-center gap-4">
               <h2 className="text-2xl md:text-4xl font-extrabold tracking-tight">Ready to Transform Your Classroom?</h2>
               <p className="text-slate-350 text-xs md:text-sm leading-relaxed">
-                Join thousands of CBSE educators using ClassPilot to automate curriculum creation, assignment delivery, and instant analytics.
+                Join thousands of CBSE educators using classPlus to automate curriculum creation, assignment delivery, and instant analytics.
               </p>
               <button
                 onClick={() => router.push('/sign-up')}

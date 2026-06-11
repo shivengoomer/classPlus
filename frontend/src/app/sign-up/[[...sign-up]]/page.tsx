@@ -4,7 +4,7 @@ import AuthLayout from "@/components/layout/AuthLayout";
 export default function SignUpPage() {
   return (
     <AuthLayout 
-      title="Start Creating with ClassPilot"
+      title="Start Creating with classPlus"
       subtitle="Join thousands of educators leveraging artificial intelligence to build, assign, and auto-evaluate student homework in minutes."
     >
       <SignUp

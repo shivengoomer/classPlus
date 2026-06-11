@@ -136,7 +136,7 @@ export function TopBar({ onMenuToggle }: TopBarProps) {
     if (pathname === '/billing') return { parent: 'Settings', current: 'Billing' };
     if (pathname.includes('/result')) return { parent: 'Assessments', current: 'Results' };
     if (pathname.includes('/status')) return { parent: 'Assessments', current: 'Processing' };
-    return { parent: 'Workspace', current: 'ClassPilot' };
+    return { parent: 'Workspace', current: 'classPlus' };
   };
 
   const breadcrumbs = getBreadcrumb();
@@ -448,7 +448,7 @@ export function TopBar({ onMenuToggle }: TopBarProps) {
               }}
               className="text-xl font-bold tracking-tight text-slate-900 leading-none"
             >
-              ClassPilot<span className="text-[#10375C]">.</span>
+              classPlus<span className="text-[#10375C]">.</span>
             </span>
           </div>
   
@@ -652,7 +652,7 @@ export function TopBar({ onMenuToggle }: TopBarProps) {
                   <span className="flex items-center gap-1"><span className="bg-slate-200 px-1 rounded text-[8px]">↑↓</span> Navigate</span>
                   <span className="flex items-center gap-1"><span className="bg-slate-200 px-1 rounded text-[8px]">↵</span> Select</span>
                 </div>
-                <span>ClassPilot Command Menu</span>
+                <span>classPlus Command Menu</span>
               </div>
             </motion.div>
           </div>

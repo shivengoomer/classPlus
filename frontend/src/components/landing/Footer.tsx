@@ -26,11 +26,11 @@ export default function Footer() {
           >
             <Logo className="w-8 h-8 group-hover:scale-105 transition-transform" />
             <span className="font-sans font-bold text-lg text-slate-900 group-hover:text-[#10375C] transition-colors">
-              ClassPilot
+              classPlus
             </span>
           </div>
           <p className="text-slate-550 text-xs leading-relaxed max-w-sm">
-            ClassPilot is an advanced, curriculum-aligned artificial intelligence assistant built to help teachers design assignments, auto-evaluate student works, and build intelligent learning paths.
+            classPlus is an advanced, curriculum-aligned artificial intelligence assistant built to help teachers design assignments, auto-evaluate student works, and build intelligent learning paths.
           </p>
           
           {/* Social icons */}
@@ -109,7 +109,7 @@ export default function Footer() {
       {/* Sub Footer */}
       <div className="max-w-6xl mx-auto border-t border-slate-100 mt-16 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
         <span className="text-[10px] text-slate-400">
-          © {new Date().getFullYear()} ClassPilot Inc. All rights reserved.
+          © {new Date().getFullYear()} classPlus Inc. All rights reserved.
         </span>
         <div className="flex gap-4">
           {legalLinks.map((link) => (

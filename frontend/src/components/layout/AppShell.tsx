@@ -175,7 +175,7 @@ export function AppShell({ children }: AppShellProps) {
                           letterSpacing: '-1.2px',
                         }}
                       >
-                        ClassPilot
+                        classPlus
                       </span>
                     </div>
                     <button 
