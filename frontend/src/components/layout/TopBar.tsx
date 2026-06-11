@@ -674,23 +674,19 @@ export function TopBar({ onMenuToggle }: TopBarProps) {
       {/* Fullscreen secure logout loader */}
       {isLoggingOut && (
         <div 
-          className="fixed inset-0 z-[99999] flex flex-col items-center justify-center transition-all duration-300 animate-in fade-in"
+          className="fixed inset-0 z-[99999] flex flex-col items-center justify-center"
           style={{
-            background: 'linear-gradient(176deg, rgba(234, 234, 234, 0.00) 3.17%, #DADADA 81.22%)',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
+            background: 'rgba(255,255,255,0.7)',
+            backdropFilter: 'blur(16px)',
+            WebkitBackdropFilter: 'blur(16px)',
           }}
         >
-          <div className="flex flex-col items-center gap-6 animate-pulse">
-            <div className="w-16 h-16 bg-[#303030] rounded-2xl flex items-center justify-center shadow-lg">
-              <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 28 28" fill="none">
-                <path fillRule="evenodd" clipRule="evenodd" d="M15.9091 19.8507C15.9091 19.8507 16.4184 21.2101 16.885 21.2952H10.988C9.80005 21.2952 8.7397 20.6155 8.40001 19.3409L4.96371 9.14447C4.96371 9.14447 4.66688 7.91238 4.2002 7.7H10.2245C11.4125 7.74254 12.2185 8.16731 12.6852 9.7394L15.9091 19.8507Z" fill="white"/>
-                <path fillRule="evenodd" clipRule="evenodd" d="M12.1336 19.8509C12.1336 19.8509 11.6244 21.2103 11.1577 21.2954H17.0547C18.2427 21.2954 19.303 20.6157 19.6427 19.3411L23.0368 9.14499C23.0368 9.14499 23.3336 7.9129 23.8003 7.70052H17.8182C16.6303 7.70052 15.8668 8.12529 15.4001 9.69738L12.1336 19.8509Z" fill="white"/>
-              </svg>
-            </div>
-            <div className="flex flex-col items-center gap-1 font-sans">
-              <span className="text-md font-bold text-gray-800">Logging out</span>
-              <span className="text-xs text-gray-500">Securing your session...</span>
+          <div className="flex flex-col items-center gap-4">
+            {/* Simple spinner — no logo */}
+            <div className="w-9 h-9 border-[3px] border-slate-200 border-t-[#10375C] rounded-full animate-spin" />
+            <div className="flex flex-col items-center gap-0.5 font-sans">
+              <span className="text-sm font-bold text-slate-800">Logging out…</span>
+              <span className="text-xs text-slate-500">Securing your session</span>
             </div>
           </div>
         </div>

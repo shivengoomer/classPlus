@@ -1,13 +1,113 @@
+'use client';
+
 import { SignIn } from "@clerk/nextjs";
 import AuthLayout from "@/components/layout/AuthLayout";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
+import { GraduationCap, Users, ChevronDown, ArrowRight, BookOpen } from "lucide-react";
+import { Logo } from "@/components/shared/Logo";
 
 export default function SignInPage() {
+  const router = useRouter();
+  const [selectedRole, setSelectedRole] = useState<'teacher' | 'student' | null>(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  // If no role chosen yet, show the role picker landing
+  if (!selectedRole) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-[#EAF0F8] via-[#EEF2F8] to-[#E6ECF5] flex flex-col items-center justify-center p-4 sm:p-6 relative overflow-hidden">
+        {/* Background orbs */}
+        <div className="absolute top-[-20%] left-[-10%] w-[60vw] h-[60vw] rounded-full bg-[#10375C]/[0.06] blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-[-15%] right-[-10%] w-[50vw] h-[50vw] rounded-full bg-indigo-300/[0.07] blur-[100px] pointer-events-none" />
+
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="w-full max-w-sm relative z-10"
+        >
+          {/* Logo */}
+          <div className="flex flex-col items-center gap-3 mb-10">
+            <div className="w-12 h-12 rounded-2xl bg-[#10375C] flex items-center justify-center shadow-xl shadow-[#10375C]/25">
+              <Logo className="w-7 h-7 text-white" />
+            </div>
+            <div className="text-center">
+              <h1 className="text-2xl font-black text-slate-900 tracking-tight">classPlus</h1>
+              <p className="text-xs text-slate-500 mt-0.5">AI-powered education platform</p>
+            </div>
+          </div>
+
+          {/* Role Picker Card */}
+          <div className="bg-white/90 backdrop-blur-xl border border-slate-200/70 rounded-3xl shadow-2xl shadow-slate-200/60 p-6 flex flex-col gap-4">
+            <div className="text-center mb-1">
+              <h2 className="text-base font-black text-slate-900">Who are you signing in as?</h2>
+              <p className="text-xs text-slate-500 mt-1">Choose your role to continue</p>
+            </div>
+
+            {/* Teacher option */}
+            <motion.button
+              whileTap={{ scale: 0.98 }}
+              onClick={() => setSelectedRole('teacher')}
+              className="w-full flex items-center gap-4 p-4 rounded-2xl border-2 border-[#10375C]/20 bg-[#10375C]/5 hover:bg-[#10375C]/10 hover:border-[#10375C]/40 transition-all group text-left"
+            >
+              <div className="w-11 h-11 rounded-xl bg-[#10375C] flex items-center justify-center shadow-md shadow-[#10375C]/20 flex-shrink-0 group-hover:scale-105 transition-transform">
+                <Users className="w-5 h-5 text-white" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-black text-slate-900">Teacher / School</p>
+                <p className="text-[10px] text-slate-500 mt-0.5">Manage classes, create assessments & grade</p>
+              </div>
+              <ArrowRight className="w-4 h-4 text-[#10375C] opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+            </motion.button>
+
+            {/* Student option */}
+            <motion.button
+              whileTap={{ scale: 0.98 }}
+              onClick={() => router.push('/student')}
+              className="w-full flex items-center gap-4 p-4 rounded-2xl border-2 border-indigo-200/60 bg-indigo-50/50 hover:bg-indigo-50 hover:border-indigo-300 transition-all group text-left"
+            >
+              <div className="w-11 h-11 rounded-xl bg-indigo-500 flex items-center justify-center shadow-md shadow-indigo-500/20 flex-shrink-0 group-hover:scale-105 transition-transform">
+                <GraduationCap className="w-5 h-5 text-white" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-black text-slate-900">Student</p>
+                <p className="text-[10px] text-slate-500 mt-0.5">Access assignments, practice & AI tutor</p>
+              </div>
+              <ArrowRight className="w-4 h-4 text-indigo-500 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+            </motion.button>
+
+            {/* Back to home */}
+            <div className="text-center pt-1 border-t border-slate-100">
+              <button
+                onClick={() => router.push('/')}
+                className="text-xs text-slate-400 hover:text-slate-600 font-semibold transition-colors"
+              >
+                ← Back to homepage
+              </button>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
+
+  // Teacher selected — show Clerk sign-in
   return (
-    <AuthLayout 
+    <AuthLayout
       title="Teacher Sign In"
-      subtitle="Sign in to your classPlus teacher account to manage classrooms, create assignments, and track student progress."
+      subtitle="Sign in to your classPlus teacher account to manage classrooms, create assessments, and track student progress."
       portalType="teacher"
     >
+      {/* Back to role picker */}
+      <div className="mb-3 flex justify-center">
+        <button
+          onClick={() => setSelectedRole(null)}
+          className="text-xs text-slate-400 hover:text-slate-600 font-semibold transition-colors flex items-center gap-1"
+        >
+          ← Switch role
+        </button>
+      </div>
       <SignIn
         appearance={{
           variables: {
@@ -21,8 +121,6 @@ export default function SignInPage() {
           elements: {
             cardBox: "shadow-none border-0 w-full bg-transparent",
             card: "shadow-[0_24px_60px_rgba(16,55,92,0.06)] border border-slate-200/50 bg-white/90 backdrop-blur-xl rounded-[24px] p-8 w-full max-w-md mx-auto",
-            headerTitle: "text-slate-900 font-black text-2xl tracking-tight font-sans text-center",
-            headerSubtitle: "text-slate-500 text-xs mt-1.5 text-center font-sans",
             header: "hidden",
             socialButtonsBlockButton: "border border-slate-200 hover:border-slate-300 hover:bg-slate-50/50 text-slate-700 font-bold shadow-sm transition-all rounded-xl h-11 flex justify-center items-center gap-2",
             socialButtonsBlockButtonText: "text-slate-600 font-bold text-xs font-sans",

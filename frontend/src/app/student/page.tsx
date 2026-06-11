@@ -117,7 +117,7 @@ export default function StudentLoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 flex flex-col items-center justify-center p-6 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 flex flex-col items-center justify-center p-3 sm:p-6 relative overflow-hidden">
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-[10%] left-[5%] w-64 h-64 bg-indigo-100 rounded-full blur-[120px] opacity-60" />
@@ -131,15 +131,15 @@ export default function StudentLoginPage() {
         className="w-full max-w-md relative z-10"
       >
         {/* Header */}
-        <div className="text-center mb-8 flex flex-col items-center gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-[#10375C] flex items-center justify-center shadow-xl shadow-[#10375C]/20">
-            <GraduationCap className="w-7 h-7 text-white" />
+        <div className="text-center mb-6 sm:mb-8 flex flex-col items-center gap-3 sm:gap-4">
+          <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-[#10375C] flex items-center justify-center shadow-xl shadow-[#10375C]/20">
+            <GraduationCap className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 tracking-tight">
               classPlus <span className="text-[#10375C]">Student</span>
             </h1>
-            <p className="text-slate-500 text-sm mt-1">
+            <p className="text-slate-500 text-xs sm:text-sm mt-1">
               {step === 'info'
                 ? flow === 'login'
                   ? 'Access your workspace with email'
@@ -150,7 +150,7 @@ export default function StudentLoginPage() {
         </div>
 
         {/* Login/Register Card */}
-        <div className="bg-white/80 backdrop-blur-md border border-slate-200/80 rounded-3xl shadow-xl shadow-slate-200/50 p-8 min-h-[400px] flex flex-col justify-between">
+        <div className="bg-white/80 backdrop-blur-md border border-slate-200/80 rounded-3xl shadow-xl shadow-slate-200/50 p-5 sm:p-8 min-h-[380px] flex flex-col justify-between">
           <AnimatePresence mode="wait">
             {step === 'info' ? (
               <motion.div

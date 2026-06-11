@@ -403,19 +403,19 @@ export default function StudentDashboard() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/20 to-indigo-50/30 font-sans flex flex-col">
       {/* Top Bar */}
       <header className="bg-white/85 backdrop-blur-md border-b border-slate-200/70 sticky top-0 z-20 shadow-sm">
-        <div className="max-w-5xl mx-auto px-5 py-3.5 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-[#10375C] flex items-center justify-center shadow-md">
-              <GraduationCap className="w-4 h-4 text-white" />
+        <div className="max-w-5xl mx-auto px-3 sm:px-5 py-2.5 sm:py-3.5 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-[#10375C] flex items-center justify-center shadow-md">
+              <GraduationCap className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
             </div>
-            <div>
+            <div className="hidden xs:block">
               <span className="text-sm font-black text-slate-900 tracking-tight">classPlus</span>
               <span className="text-[10px] text-slate-400 ml-1.5 font-semibold">Student Portal</span>
             </div>
           </div>
 
           {/* Tab Navigation */}
-          <nav className="hidden md:flex items-center gap-1.5 bg-slate-100/80 p-1 rounded-xl border border-slate-200/50">
+          <nav className="hidden md:flex items-center gap-1 bg-slate-100/80 p-1 rounded-xl border border-slate-200/50">
             {[
               { id: 'assignments', label: 'My Assignments', icon: <ClipboardList className="w-3.5 h-3.5" /> },
               { id: 'practice', label: 'AI Practice Lab', icon: <Trophy className="w-3.5 h-3.5" /> },
@@ -437,33 +437,33 @@ export default function StudentDashboard() {
             ))}
           </nav>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <div className="hidden sm:flex flex-col items-end">
-              <span className="text-xs font-bold text-slate-800">{studentName}</span>
-              <span className="text-[10px] text-slate-400 font-semibold">{studentEmail}</span>
+              <span className="text-xs font-bold text-slate-800 truncate max-w-[120px]">{studentName}</span>
+              <span className="text-[10px] text-slate-400 font-semibold truncate max-w-[120px]">{studentEmail}</span>
             </div>
             <button
               onClick={handleSignOut}
-              className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-red-500 transition-colors py-1.5 px-3 rounded-lg hover:bg-red-50 border border-transparent hover:border-red-100"
+              className="flex items-center gap-1 text-xs text-slate-500 hover:text-red-500 transition-colors py-1.5 px-2 sm:px-3 rounded-lg hover:bg-red-50 border border-transparent hover:border-red-100"
             >
               <LogOut className="w-3.5 h-3.5" />
-              Exit
+              <span className="hidden sm:inline">Exit</span>
             </button>
           </div>
         </div>
 
         {/* Mobile Tab Navigation */}
-        <div className="md:hidden flex overflow-x-auto gap-1 border-t border-slate-200/50 p-1.5 bg-slate-50/50">
+        <div className="md:hidden flex overflow-x-auto gap-1 border-t border-slate-200/50 p-1.5 bg-slate-50/50 scrollbar-hide">
           {[
             { id: 'assignments', label: 'Assignments', icon: <ClipboardList className="w-3.5 h-3.5" /> },
-            { id: 'practice', label: 'Practice Lab', icon: <Trophy className="w-3.5 h-3.5" /> },
+            { id: 'practice', label: 'Practice', icon: <Trophy className="w-3.5 h-3.5" /> },
             { id: 'syllabus', label: 'Syllabus', icon: <Search className="w-3.5 h-3.5" /> },
             { id: 'tutor', label: 'AI Tutor', icon: <Brain className="w-3.5 h-3.5" /> },
           ].map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as TabType)}
-              className={`flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg transition-all flex-shrink-0 ${
+              className={`flex items-center gap-1.5 text-[11px] font-bold px-3 py-1.5 rounded-lg transition-all flex-shrink-0 ${
                 activeTab === tab.id
                   ? 'bg-[#10375C] text-white shadow-sm'
                   : 'text-slate-500 bg-white/60 border border-slate-200/40 hover:text-[#10375C]'
@@ -477,18 +477,18 @@ export default function StudentDashboard() {
       </header>
 
       {/* Main Workspace */}
-      <main className="max-w-5xl mx-auto w-full px-5 py-6 flex-1 flex flex-col gap-6">
+      <main className="max-w-5xl mx-auto w-full px-3 sm:px-5 py-4 sm:py-6 flex-1 flex flex-col gap-4 sm:gap-6">
         
         {/* Welcome Roster Info banner */}
-        <div className="bg-[#10375C] rounded-2xl p-5 text-white flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 shadow-xl shadow-[#10375C]/15 relative overflow-hidden">
+        <div className="bg-[#10375C] rounded-2xl p-4 sm:p-5 text-white flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shadow-xl shadow-[#10375C]/15 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-36 h-36 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/4" />
-          <div className="relative z-10 flex items-center gap-3.5">
-            <div className="w-11 h-11 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center flex-shrink-0">
+          <div className="relative z-10 flex items-center gap-3">
+            <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center flex-shrink-0">
               <GraduationCap className="w-5 h-5 text-blue-200" />
             </div>
             <div>
               <p className="text-blue-200 text-[10px] font-bold uppercase tracking-wider">Unified Workspace</p>
-              <h1 className="text-xl font-black tracking-tight">{studentName}</h1>
+              <h1 className="text-lg sm:text-xl font-black tracking-tight truncate max-w-[200px] sm:max-w-none">{studentName}</h1>
               <p className="text-blue-100/80 text-xs mt-0.5">Enrolled in {groups.length} class{groups.length !== 1 && 'es'}</p>
             </div>
           </div>
@@ -499,12 +499,12 @@ export default function StudentDashboard() {
               <select
                 value={activeGroupId}
                 onChange={(e) => setActiveGroupId(e.target.value)}
-                className="text-xs bg-white/15 border border-white/25 rounded-xl px-3 py-2 text-white outline-none cursor-pointer font-bold focus:bg-[#10375C]"
+                className="text-xs bg-white/15 border border-white/25 rounded-xl px-2.5 sm:px-3 py-1.5 sm:py-2 text-white outline-none cursor-pointer font-bold focus:bg-[#10375C] max-w-[150px] sm:max-w-none"
               >
                 <option value="all" className="bg-[#10375C] text-white">All Classes</option>
                 {groups.map(g => (
                   <option key={g._id} value={g._id} className="bg-[#10375C] text-white">
-                    {g.grade} {g.subject} ({g.name})
+                    {g.grade} {g.subject}
                   </option>
                 ))}
               </select>
@@ -512,10 +512,11 @@ export default function StudentDashboard() {
 
             <button
               onClick={() => setJoinModalOpen(true)}
-              className="flex items-center gap-1.5 text-xs bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-3.5 py-2 rounded-xl transition-all shadow-md shadow-emerald-500/10"
+              className="flex items-center gap-1.5 text-xs bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl transition-all shadow-md shadow-emerald-500/10"
             >
               <PlusCircle className="w-3.5 h-3.5" />
-              Join New Class
+              <span className="hidden xs:inline">Join New Class</span>
+              <span className="xs:hidden">Join</span>
             </button>
           </div>
         </div>
@@ -534,19 +535,19 @@ export default function StudentDashboard() {
                 className="flex flex-col gap-6"
               >
                 {/* Stats Row */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-3 gap-2 sm:gap-4">
                   {[
-                    { label: 'Pending Tests', value: pending.length, icon: <Clock className="w-4 h-4 text-amber-500" />, color: 'bg-amber-50 border-amber-100 text-amber-700' },
-                    { label: 'Completed Tests', value: completed.length, icon: <CheckCircle2 className="w-4 h-4 text-emerald-500" />, color: 'bg-emerald-50 border-emerald-100 text-emerald-700' },
-                    { label: 'Average Score', value: `${avgScore}%`, icon: <Trophy className="w-4 h-4 text-[#10375C]" />, color: 'bg-indigo-50 border-indigo-100 text-[#10375C]' },
+                    { label: 'Pending', value: pending.length, icon: <Clock className="w-4 h-4 text-amber-500" />, color: 'bg-amber-50 border-amber-100 text-amber-700' },
+                    { label: 'Completed', value: completed.length, icon: <CheckCircle2 className="w-4 h-4 text-emerald-500" />, color: 'bg-emerald-50 border-emerald-100 text-emerald-700' },
+                    { label: 'Avg Score', value: `${avgScore}%`, icon: <Trophy className="w-4 h-4 text-[#10375C]" />, color: 'bg-indigo-50 border-indigo-100 text-[#10375C]' },
                   ].map((stat) => (
-                    <div key={stat.label} className="bg-white rounded-xl border border-slate-200/80 p-4 flex items-center gap-3.5 shadow-sm">
-                      <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${stat.color.split(' ')[0]} border ${stat.color.split(' ')[1]}`}>
+                    <div key={stat.label} className="bg-white rounded-xl border border-slate-200/80 p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3.5 shadow-sm">
+                      <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${stat.color.split(' ')[0]} border ${stat.color.split(' ')[1]}`}>
                         {stat.icon}
                       </div>
                       <div>
-                        <p className="text-lg font-black text-slate-800 leading-tight">{stat.value}</p>
-                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{stat.label}</p>
+                        <p className="text-base sm:text-lg font-black text-slate-800 leading-tight">{stat.value}</p>
+                        <p className="text-[9px] sm:text-[10px] text-slate-400 font-bold uppercase tracking-wider">{stat.label}</p>
                       </div>
                     </div>
                   ))}
