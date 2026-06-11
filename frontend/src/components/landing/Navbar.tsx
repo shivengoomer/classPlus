@@ -139,21 +139,13 @@ export default function Navbar() {
           </div>
 
           {/* Auth elements (Desktop) */}
-          <div className="hidden md:flex items-center gap-2">
+          <div className="hidden md:flex items-center gap-3">
             <SignedOut>
-              {/* Student Login */}
-              <button
-                onClick={() => router.push('/student')}
-                className="px-4 py-2 rounded-full text-xs font-semibold border border-slate-200 hover:border-slate-300 text-slate-700 hover:bg-slate-50 transition-all active:scale-95 flex items-center gap-1.5"
-              >
-                <span>Student Login</span>
-              </button>
-              {/* Teacher Login */}
               <button
                 onClick={() => router.push('/sign-in')}
-                className="px-4 py-2 rounded-full text-xs font-semibold bg-[#10375C] hover:bg-[#0d2f4f] text-white shadow-md shadow-[#10375C]/20 hover:shadow-[#10375C]/30 active:scale-95 transition-all flex items-center gap-1.5"
+                className="px-4 py-2 rounded-full text-xs font-semibold bg-[#10375C] hover:bg-[#0d2f4f] text-white shadow-md shadow-[#10375C]/20 active:scale-95 transition-all"
               >
-                <span>Teacher Login</span>
+                Sign In
               </button>
             </SignedOut>
 
@@ -175,16 +167,10 @@ export default function Navbar() {
           <div className="flex md:hidden items-center gap-2">
             <SignedOut>
               <button
-                onClick={() => router.push('/student')}
-                className="px-2.5 py-1.5 rounded-full text-[10px] font-bold border border-slate-200 hover:bg-slate-50 text-slate-700 transition-all active:scale-95"
-              >
-                Student
-              </button>
-              <button
                 onClick={() => router.push('/sign-in')}
                 className="px-3 py-1.5 rounded-full text-[10px] font-bold bg-[#10375C] hover:bg-[#0d2f4f] text-white shadow-sm transition-all active:scale-95"
               >
-                Teacher
+                Sign In
               </button>
             </SignedOut>
 
@@ -356,20 +342,11 @@ export default function Navbar() {
                   <button
                     onClick={() => {
                       setIsMobileMenuOpen(false);
-                      router.push('/student');
-                    }}
-                    className="w-full py-3 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-xs transition-colors text-center flex items-center justify-center gap-2"
-                  >
-                    <span>📚</span> Student Login
-                  </button>
-                  <button
-                    onClick={() => {
-                      setIsMobileMenuOpen(false);
                       router.push('/sign-in');
                     }}
-                    className="w-full py-3 rounded-xl bg-[#10375C] hover:bg-[#0d2f4f] text-white font-semibold text-xs shadow-md shadow-[#10375C]/20 transition-colors text-center flex items-center justify-center gap-2"
+                    className="w-full py-3 rounded-xl bg-[#10375C] hover:bg-[#0d2f4f] text-white font-semibold text-xs shadow-md shadow-[#10375C]/20 transition-colors text-center"
                   >
-                    <span>🎓</span> Teacher Login
+                    Sign In
                   </button>
                 </SignedOut>
 

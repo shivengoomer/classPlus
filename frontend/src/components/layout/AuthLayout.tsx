@@ -587,13 +587,13 @@ export default function AuthLayout({ children, title, subtitle, portalType }: Au
         </div>
 
         {/* Form Container Wrapper with colorful glowing backing */}
-        <div className="relative w-full max-w-md flex flex-col items-center justify-center py-10 z-10">
+        <div className="relative w-full max-w-lg flex flex-col items-center justify-center py-10 z-10">
           
           {/* Subtle colored glow backing */}
           <div className="absolute w-[80%] h-[80%] -z-10 rounded-full bg-gradient-to-tr from-orange-500/5 to-[#10375C]/5 blur-[70px] pointer-events-none opacity-80" />
 
           {/* Form Header Info (Educator / School Portal Info) */}
-          <div className="w-full text-center max-w-sm mb-2 select-none">
+          <div className="w-full text-center mb-2 select-none">
             <div className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-slate-200/60 bg-slate-50 text-[10px] font-bold text-slate-500 mb-3.5">
               <Sparkle className="w-3 h-3 text-[#10375C] fill-[#10375C]/20" />
               <span>

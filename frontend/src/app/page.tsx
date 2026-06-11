@@ -128,14 +128,8 @@ export default function LandingPage() {
                   onClick={() => router.push('/sign-in')}
                   className="px-5 py-3 rounded-2xl text-xs font-bold bg-[#10375C] hover:bg-[#0d2f4f] text-white shadow-lg shadow-[#10375C]/20 active:scale-95 flex items-center gap-2 transition-all group"
                 >
-                  <span>🎓 Teacher Login</span>
+                  <span>Sign In</span>
                   <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                </button>
-                <button
-                  onClick={() => router.push('/student')}
-                  className="px-5 py-3 rounded-2xl text-xs font-bold bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 shadow-sm active:scale-95 flex items-center gap-2 transition-all"
-                >
-                  <span>📚 Student Login</span>
                 </button>
               </SignedOut>
 
