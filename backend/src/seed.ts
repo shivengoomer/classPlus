@@ -6,12 +6,17 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import mongoose from 'mongoose';
+import crypto from 'crypto';
 import { Assignment } from './models/assignment.model';
 import { LibraryItem } from './models/library.model';
 import { Group } from './models/group.model';
 import { AssignedAssignment } from './models/assignedAssignment.model';
 import { StudentSubmission } from './models/studentSubmission.model';
 import { Template } from './models/template.model';
+import { User } from './models/user.model';
+import { Announcement } from './models/announcement.model';
+import { StudentCredential } from './models/studentCredential.model';
+import { BankQuestion } from './models/bankQuestion.model';
 import { env } from './config/env';
 
 const seedData = [
@@ -365,7 +370,7 @@ const seedData = [
         { questionId: 'hi-q4', answer: 'वह सोता है (कोई कर्म नहीं है)' },
         { questionId: 'hi-q5', answer: 'परिमाणवाचक विशेषण' },
         { questionId: 'hi-q6', answer: 'जो शब्द संज्ञा या सर्वनाम की विशेषता बताए, उसे विशेषण कहते हैं। उदाहरण: सुन्दर लड़की, पाँच पुस्तकें।' },
-        { questionId: 'hi-q7', answer: 'सकर्मक क्रिया को कर्म की आवश्यकता होती है (वह पुस्तक पढ़ता है)। अकर्मक क्रिया बिना कर्म के पूर्ण होती है (वह सोता है)।' },
+        { questionId: 'hi-q7', answer: 'सकर्मक और अकर्मक क्रिया में अंतर स्पष्ट कीजिए। सकर्मक क्रिया को कर्म की आवश्यकता होती है (वह पुस्तक पढ़ता है)। अकर्मक क्रिया बिना कर्म के पूर्ण होती है (वह सोता है)।' },
         { questionId: 'hi-q8', answer: 'जब कर्ता स्वयं कार्य न करके किसी और से करवाता है, उसे प्रेरणार्थक क्रिया कहते हैं। जैसे: माँ ने बच्चे से खाना खिलवाया।' },
       ],
       generatedAt: '2026-05-15T08:05:00Z',
@@ -448,7 +453,7 @@ const seedData = [
         { questionId: 'ss-q10', answer: 'True' },
         { questionId: 'ss-q11', answer: 'Cities were divided into citadel and lower town. Streets were at right angles, houses had separate bathing areas, and there was an advanced drainage system.' },
         { questionId: 'ss-q12', answer: 'The Great Bath was a large rectangular tank found at Mohenjo-daro. It was likely used for ritualistic bathing and had waterproofing with bitumen.' },
-        { questionId: 'ss-q13', answer: 'The Harappan script has not been deciphered because the inscriptions are very short, there is no bilingual text to compare, and the language is unknown.' },
+        { questionId: 'ss-q13', answer: 'Why is the Harappan script still a mystery? What challenges do historians face?' },
       ],
       generatedAt: '2026-05-24T11:10:00Z',
     },
@@ -549,6 +554,89 @@ const librarySeedData = [
   { name: 'Delhi Public School Exam Instructions.doc', type: 'doc', size: '150 KB', category: 'Reference Materials', url: 'https://utfs.io/f/dummy-exam-instructions.doc' },
   { name: 'Electricity Chapter 14 Quiz (Final Export).pdf', type: 'pdf', size: '1.2 MB', category: 'Exports', url: 'https://utfs.io/f/dummy-electricity-quiz.pdf' },
   { name: 'English Grammar Prepositions Test.pdf', type: 'pdf', size: '890 KB', category: 'Exports', url: 'https://utfs.io/f/dummy-prepositions-test.pdf' }
+];
+
+const bankQuestionSeedData = [
+  {
+    questionText: 'What is the chemical formula of rust?',
+    type: 'mcq',
+    options: ['Fe2O3', 'FeO', 'Fe3O4', 'Fe(OH)3'],
+    correctAnswer: 'Fe2O3',
+    subject: 'Science',
+    grade: '8th',
+    chapter: 'Materials: Metals and Non-Metals',
+    difficulty: 'Medium',
+    bloomLevel: 'Remembering',
+    tags: ['Chemistry', 'Metals', 'Rusting'],
+  },
+  {
+    questionText: 'Explain why sodium metal is stored in kerosene.',
+    type: 'short',
+    correctAnswer: 'Sodium is highly reactive. It reacts vigorously with oxygen and moisture in air, catching fire. To prevent this accidental contact, it is kept in kerosene.',
+    subject: 'Science',
+    grade: '8th',
+    chapter: 'Materials: Metals and Non-Metals',
+    difficulty: 'Easy',
+    bloomLevel: 'Understanding',
+    tags: ['Chemistry', 'Metals', 'Reactivity'],
+  },
+  {
+    questionText: 'Solve for x: 3x + 5 = 20.',
+    type: 'mcq',
+    options: ['x = 3', 'x = 5', 'x = 4', 'x = 6'],
+    correctAnswer: 'x = 5',
+    subject: 'Mathematics',
+    grade: '9th',
+    chapter: 'Linear Equations',
+    difficulty: 'Easy',
+    bloomLevel: 'Applying',
+    tags: ['Algebra', 'Equations'],
+  },
+  {
+    questionText: 'State and prove the Pythagoras Theorem.',
+    type: 'long',
+    correctAnswer: 'Pythagoras Theorem states that in a right-angled triangle, the square of the hypotenuse is equal to the sum of the squares of the other two sides. Proof involves constructing altitude to hypotenuse and utilizing similarity of triangles.',
+    subject: 'Mathematics',
+    grade: '9th',
+    chapter: 'Triangles',
+    difficulty: 'Hard',
+    bloomLevel: 'Evaluating',
+    tags: ['Geometry', 'Triangles', 'Pythagoras'],
+  },
+  {
+    questionText: 'The synonym of "Magnificent" is:',
+    type: 'mcq',
+    options: ['Ordinary', 'Splendid', 'Dull', 'Cheap'],
+    correctAnswer: 'Splendid',
+    subject: 'English',
+    grade: '5th',
+    chapter: 'Vocabulary',
+    difficulty: 'Easy',
+    bloomLevel: 'Remembering',
+    tags: ['Synonyms', 'Vocabulary'],
+  },
+  {
+    questionText: 'Fill in the blank with the correct preposition: She has been living here ___ 2020.',
+    type: 'fillblank',
+    correctAnswer: 'since',
+    subject: 'English',
+    grade: '5th',
+    chapter: 'Prepositions',
+    difficulty: 'Medium',
+    bloomLevel: 'Applying',
+    tags: ['Grammar', 'Prepositions'],
+  },
+  {
+    questionText: 'संज्ञा के कितने भेद होते हैं? उनके नाम लिखिए।',
+    type: 'short',
+    correctAnswer: 'संज्ञा के मुख्य रूप से पांच भेद होते हैं: व्यक्तिवाचक, जातिवाचक, भाववाचक, समूहवाचक, और द्रव्यवाचक।',
+    subject: 'Hindi',
+    grade: '7th',
+    chapter: 'संज्ञा',
+    difficulty: 'Easy',
+    bloomLevel: 'Remembering',
+    tags: ['व्याकरण', 'संज्ञा'],
+  },
 ];
 
 const groupSeedData = [
@@ -652,157 +740,304 @@ async function seed() {
   await mongoose.connect(env.MONGODB_URI);
   console.log('✅ Connected');
 
-  // clear old data
-  await Assignment.deleteMany({});
-  console.log('🗑️  Cleared existing assignments');
-
-  // insert seed data
-  const created = await Assignment.insertMany(seedData);
-  console.log(`✅ Seeded ${created.length} assignments:`);
-  created.forEach((a) => {
-    console.log(`   - ${a.title} (${a.status}) — created: ${a.createdAt}`);
-  });
-
-  // clear old library items
-  await LibraryItem.deleteMany({});
-  console.log('🗑️  Cleared existing library items');
-
-  // insert library seed data
-  const createdLibrary = await LibraryItem.insertMany(librarySeedData);
-  console.log(`✅ Seeded ${createdLibrary.length} library items:`);
-  createdLibrary.forEach((li) => {
-    console.log(`   - ${li.name} (${li.type}) — category: ${li.category}`);
-  });
-
-  // clear and seed groups
-  await Group.deleteMany({});
-  console.log('🗑️  Cleared existing groups');
-  const createdGroups = await Group.insertMany(groupSeedData);
-  console.log(`✅ Seeded ${createdGroups.length} groups:`);
-  createdGroups.forEach((g) => {
-    console.log(`   - ${g.name} (${g.grade} ${g.subject}) — ${g.students.length} students`);
-  });
-
-  // clear and seed assigned assignments + student submissions
-  await AssignedAssignment.deleteMany({});
-  await StudentSubmission.deleteMany({});
-  console.log('🗑️  Cleared existing assigned assignments and submissions');
-
-  // Assign the Science quiz to Grade 8 Science group
-  const scienceAssignment = created.find(a => a.title === 'Quiz on Electricity');
-  const scienceGroup = createdGroups.find(g => g.name === 'Grade 8 Science - Sec A');
-  if (scienceAssignment && scienceGroup) {
-    const assigned = await AssignedAssignment.create({
-      assignmentId: scienceAssignment._id,
-      groupId: scienceGroup._id,
-      assignedDate: new Date('2026-05-21T10:00:00Z'),
-      dueDate: '2026-06-21',
-      hintsEnabled: true,
-      durationMinutes: 45,
+  // Make sure tester@shiven.com exists in User
+  let testerUser = await User.findOne({ email: 'tester@shiven.com' });
+  if (!testerUser) {
+    testerUser = await User.create({
+      clerkId: 'user_tester',
+      email: 'tester@shiven.com',
+      firstName: 'Shiven',
+      lastName: 'Tester',
     });
-
-    // Create student submissions with varied scores
-    const studentAnswers = [
-      { name: 'Aarav Sharma', score: 6, answers: [
-        { questionId: 'q1', answer: 'Electroplating is coating metal using electricity. Prevents corrosion.', isCorrect: true, marks: 2 },
-        { questionId: 'q2', answer: 'Conductor completes the circuit for electrolysis.', isCorrect: true, marks: 2 },
-        { questionId: 'q3', answer: 'NaOH is made by electrolysis of salt water.', isCorrect: true, marks: 2 },
-        { questionId: 'q4', answer: 'Lemon juice', isCorrect: true, marks: 1, aiFeedback: 'Correct! Citric acid makes lemon juice a conductor.' },
-      ]},
-      { name: 'Aditi Verma', score: 5, answers: [
-        { questionId: 'q1', answer: 'Electroplating uses electricity to coat metal.', isCorrect: true, marks: 2 },
-        { questionId: 'q2', answer: 'It dissolves the chemicals.', isCorrect: false, marks: 0, aiFeedback: 'Partially correct. A conductor allows charge flow, not dissolution.' },
-        { questionId: 'q3', answer: 'Chloralkali process produces NaOH from brine.', isCorrect: true, marks: 2 },
-        { questionId: 'q4', answer: 'Lemon juice', isCorrect: true, marks: 1 },
-      ]},
-      { name: 'Amit Kumar', score: 3, answers: [
-        { questionId: 'q1', answer: 'It is a type of painting.', isCorrect: false, marks: 0, aiFeedback: 'Incorrect. Electroplating uses electricity to deposit metal, not paint.' },
-        { questionId: 'q2', answer: 'Conductor carries current.', isCorrect: true, marks: 2 },
-        { questionId: 'q3', answer: 'By mixing chemicals.', isCorrect: false, marks: 0, aiFeedback: 'Incorrect. NaOH is produced via electrolysis, not simple mixing.' },
-        { questionId: 'q4', answer: 'Lemon juice', isCorrect: true, marks: 1 },
-      ]},
-      { name: 'Anjali Gupta', score: 4, answers: [
-        { questionId: 'q1', answer: 'Using electricity to put a metal layer on objects.', isCorrect: true, marks: 2 },
-        { questionId: 'q2', answer: 'It makes heat.', isCorrect: false, marks: 0, aiFeedback: 'Incorrect. Conductors allow current flow, not heat generation in electrolysis.' },
-        { questionId: 'q3', answer: 'Electrolysis of NaCl solution.', isCorrect: true, marks: 2 },
-        { questionId: 'q4', answer: 'Distilled water', isCorrect: false, marks: 0, aiFeedback: 'Incorrect. Distilled water lacks ions and is a poor conductor.' },
-      ]},
-      { name: 'Deepak Roy', score: 7, answers: [
-        { questionId: 'q1', answer: 'Electroplating deposits metal using electrical current for corrosion prevention.', isCorrect: true, marks: 2 },
-        { questionId: 'q2', answer: 'Conductor lets charge carriers flow through the solution.', isCorrect: true, marks: 2 },
-        { questionId: 'q3', answer: 'Chloralkali process: electrolysis of brine gives NaOH, Cl2, H2.', isCorrect: true, marks: 2 },
-        { questionId: 'q4', answer: 'Lemon juice', isCorrect: true, marks: 1 },
-      ]},
-    ];
-
-    for (const sa of studentAnswers) {
-      await StudentSubmission.create({
-        assignedAssignmentId: assigned._id,
-        studentName: sa.name,
-        answers: sa.answers,
-        totalScore: sa.score,
-        totalMarks: 7,
-        submittedAt: new Date('2026-05-22T10:00:00Z'),
-      });
-    }
-    console.log(`✅ Assigned "Quiz on Electricity" to Grade 8 Science with ${studentAnswers.length} submissions`);
+    console.log('👤 Created default user: tester@shiven.com');
   }
 
-  // Assign the Math test to Grade 9 Maths group
-  const mathAssignment = created.find(a => a.title === 'Mathematics: Algebra Basics');
-  const mathGroup = createdGroups.find(g => g.name === 'Grade 9 Maths - Sec C');
-  if (mathAssignment && mathGroup) {
-    const assigned = await AssignedAssignment.create({
-      assignmentId: mathAssignment._id,
-      groupId: mathGroup._id,
-      assignedDate: new Date('2026-05-19T09:00:00Z'),
-      dueDate: '2026-06-15',
-      hintsEnabled: false,
-      durationMinutes: 90,
-    });
+  // Fetch all existing users in the database
+  const users = await User.find({});
+  console.log(`Found ${users.length} users in the database.`);
 
-    const mathStudentAnswers = [
-      { name: 'Abhishek Vyas', score: 22, answers: [
-        { questionId: 'math-q1', answer: 'x=3, y=2', isCorrect: true, marks: 3 },
-        { questionId: 'math-q2', answer: 'y = -3/2 x + 4, slope = -3/2', isCorrect: true, marks: 3 },
-        { questionId: 'math-q3', answer: '(0,4) and (6,0)', isCorrect: true, marks: 3 },
-        { questionId: 'math-q4', answer: '4a + b = 10', isCorrect: true, marks: 3 },
-        { questionId: 'math-q5', answer: '2(3)-2=4=RHS', isCorrect: true, marks: 3 },
-        { questionId: 'math-q6', answer: 'orange=4, apple=5', isCorrect: true, marks: 5 },
-        { questionId: 'math-q7', answer: 'Incomplete graph description', isCorrect: false, marks: 2, aiFeedback: 'Partially correct. Graph is right but missing intersection point labels.' },
-      ]},
-      { name: 'Komal Pandey', score: 18, answers: [
-        { questionId: 'math-q1', answer: 'x=3, y=2', isCorrect: true, marks: 3 },
-        { questionId: 'math-q2', answer: 'y = -3/2 x + 4', isCorrect: true, marks: 3 },
-        { questionId: 'math-q3', answer: '(3,2) and (0,4)', isCorrect: true, marks: 3 },
-        { questionId: 'math-q4', answer: 'Unable to solve', isCorrect: false, marks: 0, aiFeedback: 'Substitute x=2, y=1 to get 4a+b=10.' },
-        { questionId: 'math-q5', answer: '2(3)-2=4', isCorrect: true, marks: 3 },
-        { questionId: 'math-q6', answer: 'orange=4, apple=5', isCorrect: true, marks: 5 },
-        { questionId: 'math-q7', answer: 'Did not attempt', isCorrect: false, marks: 1 },
-      ]},
-    ];
-
-    for (const sa of mathStudentAnswers) {
-      await StudentSubmission.create({
-        assignedAssignmentId: assigned._id,
-        studentName: sa.name,
-        answers: sa.answers,
-        totalScore: sa.score,
-        totalMarks: 25,
-        submittedAt: new Date('2026-05-20T11:00:00Z'),
-      });
-    }
-    console.log(`✅ Assigned "Mathematics: Algebra Basics" to Grade 9 Maths with ${mathStudentAnswers.length} submissions`);
+  let userList = users;
+  if (!userList.some(u => u.email === 'tester@shiven.com')) {
+    userList.push(testerUser);
   }
 
-  // clear and seed templates
-  await Template.deleteMany({});
-  console.log('🗑️  Cleared existing templates');
-  const createdTemplates = await Template.insertMany(templateSeedData);
-  console.log(`✅ Seeded ${createdTemplates.length} templates:`);
-  createdTemplates.forEach((t) => {
-    console.log(`   - ${t.name} (${t.isDefault ? 'default' : 'custom'})`);
-  });
+  // Drop legacy unique index if it exists in mongo before populating
+  try {
+    await StudentCredential.collection.dropIndex('studentName_1_groupId_1');
+    console.log('Dropped legacy index studentName_1_groupId_1');
+  } catch (err) {
+    // index might not exist, ignore
+  }
+
+  // NOTE: We no longer run deleteMany({}) on any collections to avoid overwriting past data.
+  console.log('⚙️ Seeding missing records (without overwriting past data)...');
+
+  // Loop through all users and seed their workspace data
+  for (const user of userList) {
+    console.log(`\n👥 Seeding data for teacher: ${user.email} (${user.clerkId})`);
+
+    // Seed library items if they do not exist
+    for (const item of librarySeedData) {
+      const exists = await LibraryItem.findOne({ name: item.name, userId: user.clerkId });
+      if (!exists) {
+        await LibraryItem.create({
+          ...item,
+          userId: user.clerkId
+        });
+      }
+    }
+
+    // Seed bank questions if they do not exist
+    for (const q of bankQuestionSeedData) {
+      const exists = await BankQuestion.findOne({ questionText: q.questionText, createdBy: user.clerkId });
+      if (!exists) {
+        await BankQuestion.create({
+          ...q,
+          createdBy: user.clerkId
+        });
+      }
+    }
+
+    // Seed assignments if they do not exist
+    const userAssignments = [];
+    for (const assignment of seedData) {
+      let created = await Assignment.findOne({ title: assignment.title, userId: user.clerkId });
+      if (!created) {
+        created = await Assignment.create({
+          ...assignment,
+          userId: user.clerkId
+        });
+      }
+      userAssignments.push(created);
+    }
+
+    // Seed groups if they do not exist
+    const userGroups = [];
+    for (const gData of groupSeedData) {
+      let created = await Group.findOne({ name: gData.name, userId: user.clerkId });
+      if (!created) {
+        created = await Group.create({
+          ...gData,
+          userId: user.clerkId
+        });
+      }
+      userGroups.push(created);
+    }
+
+    // Connect them (AssignedAssignments, Submissions, Credentials, Announcements)
+    // 1. Science quiz -> Science Group
+    const electricityQuiz = userAssignments.find(a => a.title === 'Quiz on Electricity');
+    const scienceGroup = userGroups.find(g => g.name === 'Grade 8 Science - Sec A');
+    if (electricityQuiz && scienceGroup) {
+      let assigned = await AssignedAssignment.findOne({
+        assignmentId: electricityQuiz._id,
+        groupId: scienceGroup._id,
+      });
+      if (!assigned) {
+        assigned = await AssignedAssignment.create({
+          assignmentId: electricityQuiz._id,
+          groupId: scienceGroup._id,
+          assignedDate: new Date('2026-05-21T10:00:00Z'),
+          dueDate: '2026-06-21',
+          hintsEnabled: true,
+          durationMinutes: 45,
+        });
+      }
+
+      const studentAnswers = [
+        { name: 'Aarav Sharma', score: 6, answers: [
+          { questionId: 'q1', answer: 'Electroplating is coating metal using electricity. Prevents corrosion.', isCorrect: true, marks: 2 },
+          { questionId: 'q2', answer: 'Conductor completes the circuit for electrolysis.', isCorrect: true, marks: 2 },
+          { questionId: 'q3', answer: 'NaOH is made by electrolysis of salt water.', isCorrect: true, marks: 2 },
+          { questionId: 'q4', answer: 'Lemon juice', isCorrect: true, marks: 1, aiFeedback: 'Correct! Citric acid makes lemon juice a conductor.' },
+        ]},
+        { name: 'Aditi Verma', score: 5, answers: [
+          { questionId: 'q1', answer: 'Electroplating uses electricity to coat metal.', isCorrect: true, marks: 2 },
+          { questionId: 'q2', answer: 'It dissolves the chemicals.', isCorrect: false, marks: 0, aiFeedback: 'Partially correct. A conductor allows charge flow, not dissolution.' },
+          { questionId: 'q3', answer: 'Chloralkali process produces NaOH from brine.', isCorrect: true, marks: 2 },
+          { questionId: 'q4', answer: 'Lemon juice', isCorrect: true, marks: 1 },
+        ]},
+        { name: 'Amit Kumar', score: 3, answers: [
+          { questionId: 'q1', answer: 'It is a type of painting.', isCorrect: false, marks: 0, aiFeedback: 'Incorrect. Electroplating uses electricity to deposit metal, not paint.' },
+          { questionId: 'q2', answer: 'Conductor carries current.', isCorrect: true, marks: 2 },
+          { questionId: 'q3', answer: 'By mixing chemicals.', isCorrect: false, marks: 0, aiFeedback: 'Incorrect. NaOH is produced via electrolysis, not simple mixing.' },
+          { questionId: 'q4', answer: 'Lemon juice', isCorrect: true, marks: 1 },
+        ]},
+        { name: 'Anjali Gupta', score: 4, answers: [
+          { questionId: 'q1', answer: 'Using electricity to put a metal layer on objects.', isCorrect: true, marks: 2 },
+          { questionId: 'q2', answer: 'It makes heat.', isCorrect: false, marks: 0, aiFeedback: 'Incorrect. Conductors allow current flow, not heat generation in electrolysis.' },
+          { questionId: 'q3', answer: 'Electrolysis of NaCl solution.', isCorrect: true, marks: 2 },
+          { questionId: 'q4', answer: 'Distilled water', isCorrect: false, marks: 0, aiFeedback: 'Incorrect. Distilled water lacks ions and is a poor conductor.' },
+        ]},
+        { name: 'Deepak Roy', score: 7, answers: [
+          { questionId: 'q1', answer: 'Electroplating deposits metal using electrical current for corrosion prevention.', isCorrect: true, marks: 2 },
+          { questionId: 'q2', answer: 'Conductor lets charge carriers flow through the solution.', isCorrect: true, marks: 2 },
+          { questionId: 'q3', answer: 'Chloralkali process: electrolysis of brine gives NaOH, Cl2, H2.', isCorrect: true, marks: 2 },
+          { questionId: 'q4', answer: 'Lemon juice', isCorrect: true, marks: 1 },
+        ]},
+      ];
+
+      for (const sa of studentAnswers) {
+        // Build the email address
+        // For Aarav Sharma of tester@shiven.com, set it exactly to aarav.sharma@school.com
+        let email = `${sa.name.toLowerCase().replace(/ /g, '')}_${user.clerkId.substring(user.clerkId.length - 4)}@school.com`.toLowerCase();
+        if (sa.name === 'Aarav Sharma' && user.email === 'tester@shiven.com') {
+          email = 'aarav.sharma@school.com';
+        }
+        const salt = email;
+        const hashedPasscode = crypto.createHash('sha256').update("1234" + salt).digest('hex');
+
+        let cred = await StudentCredential.findOne({ email });
+        if (!cred) {
+          cred = await StudentCredential.create({
+            studentName: sa.name,
+            email,
+            groupIds: [scienceGroup._id],
+            hashedPasscode,
+          });
+        } else {
+          if (!cred.groupIds.some(id => id.toString() === scienceGroup._id.toString())) {
+            cred.groupIds.push(scienceGroup._id as any);
+            await cred.save();
+          }
+        }
+
+        const submissionExists = await StudentSubmission.findOne({
+          assignedAssignmentId: assigned._id,
+          studentId: cred._id,
+        });
+        if (!submissionExists) {
+          await StudentSubmission.create({
+            assignedAssignmentId: assigned._id,
+            studentId: cred._id,
+            studentName: sa.name,
+            answers: sa.answers,
+            totalScore: sa.score,
+            totalMarks: 7,
+            submittedAt: new Date('2026-05-22T10:00:00Z'),
+          });
+        }
+      }
+      console.log(`   - Seeded "Quiz on Electricity" to Grade 8 Science with submissions & credentials.`);
+    }
+
+    // 2. Algebra Basics -> Maths Group
+    const algebraQuiz = userAssignments.find(a => a.title === 'Mathematics: Algebra Basics');
+    const mathsGroup = userGroups.find(g => g.name === 'Grade 9 Maths - Sec C');
+    if (algebraQuiz && mathsGroup) {
+      let assigned = await AssignedAssignment.findOne({
+        assignmentId: algebraQuiz._id,
+        groupId: mathsGroup._id,
+      });
+      if (!assigned) {
+        assigned = await AssignedAssignment.create({
+          assignmentId: algebraQuiz._id,
+          groupId: mathsGroup._id,
+          assignedDate: new Date('2026-05-19T09:00:00Z'),
+          dueDate: '2026-06-15',
+          hintsEnabled: false,
+          durationMinutes: 90,
+        });
+      }
+
+      const mathStudentAnswers = [
+        { name: 'Abhishek Vyas', score: 22, answers: [
+          { questionId: 'math-q1', answer: 'x=3, y=2', isCorrect: true, marks: 3 },
+          { questionId: 'math-q2', answer: 'y = -3/2 x + 4, slope = -3/2', isCorrect: true, marks: 3 },
+          { questionId: 'math-q3', answer: '(0,4) and (6,0)', isCorrect: true, marks: 3 },
+          { questionId: 'math-q4', answer: '4a + b = 10', isCorrect: true, marks: 3 },
+          { questionId: 'math-q5', answer: '2(3)-2=4=RHS', isCorrect: true, marks: 3 },
+          { questionId: 'math-q6', answer: 'orange=4, apple=5', isCorrect: true, marks: 5 },
+          { questionId: 'math-q7', answer: 'Incomplete graph description', isCorrect: false, marks: 2, aiFeedback: 'Partially correct. Graph is right but missing intersection point labels.' },
+        ]},
+        { name: 'Komal Pandey', score: 18, answers: [
+          { questionId: 'math-q1', answer: 'x=3, y=2', isCorrect: true, marks: 3 },
+          { questionId: 'math-q2', answer: 'y = -3/2 x + 4', isCorrect: true, marks: 3 },
+          { questionId: 'math-q3', answer: '(3,2) and (0,4)', isCorrect: true, marks: 3 },
+          { questionId: 'math-q4', answer: 'Unable to solve', isCorrect: false, marks: 0, aiFeedback: 'Substitute x=2, y=1 to get 4a+b=10.' },
+          { questionId: 'math-q5', answer: '2(3)-2=4', isCorrect: true, marks: 3 },
+          { questionId: 'math-q6', answer: 'orange=4, apple=5', isCorrect: true, marks: 5 },
+          { questionId: 'math-q7', answer: 'Did not attempt', isCorrect: false, marks: 1 },
+        ]},
+      ];
+
+      for (const sa of mathStudentAnswers) {
+        const suffix = user.clerkId.substring(user.clerkId.length - 4);
+        const email = `${sa.name.toLowerCase().replace(/ /g, '')}_${suffix}@school.com`.toLowerCase();
+        const salt = email;
+        const hashedPasscode = crypto.createHash('sha256').update("1234" + salt).digest('hex');
+
+        let cred = await StudentCredential.findOne({ email });
+        if (!cred) {
+          cred = await StudentCredential.create({
+            studentName: sa.name,
+            email,
+            groupIds: [mathsGroup._id],
+            hashedPasscode,
+          });
+        } else {
+          if (!cred.groupIds.some(id => id.toString() === mathsGroup._id.toString())) {
+            cred.groupIds.push(mathsGroup._id as any);
+            await cred.save();
+          }
+        }
+
+        const submissionExists = await StudentSubmission.findOne({
+          assignedAssignmentId: assigned._id,
+          studentId: cred._id,
+        });
+        if (!submissionExists) {
+          await StudentSubmission.create({
+            assignedAssignmentId: assigned._id,
+            studentId: cred._id,
+            studentName: sa.name,
+            answers: sa.answers,
+            totalScore: sa.score,
+            totalMarks: 25,
+            submittedAt: new Date('2026-05-20T11:00:00Z'),
+          });
+        }
+      }
+      console.log(`   - Seeded "Mathematics: Algebra Basics" to Grade 9 Maths with submissions & credentials.`);
+    }
+
+    // Seed announcements for each group
+    const teacherName = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email;
+    for (const group of userGroups) {
+      const title1 = 'Welcome to our class group!';
+      const exists1 = await Announcement.findOne({ groupId: group._id, title: title1 });
+      if (!exists1) {
+        await Announcement.create({
+          groupId: group._id,
+          teacherId: user.clerkId,
+          teacherName,
+          title: title1,
+          content: `Hello students! Welcome to our ${group.name} class workspace. I will post announcements, test notifications, and study resources here. Please verify your profile details and check this feed regularly!`,
+        });
+      }
+
+      const title2 = 'NCERT Guidelines & Homework policy';
+      const exists2 = await Announcement.findOne({ groupId: group._id, title: title2 });
+      if (!exists2) {
+        await Announcement.create({
+          groupId: group._id,
+          teacherId: user.clerkId,
+          teacherName,
+          title: title2,
+          content: `Hi everyone, please note that all assessments and worksheets will follow the NCERT CBSE guidelines strictly. Make sure you complete your assigned assignments before their respective deadlines. Let's have a great learning journey!`,
+        });
+      }
+    }
+  }
+
+  // Seed default templates if they do not exist
+  for (const template of templateSeedData) {
+    const exists = await Template.findOne({ name: template.name });
+    if (!exists) {
+      await Template.create(template);
+    }
+  }
+  console.log(`✅ Default templates seeded.`);
 
   await mongoose.disconnect();
   console.log('👋 Done!');

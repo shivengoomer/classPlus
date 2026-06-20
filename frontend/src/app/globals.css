@@ -6,19 +6,19 @@
   --background: #F3F4F6;
   --foreground: #111111;
 
-  --veda-bg: #F3F4F6;
-  --veda-sidebar: #FFFFFF;
-  --veda-card: #FFFFFF;
-  --veda-card-border: #E5E7EB;
-  --veda-text-primary: #111111;
-  --veda-text-secondary: #6B7280;
-  --veda-text-hint: #9CA3AF;
-  --veda-btn-primary: #10375C;
-  --veda-orange: #10375C;
-  --veda-orange-red: #EF4444;
-  --veda-nav-active-bg: #EBF1F7;
-  --veda-progress: #10375C;
-  --veda-dark-banner: #10375C;
+  --classplus-bg: #F3F4F6;
+  --classplus-sidebar: #FFFFFF;
+  --classplus-card: #FFFFFF;
+  --classplus-card-border: #E5E7EB;
+  --classplus-text-primary: #111111;
+  --classplus-text-secondary: #6B7280;
+  --classplus-text-hint: #9CA3AF;
+  --classplus-btn-primary: #10375C;
+  --classplus-orange: #10375C;
+  --classplus-orange-red: #EF4444;
+  --classplus-nav-active-bg: #EBF1F7;
+  --classplus-progress: #10375C;
+  --classplus-dark-banner: #10375C;
   --background-bg-off-white-50: #CECECE;
   --cp-primary: #10375C;
   --cp-primary-hover: #0d2f4f;
@@ -27,8 +27,8 @@
 }
 
 body {
-  color: var(--veda-text-primary);
-  background: var(--veda-bg);
+  color: var(--classplus-text-primary);
+  background: var(--classplus-bg);
   font-family: var(--font-plus-jakarta-sans), sans-serif;
   overflow-x: hidden;
 }

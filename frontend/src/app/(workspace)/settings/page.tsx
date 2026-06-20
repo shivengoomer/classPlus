@@ -102,27 +102,27 @@ export default function SettingsPage() {
         
         {/* Page Header */}
         <div className="flex flex-col gap-1">
-          <h2 className="text-[20px] font-bold text-veda-text-primary flex items-center gap-2">
+          <h2 className="text-[20px] font-bold text-classplus-text-primary flex items-center gap-2">
             <Settings className="w-5 h-5 text-gray-700" />
             <span>Settings</span>
           </h2>
-          <p className="text-[13px] text-veda-text-secondary">
+          <p className="text-[13px] text-classplus-text-secondary">
             Configure your personal profile details, school organization information, and AI generation parameters.
           </p>
         </div>
 
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20 gap-3">
-            <Loader2 className="w-8 h-8 text-veda-orange animate-spin" />
-            <p className="text-sm text-veda-text-secondary font-medium">Loading settings profile...</p>
+            <Loader2 className="w-8 h-8 text-classplus-orange animate-spin" />
+            <p className="text-sm text-classplus-text-secondary font-medium">Loading settings profile...</p>
           </div>
         ) : (
           <>
             {/* Section 1: Teacher Profile Details */}
-            <div className="bg-white border border-veda-card-border rounded-xl shadow-sm overflow-hidden flex flex-col">
-              <div className="bg-gray-50 px-5 py-4 border-b border-veda-card-border flex items-center gap-2">
+            <div className="bg-white border border-classplus-card-border rounded-xl shadow-sm overflow-hidden flex flex-col">
+              <div className="bg-gray-50 px-5 py-4 border-b border-classplus-card-border flex items-center gap-2">
                 <User className="w-4 h-4 text-indigo-600" />
-                <h3 className="text-sm font-bold text-veda-text-primary">
+                <h3 className="text-sm font-bold text-classplus-text-primary">
                   Teacher Profile Details
                 </h3>
               </div>
@@ -133,7 +133,7 @@ export default function SettingsPage() {
                     type="text"
                     value={profile.name}
                     onChange={(e) => setProfile({ ...profile, name: e.target.value })}
-                    className="border border-veda-card-border p-2.5 rounded-lg text-veda-text-primary outline-none focus:border-gray-400 font-sans"
+                    className="border border-classplus-card-border p-2.5 rounded-lg text-classplus-text-primary outline-none focus:border-gray-400 font-sans"
                   />
                 </div>
                 <div className="flex flex-col gap-1.5">
@@ -142,7 +142,7 @@ export default function SettingsPage() {
                     type="email"
                     value={profile.email}
                     disabled
-                    className="border border-veda-card-border p-2.5 rounded-lg text-gray-400 bg-gray-50 outline-none cursor-not-allowed font-sans"
+                    className="border border-classplus-card-border p-2.5 rounded-lg text-gray-400 bg-gray-50 outline-none cursor-not-allowed font-sans"
                   />
                 </div>
                 <div className="flex flex-col gap-1.5 md:col-span-2">
@@ -151,7 +151,7 @@ export default function SettingsPage() {
                     type="text"
                     value={profile.role}
                     onChange={(e) => setProfile({ ...profile, role: e.target.value })}
-                    className="border border-veda-card-border p-2.5 rounded-lg text-veda-text-primary outline-none focus:border-gray-400 font-sans w-full"
+                    className="border border-classplus-card-border p-2.5 rounded-lg text-classplus-text-primary outline-none focus:border-gray-400 font-sans w-full"
                   />
                 </div>
                 <div className="md:col-span-2 flex justify-end mt-2">
@@ -167,10 +167,10 @@ export default function SettingsPage() {
             </div>
 
             {/* Section 2: School Organization Settings */}
-            <div className="bg-white border border-veda-card-border rounded-xl shadow-sm overflow-hidden flex flex-col">
-              <div className="bg-gray-50 px-5 py-4 border-b border-veda-card-border flex items-center gap-2">
+            <div className="bg-white border border-classplus-card-border rounded-xl shadow-sm overflow-hidden flex flex-col">
+              <div className="bg-gray-50 px-5 py-4 border-b border-classplus-card-border flex items-center gap-2">
                 <School className="w-4 h-4 text-emerald-600" />
-                <h3 className="text-sm font-bold text-veda-text-primary">
+                <h3 className="text-sm font-bold text-classplus-text-primary">
                   School Organization settings
                 </h3>
               </div>
@@ -181,7 +181,7 @@ export default function SettingsPage() {
                     type="text"
                     value={school.name}
                     onChange={(e) => setSchool({ ...school, name: e.target.value })}
-                    className="border border-veda-card-border p-2.5 rounded-lg text-veda-text-primary outline-none focus:border-gray-400 font-sans"
+                    className="border border-classplus-card-border p-2.5 rounded-lg text-classplus-text-primary outline-none focus:border-gray-400 font-sans"
                   />
                 </div>
                 <div className="flex flex-col gap-1.5">
@@ -190,7 +190,7 @@ export default function SettingsPage() {
                     type="text"
                     value={school.branch}
                     onChange={(e) => setSchool({ ...school, branch: e.target.value })}
-                    className="border border-veda-card-border p-2.5 rounded-lg text-veda-text-primary outline-none focus:border-gray-400 font-sans"
+                    className="border border-classplus-card-border p-2.5 rounded-lg text-classplus-text-primary outline-none focus:border-gray-400 font-sans"
                   />
                 </div>
                 <div className="flex flex-col gap-1.5 md:col-span-2">
@@ -199,7 +199,7 @@ export default function SettingsPage() {
                     type="text"
                     value={school.code}
                     onChange={(e) => setSchool({ ...school, code: e.target.value })}
-                    className="border border-veda-card-border p-2.5 rounded-lg text-veda-text-primary outline-none focus:border-gray-400 font-sans w-full"
+                    className="border border-classplus-card-border p-2.5 rounded-lg text-classplus-text-primary outline-none focus:border-gray-400 font-sans w-full"
                   />
                 </div>
                 <div className="md:col-span-2 flex justify-end mt-2">

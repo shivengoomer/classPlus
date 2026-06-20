@@ -14,7 +14,7 @@ import {
   exportPDF,
   regenerateWithDifficulty,
 } from '../controllers/assignment.controller';
-import { requireAuth, syncUserMiddleware } from '../middlewares/auth.middleware';
+import { requireAuth, syncUserMiddleware, checkCredits } from '../middlewares/auth.middleware';
 
 const router = Router();
 
@@ -54,11 +54,11 @@ router.get('/:id/export-pdf', exportPDF);
 // Protected endpoints
 router.use(requireAuth(), syncUserMiddleware);
 
-router.post('/', upload.single('file'), createAssignment);
+router.post('/', upload.single('file'), checkCredits, createAssignment);
 router.get('/', listAssignments);
 router.get('/:id', getAssignment);
 router.delete('/:id', deleteAssignment);
-router.post('/:id/regenerate', regenerateAssignment);
-router.post('/:id/regenerate-difficulty', regenerateWithDifficulty);
+router.post('/:id/regenerate', checkCredits, regenerateAssignment);
+router.post('/:id/regenerate-difficulty', checkCredits, regenerateWithDifficulty);
 
 export default router;

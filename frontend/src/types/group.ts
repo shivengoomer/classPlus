@@ -66,6 +66,8 @@ export interface StudentSubmission {
   submittedAt: string | null;
   autoSubmitted: boolean;
   timerJobId: string | null;
+  similarityScore?: number;
+  similarityFlaggedWith?: string[];
   createdAt: string;
   updatedAt: string;
 }

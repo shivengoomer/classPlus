@@ -4,7 +4,12 @@ import { AssignedAssignment } from '../models/assignedAssignment.model';
 import { Group } from '../models/group.model';
 import { Assignment } from '../models/assignment.model';
 import { StudentSubmission } from '../models/studentSubmission.model';
+import { StudentCredential } from '../models/studentCredential.model';
 import { log, logError } from '../utils/logger';
+
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
 
 // GET /api/assigned — all assigned assignments for the teacher
 export async function listAssigned(req: Request, res: Response) {
@@ -125,7 +130,7 @@ export async function getAssignedSubmissions(req: Request, res: Response) {
     }
 
     const submissions = await StudentSubmission.find({ assignedAssignmentId: assignedId })
-      .select('studentName totalScore totalMarks submittedAt autoSubmitted answers')
+      .select('studentId studentName totalScore totalMarks submittedAt autoSubmitted answers')
       .sort({ submittedAt: -1 });
 
     return res.json(submissions);
@@ -157,20 +162,36 @@ export async function updateStudentSubmission(req: Request, res: Response) {
       return res.status(403).json({ error: 'Access denied' });
     }
 
-    // Find or create submission
-    let submission = await StudentSubmission.findOne({
-      assignedAssignmentId: assignedId,
-      studentName,
+    // First find the credential for the student in this group/class
+    const credential = await StudentCredential.findOne({
+      studentName: { $regex: new RegExp(`^${escapeRegExp(studentName)}$`, 'i') },
+      groupIds: assigned.groupId,
     });
+
+    let query: any = { assignedAssignmentId: assignedId };
+    if (credential) {
+      query.$or = [
+        { studentId: credential._id },
+        { studentName: studentName }
+      ];
+    } else {
+      query.studentName = studentName;
+    }
+
+    // Find or create submission
+    let submission = await StudentSubmission.findOne(query);
 
     if (!submission) {
       submission = new StudentSubmission({
         assignedAssignmentId: assignedId,
         studentName,
+        studentId: credential ? credential._id : undefined,
         submittedAt: new Date(),
         startedAt: new Date(),
         answers: [],
       });
+    } else if (credential && !submission.studentId) {
+      submission.studentId = credential._id;
     }
 
     if (totalScore !== undefined) {

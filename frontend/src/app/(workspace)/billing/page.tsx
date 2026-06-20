@@ -91,7 +91,7 @@ export default function BillingPage() {
         'Unlimited student groups',
         'Custom template saving'
       ],
-      color: 'border-veda-orange shadow-md relative ring-2 ring-veda-orange ring-opacity-20',
+      color: 'border-classplus-orange shadow-md relative ring-2 ring-classplus-orange ring-opacity-20',
       btnVariant: 'primary' as const,
       btnText: 'Upgrade to Pro',
       badge: 'Most Popular'
@@ -121,28 +121,28 @@ export default function BillingPage() {
         
         {/* Page Header */}
         <div className="flex flex-col gap-1">
-          <h2 className="text-[20px] font-bold text-veda-text-primary flex items-center gap-2">
+          <h2 className="text-[20px] font-bold text-classplus-text-primary flex items-center gap-2">
             <CreditCard className="w-5 h-5 text-gray-700" />
             <span>Billing & Subscription</span>
           </h2>
-          <p className="text-[13px] text-veda-text-secondary">
+          <p className="text-[13px] text-classplus-text-secondary">
             Manage your classPlus subscription plan, track your assignment usage limits, and view pricing options.
           </p>
         </div>
 
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20 gap-3">
-            <Loader2 className="w-8 h-8 text-veda-orange animate-spin" />
-            <p className="text-sm text-veda-text-secondary font-medium">Loading subscription details...</p>
+            <Loader2 className="w-8 h-8 text-classplus-orange animate-spin" />
+            <p className="text-sm text-classplus-text-secondary font-medium">Loading subscription details...</p>
           </div>
         ) : (
           <>
             {/* Usage Summary Card */}
-            <div className="bg-white border border-veda-card-border rounded-xl shadow-sm p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <div className="bg-white border border-classplus-card-border rounded-xl shadow-sm p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
               <div className="flex flex-col gap-3 w-full md:w-3/5">
                 <div className="flex items-center gap-2">
                   <span className="text-xs uppercase font-extrabold text-gray-400 tracking-wider">Current Active Plan</span>
-                  <span className="bg-orange-50 text-veda-orange text-[10px] font-bold px-2 py-0.5 rounded-full border border-orange-100 flex items-center gap-0.5">
+                  <span className="bg-orange-50 text-classplus-orange text-[10px] font-bold px-2 py-0.5 rounded-full border border-orange-100 flex items-center gap-0.5">
                     <Sparkles className="w-3 h-3" />
                     {currentPlan}
                   </span>
@@ -150,7 +150,7 @@ export default function BillingPage() {
                 
                 {/* Credit usage bar */}
                 <div className="flex flex-col gap-1.5 font-sans">
-                  <div className="flex justify-between text-xs text-veda-text-primary font-bold">
+                  <div className="flex justify-between text-xs text-classplus-text-primary font-bold">
                     <span>Assignment Consumption Limit</span>
                     <span>{creditsUsed} / {creditsLimit === 9999 ? '∞' : creditsLimit} created</span>
                   </div>
@@ -160,7 +160,7 @@ export default function BillingPage() {
                       style={{ width: `${usagePercentage}%` }}
                     />
                   </div>
-                  <p className="text-[11px] text-veda-text-secondary">
+                  <p className="text-[11px] text-classplus-text-secondary">
                     {creditsLimit === 9999 
                       ? 'You have unlimited assignment generation capabilities under your Enterprise account.'
                       : `Your consumption rate is at ${usagePercentage}% of your total allocated monthly credits.`}
@@ -168,7 +168,7 @@ export default function BillingPage() {
                 </div>
               </div>
 
-              <div className="bg-gray-50 border border-veda-card-border rounded-lg p-4 flex flex-col gap-1.5 w-full md:w-auto font-sans text-xs">
+              <div className="bg-gray-50 border border-classplus-card-border rounded-lg p-4 flex flex-col gap-1.5 w-full md:w-auto font-sans text-xs">
                 <div className="flex justify-between gap-6">
                   <span className="text-gray-500 font-semibold">Payment Status:</span>
                   <span className="text-emerald-600 font-extrabold flex items-center gap-0.5">
@@ -178,18 +178,18 @@ export default function BillingPage() {
                 </div>
                 <div className="flex justify-between gap-6">
                   <span className="text-gray-500 font-semibold">Billing Cycle:</span>
-                  <span className="text-veda-text-primary font-medium">Monthly Renewal</span>
+                  <span className="text-classplus-text-primary font-medium">Monthly Renewal</span>
                 </div>
                 <div className="flex justify-between gap-6">
                   <span className="text-gray-500 font-semibold">Next Invoice Date:</span>
-                  <span className="text-veda-text-primary font-medium">June 26, 2026</span>
+                  <span className="text-classplus-text-primary font-medium">June 26, 2026</span>
                 </div>
               </div>
             </div>
 
             {/* Pricing Section */}
             <div className="flex flex-col gap-4 mt-2">
-              <h3 className="text-sm font-extrabold text-veda-text-primary">Available Plans & Upgrades</h3>
+              <h3 className="text-sm font-extrabold text-classplus-text-primary">Available Plans & Upgrades</h3>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {pricingTiers.map((tier) => {
@@ -203,22 +203,22 @@ export default function BillingPage() {
                     >
                       <div>
                         {tier.badge && (
-                          <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-veda-orange text-white text-[10px] uppercase font-black px-3 py-1 rounded-full shadow-sm tracking-wider">
+                          <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-classplus-orange text-white text-[10px] uppercase font-black px-3 py-1 rounded-full shadow-sm tracking-wider">
                             {tier.badge}
                           </span>
                         )}
                         
                         <div className="flex flex-col gap-1 mb-4 font-sans">
-                          <h4 className="text-sm font-bold text-veda-text-primary">{tier.name}</h4>
-                          <p className="text-[11px] text-veda-text-secondary leading-relaxed min-h-[32px]">{tier.description}</p>
+                          <h4 className="text-sm font-bold text-classplus-text-primary">{tier.name}</h4>
+                          <p className="text-[11px] text-classplus-text-secondary leading-relaxed min-h-[32px]">{tier.description}</p>
                           <div className="flex items-baseline gap-1 mt-2">
-                            <span className="text-2xl font-black text-veda-text-primary">{tier.price}</span>
-                            <span className="text-[11px] text-veda-text-secondary">/ {tier.period}</span>
+                            <span className="text-2xl font-black text-classplus-text-primary">{tier.price}</span>
+                            <span className="text-[11px] text-classplus-text-secondary">/ {tier.period}</span>
                           </div>
                         </div>
 
                         {/* Feature list */}
-                        <ul className="flex flex-col gap-2 mb-6 font-sans text-xs text-veda-text-primary">
+                        <ul className="flex flex-col gap-2 mb-6 font-sans text-xs text-classplus-text-primary">
                           {tier.features.map((feat, idx) => (
                             <li key={idx} className="flex items-start gap-1.5">
                               <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />

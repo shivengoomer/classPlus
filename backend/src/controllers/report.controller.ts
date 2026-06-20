@@ -91,7 +91,9 @@ export async function listStudentReports(req: Request, res: Response) {
       const studentSubmissions = submissions.filter((submission) => {
         return (
           studentAssignedIds.has(asObjectIdString(submission.assignedAssignmentId)) &&
-          normalizeText(submission.studentName) === normalizeText(studentName)
+          (submission.studentId
+            ? asObjectIdString(submission.studentId) === asObjectIdString(cred._id)
+            : normalizeText(submission.studentName) === normalizeText(studentName))
         );
       });
 
@@ -174,7 +176,10 @@ export async function getDetailedStudentReport(req: Request, res: Response) {
     const assigned = await AssignedAssignment.find({ groupId: { $in: studentGroupIds } }).lean();
     const assignedIds = assigned.map((item) => item._id);
     const submissions = await StudentSubmission.find({
-      studentName: { $regex: new RegExp(`^${escapeRegExp(credential.studentName.trim())}$`, 'i') },
+      $or: [
+        { studentId: credential._id },
+        { studentName: { $regex: new RegExp(`^${escapeRegExp(credential.studentName.trim())}$`, 'i') } }
+      ],
       assignedAssignmentId: { $in: assignedIds },
     }).lean();
 

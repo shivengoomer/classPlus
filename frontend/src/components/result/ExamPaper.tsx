@@ -86,6 +86,9 @@ export function ExamPaper({ assignment }: ExamPaperProps) {
               key={section.id}
               section={section}
               questionNumberStart={startNum}
+              subject={result.subject}
+              grade={result.grade}
+              sourceAssessmentId={assignment._id}
             />
           );
         })}

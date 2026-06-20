@@ -148,9 +148,9 @@ export function FileUploadZone({
       
       {selectedFile ? (
         // File Selected View
-        <div className="flex items-center justify-between p-4 bg-gray-50 border border-veda-card-border rounded-xl">
+        <div className="flex items-center justify-between p-4 bg-gray-50 border border-classplus-card-border rounded-xl">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="p-2 bg-orange-100 rounded-lg text-veda-orange">
+            <div className="p-2 bg-orange-100 rounded-lg text-classplus-orange">
               <File className="w-6 h-6" />
             </div>
             <div className="flex flex-col min-w-0">
@@ -172,16 +172,16 @@ export function FileUploadZone({
         </div>
       ) : selectedFileUrl ? (
         // Library Material selected
-        <div className="flex items-center justify-between p-4 bg-orange-50/50 border border-veda-orange/25 rounded-xl">
+        <div className="flex items-center justify-between p-4 bg-orange-50/50 border border-classplus-orange/25 rounded-xl">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="p-2 bg-orange-100 rounded-lg text-veda-orange">
+            <div className="p-2 bg-orange-100 rounded-lg text-classplus-orange">
               <File className="w-6 h-6" />
             </div>
             <div className="flex flex-col min-w-0">
               <span className="text-sm font-semibold text-[#303030] truncate font-sans">
                 {getSelectedFileName()}
               </span>
-              <span className="text-xs text-veda-orange font-sans font-medium">
+              <span className="text-xs text-classplus-orange font-sans font-medium">
                 Using Library Material (UploadThing)
               </span>
             </div>
@@ -317,7 +317,7 @@ export function FileUploadZone({
                   placeholder="Search your library documents..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full text-xs pl-10 pr-10 py-3 bg-gray-50/50 border border-veda-card-border rounded-xl outline-none focus:bg-white focus:border-veda-orange/50 transition-all font-sans text-gray-800 shadow-sm"
+                  className="w-full text-xs pl-10 pr-10 py-3 bg-gray-50/50 border border-classplus-card-border rounded-xl outline-none focus:bg-white focus:border-classplus-orange/50 transition-all font-sans text-gray-800 shadow-sm"
                 />
                 {searchQuery && (
                   <button
@@ -366,7 +366,7 @@ export function FileUploadZone({
             <div className="flex-1 overflow-y-auto flex flex-col gap-2 min-h-[220px] max-h-[360px] pr-1.5 custom-scrollbar">
               {loadingLibrary ? (
                 <div className="py-16 flex flex-col items-center justify-center gap-3 text-xs text-gray-500">
-                  <Loader2 className="w-7 h-7 animate-spin text-veda-orange" />
+                  <Loader2 className="w-7 h-7 animate-spin text-classplus-orange" />
                   <span className="font-sans font-medium">Fetching library assets from storage...</span>
                 </div>
               ) : filteredLibraryItems.length > 0 ? (
@@ -396,7 +396,7 @@ export function FileUploadZone({
                           </div>
                           
                           <div className="flex flex-col min-w-0">
-                            <span className="text-xs font-bold text-gray-800 truncate font-sans group-hover:text-veda-orange transition-colors">
+                            <span className="text-xs font-bold text-gray-800 truncate font-sans group-hover:text-classplus-orange transition-colors">
                               {item.name}
                             </span>
                             <div className="flex items-center gap-2 mt-1 text-[10px] text-gray-400 font-sans">

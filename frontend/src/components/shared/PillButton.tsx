@@ -19,9 +19,9 @@ export function PillButton({
   let variantStyles = '';
 
   if (variant === 'primary') {
-    variantStyles = 'bg-veda-btn-primary text-white hover:bg-opacity-90 active:scale-95 shadow-sm';
+    variantStyles = 'bg-classplus-btn-primary text-white hover:bg-opacity-90 active:scale-95 shadow-sm';
   } else if (variant === 'outline') {
-    variantStyles = 'border border-veda-card-border bg-white text-veda-text-primary hover:bg-gray-50 active:scale-95';
+    variantStyles = 'border border-classplus-card-border bg-white text-classplus-text-primary hover:bg-gray-50 active:scale-95';
   } else if (variant === 'gradient-border') {
     // Gradient border trick:
     // Uses linear-gradient to fill black back, and border-transparent + linear-gradient border box.

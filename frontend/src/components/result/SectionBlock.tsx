@@ -8,9 +8,18 @@ import { QuestionItem } from './QuestionItem';
 interface SectionBlockProps {
   section: Section;
   questionNumberStart: number;
+  subject?: string;
+  grade?: string;
+  sourceAssessmentId?: string;
 }
 
-export function SectionBlock({ section, questionNumberStart }: SectionBlockProps) {
+export function SectionBlock({ 
+  section, 
+  questionNumberStart,
+  subject,
+  grade,
+  sourceAssessmentId
+}: SectionBlockProps) {
   return (
     <div className="flex flex-col gap-4 border-b border-gray-100 pb-6 mb-2 w-full text-left">
       
@@ -36,6 +45,9 @@ export function SectionBlock({ section, questionNumberStart }: SectionBlockProps
             key={q.id}
             number={questionNumberStart + index}
             question={q}
+            subject={subject}
+            grade={grade}
+            sourceAssessmentId={sourceAssessmentId}
           />
         ))}
       </div>

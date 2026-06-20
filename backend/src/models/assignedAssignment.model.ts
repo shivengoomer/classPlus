@@ -17,6 +17,7 @@ const QuestionMisconceptionSchema = new Schema({
 
 // Hint log sub-schema
 const HintLogEntrySchema = new Schema({
+  studentId: { type: Schema.Types.ObjectId, ref: 'StudentCredential' },
   studentName: { type: String, required: true },
   questionId: { type: String, required: true },
   timestamp: { type: Date, default: Date.now },
@@ -34,6 +35,7 @@ export interface IQuestionMisconception {
 }
 
 export interface IHintLogEntry {
+  studentId?: mongoose.Types.ObjectId;
   studentName: string;
   questionId: string;
   timestamp: Date;

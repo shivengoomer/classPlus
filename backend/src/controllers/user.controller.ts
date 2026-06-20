@@ -35,6 +35,11 @@ export async function updateProfile(req: Request, res: Response) {
       schoolCode,
       aiModel,
       aiStrictNCERT,
+      aiIgnoreHandwriting,
+      aiStrictSpelling,
+      aiPartialFormulas,
+      aiLatePenalty,
+      aiCustomDirectives,
       aiCreativity,
       firstName,
       lastName
@@ -46,6 +51,11 @@ export async function updateProfile(req: Request, res: Response) {
     if (schoolCode !== undefined) user.schoolCode = schoolCode;
     if (aiModel !== undefined) user.aiModel = aiModel;
     if (aiStrictNCERT !== undefined) user.aiStrictNCERT = aiStrictNCERT;
+    if (aiIgnoreHandwriting !== undefined) user.aiIgnoreHandwriting = aiIgnoreHandwriting;
+    if (aiStrictSpelling !== undefined) user.aiStrictSpelling = aiStrictSpelling;
+    if (aiPartialFormulas !== undefined) user.aiPartialFormulas = aiPartialFormulas;
+    if (aiLatePenalty !== undefined) user.aiLatePenalty = aiLatePenalty;
+    if (aiCustomDirectives !== undefined) user.aiCustomDirectives = aiCustomDirectives;
     if (aiCreativity !== undefined) user.aiCreativity = aiCreativity;
     if (firstName !== undefined) user.firstName = firstName;
     if (lastName !== undefined) user.lastName = lastName;

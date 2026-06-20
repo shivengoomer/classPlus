@@ -4,7 +4,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Settings, Sparkles, Home, Users, ClipboardList, Cpu, BookOpen, ChevronLeft, ChevronRight, TrendingUp } from 'lucide-react';
+import { Settings, Sparkles, Home, Users, ClipboardList, Cpu, BookOpen, ChevronLeft, ChevronRight, TrendingUp, Archive } from 'lucide-react';
 import { useAssignmentStore } from '@/store/assignmentStore';
 import { listAssignments, listLibraryItems, setGlobalToken } from '@/lib/api';
 import { UserButton, useAuth } from '@clerk/nextjs';
@@ -78,6 +78,11 @@ export function Sidebar({
       label: 'Assessments',
       path: '/assignments',
       icon: <ClipboardList className="w-4.5 h-4.5 flex-shrink-0" />
+    },
+    {
+      label: 'Item Bank',
+      path: '/bank',
+      icon: <Archive className="w-4.5 h-4.5 flex-shrink-0" />
     },
     {
       label: 'Student Reports',

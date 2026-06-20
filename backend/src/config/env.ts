@@ -12,6 +12,7 @@ export const env = {
   UPLOADTHING_TOKEN: process.env.UPLOADTHING_TOKEN || '',
   CLERK_PUBLISHABLE_KEY: process.env.CLERK_PUBLISHABLE_KEY || '',
   CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY || '',
+  ADMIN_SETUP_TOKEN: process.env.ADMIN_SETUP_TOKEN || 'classPlus_erp_admin_secret_9988',
 };
 
 // basic check so we don't start with missing config

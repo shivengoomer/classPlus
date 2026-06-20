@@ -1,20 +1,56 @@
 // src/components/result/QuestionItem.tsx
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Question } from '@/types/question';
+import { saveToBank } from '@/lib/api';
+import { useToastStore } from '@/store/toastStore';
+import { Archive, Loader2, Check } from 'lucide-react';
 
 interface QuestionItemProps {
   number: number;
   question: Question;
+  subject?: string;
+  grade?: string;
+  sourceAssessmentId?: string;
 }
 
-export function QuestionItem({ number, question }: QuestionItemProps) {
-  // Format difficulty text
-  const difficultyLabel = 
-    question.difficulty === 'easy' ? '[Easy]' : 
-    question.difficulty === 'moderate' ? '[Moderate]' : 
-    '[Challenging]';
+export function QuestionItem({ 
+  number, 
+  question,
+  subject,
+  grade,
+  sourceAssessmentId
+}: QuestionItemProps) {
+  const { addToast } = useToastStore();
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  const handleSaveToBank = async () => {
+    if (saved) return;
+    setSaving(true);
+    try {
+      await saveToBank({
+        questionText: question.text,
+        type: question.type,
+        options: question.options,
+        correctAnswer: (question as any).correctAnswer || question.answer || '',
+        subject: subject || 'Science',
+        grade: grade || 'Class 8',
+        difficulty: question.difficulty === 'easy' ? 'Easy' : question.difficulty === 'moderate' ? 'Medium' : 'Hard',
+        tags: question.conceptTag ? [question.conceptTag] : [],
+        bloomLevel: (question as any).bloomLevel || 'Remembering',
+        sourceAssessmentId,
+      });
+      setSaved(true);
+      addToast('Saved question to Item Bank!', 'success');
+    } catch (err: any) {
+      console.error(err);
+      addToast(err.message || 'Failed to save question.', 'error');
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <div className="flex flex-col gap-2 w-full text-left py-2 border-b border-slate-150/40 last:border-b-0">
@@ -37,9 +73,30 @@ export function QuestionItem({ number, question }: QuestionItemProps) {
             </span>
             <span>{question.text}</span>
           </div>
-          <span className="text-[9px] font-bold text-slate-500 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-lg flex-shrink-0 whitespace-nowrap self-start">
-            {question.marks} Mark{question.marks > 1 ? 's' : ''}
-          </span>
+
+          <div className="flex items-center gap-2 flex-shrink-0 self-start">
+            <button
+              onClick={handleSaveToBank}
+              disabled={saving || saved}
+              className={`flex items-center gap-1 text-[9px] font-bold px-2 py-0.5 rounded-lg border transition-all cursor-pointer select-none border-solid ${
+                saved 
+                  ? 'bg-emerald-50 border-emerald-250 text-emerald-600' 
+                  : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-500'
+              }`}
+            >
+              {saving ? (
+                <Loader2 className="w-2.5 h-2.5 animate-spin" />
+              ) : saved ? (
+                <Check className="w-2.5 h-2.5" />
+              ) : (
+                <Archive className="w-2.5 h-2.5" />
+              )}
+              <span>{saved ? 'Saved' : 'Save to Bank'}</span>
+            </button>
+            <span className="text-[9px] font-bold text-slate-500 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-lg whitespace-nowrap">
+              {question.marks} Mark{question.marks > 1 ? 's' : ''}
+            </span>
+          </div>
         </div>
       </div>
 

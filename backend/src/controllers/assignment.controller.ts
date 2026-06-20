@@ -60,6 +60,7 @@ export async function createAssignment(req: Request, res: Response) {
       status: 'pending',
       jobId,
       userId,
+      institutionId: (req as any).user?.institutionId,
     });
 
     log(`Assignment created: ${assignment._id} with jobId: ${jobId} for user ${userId}`);
@@ -187,6 +188,7 @@ export async function regenerateWithDifficulty(req: Request, res: Response) {
       status: 'pending',
       jobId,
       userId,
+      institutionId: (req as any).user?.institutionId,
       parentAssignmentId: originalAssignment._id.toString(),
     });
 

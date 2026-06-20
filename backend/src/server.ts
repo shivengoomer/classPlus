@@ -6,6 +6,8 @@ import { validateEnv, env } from './config/env';
 import { connectDB } from './config/db';
 import { setupWebSocket } from './websocket/socket';
 import { startWorker } from './workers/assignment.worker';
+import { startGradingWorker } from './workers/grading.worker';
+import { startPlagiarismWorker } from './workers/plagiarism.worker';
 import app from './app';
 import { log } from './utils/logger';
 
@@ -23,8 +25,10 @@ async function main() {
   // so ws://localhost:4000 works alongside http://localhost:4000/api
   setupWebSocket(server);
 
-  // step 5: start the BullMQ worker
+  // step 5: start the BullMQ workers
   startWorker();
+  startGradingWorker();
+  startPlagiarismWorker();
 
   // step 6: start listening
   server.listen(env.PORT, () => {

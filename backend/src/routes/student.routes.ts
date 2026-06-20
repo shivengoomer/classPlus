@@ -1,5 +1,5 @@
 // src/routes/student.routes.ts
-// All student-facing routes — NO Clerk auth required
+// All student-facing routes
 import { Router } from 'express';
 import multer from 'multer';
 import path from 'path';
@@ -20,6 +20,7 @@ import {
   getPracticeHistory,
   exploreCbsesyllabus,
 } from '../controllers/student.controller';
+import { requireStudentAuth } from '../middlewares/auth.middleware';
 
 const router = Router();
 
@@ -42,26 +43,27 @@ const upload = multer({
   },
 });
 
-// No auth middleware — students authenticate via Email + 4-digit PIN
+// Authentication endpoints (public)
 router.post('/login/verify', verifyStudentSession);
 router.post('/register', studentRegister);
 router.post('/login', studentLogin);
-router.post('/join-class', joinClassGroup);
-router.get('/session', getStudentSession);
 
-router.get('/assignment/:assignedId', getStudentAssignment);
-router.post('/submit/:assignedId', submitStudentAnswers);
-router.post('/upload/:assignedId', upload.single('paper'), uploadStudentPaper);
-router.get('/results/:assignedId', getStudentResults);
-router.post('/tutor/chat', studentTutorChat);
+// Protected endpoints (require student JWT token)
+router.post('/join-class', requireStudentAuth(), joinClassGroup);
+router.get('/session', requireStudentAuth(), getStudentSession);
+router.get('/assignment/:assignedId', requireStudentAuth(), getStudentAssignment);
+router.post('/submit/:assignedId', requireStudentAuth(), submitStudentAnswers);
+router.post('/upload/:assignedId', requireStudentAuth(), upload.single('paper'), uploadStudentPaper);
+router.get('/results/:assignedId', requireStudentAuth(), getStudentResults);
+router.post('/tutor/chat', requireStudentAuth(), studentTutorChat);
 
 // AI Practice Lab routes
-router.post('/practice/generate', generatePracticeWorksheet);
-router.post('/practice/submit/:practiceId', submitPracticeWorksheet);
-router.get('/practice/history', getPracticeHistory);
+router.post('/practice/generate', requireStudentAuth(), generatePracticeWorksheet);
+router.post('/practice/submit/:practiceId', requireStudentAuth(), submitPracticeWorksheet);
+router.get('/practice/history', requireStudentAuth(), getPracticeHistory);
 
 // Syllabus mapping / explore route
-router.post('/syllabus/explore', exploreCbsesyllabus);
+router.post('/syllabus/explore', requireStudentAuth(), exploreCbsesyllabus);
 
 export default router;
 

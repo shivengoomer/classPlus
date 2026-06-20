@@ -86,7 +86,7 @@ export function AppShell({ children }: AppShellProps) {
   return (
     <div 
       style={{ '--sidebar-width': isSidebarExpanded ? '260px' : '82px' } as React.CSSProperties}
-      className="flex h-screen bg-[#F3F4F6] text-veda-text-primary overflow-hidden font-sans relative"
+      className="flex h-screen bg-[#F3F4F6] text-classplus-text-primary overflow-hidden font-sans relative"
     >
       
       {/* Dynamic Background Mesh & Interactive Shape Grid */}

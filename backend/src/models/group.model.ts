@@ -10,6 +10,7 @@ export interface IGroup extends Document {
   rubric?: string;
   classCode: string;
   userId?: string;
+  institutionId?: mongoose.Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -27,6 +28,7 @@ const GroupSchema = new Schema(
       default: () => crypto.randomBytes(3).toString('hex').toUpperCase(), // 6-char e.g. "A3F9BC"
     },
     userId: { type: String },
+    institutionId: { type: Schema.Types.ObjectId, ref: 'Institution', index: true },
   },
   { timestamps: true }
 );

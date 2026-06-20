@@ -6,7 +6,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { 
   ArrowLeft, Sparkles, Star, AlertCircle, Sparkle,
-  Brain, TrendingUp, HelpCircle, CheckCircle
+  Brain, TrendingUp, HelpCircle, CheckCircle,
+  Book, Calculator, Compass, Award, GraduationCap
 } from 'lucide-react';
 import ShapeGrid from '@/components/ShapeGrid';
 import { Logo } from '@/components/shared/Logo';
@@ -339,6 +340,160 @@ function AnalyticsSimulator() {
   );
 }
 
+function StudentDoodleShowcase() {
+  const [activeTask, setActiveTask] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveTask(prev => (prev + 1) % 3);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="w-full h-full flex flex-col justify-between items-center gap-6 relative select-none">
+      
+      {/* Floating Doodles Container */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
+        {/* Doodle 1: Book */}
+        <motion.div
+          animate={{ y: [0, -12, 0], rotate: [0, 5, 0] }}
+          transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
+          className="absolute top-[5%] left-[5%] text-indigo-400/25"
+        >
+          <Book className="w-9 h-9" />
+        </motion.div>
+        
+        {/* Doodle 2: Calculator */}
+        <motion.div
+          animate={{ y: [0, 10, 0], rotate: [0, -8, 0] }}
+          transition={{ repeat: Infinity, duration: 4.5, ease: "easeInOut", delay: 0.5 }}
+          className="absolute top-[8%] right-[5%] text-violet-400/25"
+        >
+          <Calculator className="w-10 h-10" />
+        </motion.div>
+
+        {/* Doodle 3: Compass */}
+        <motion.div
+          animate={{ y: [0, -8, 0], rotate: [0, 10, 0] }}
+          transition={{ repeat: Infinity, duration: 5, ease: "easeInOut", delay: 1 }}
+          className="absolute bottom-[20%] left-[8%] text-purple-400/25"
+        >
+          <Compass className="w-9 h-9" />
+        </motion.div>
+
+        {/* Doodle 4: Award */}
+        <motion.div
+          animate={{ y: [0, 12, 0], rotate: [0, -5, 0] }}
+          transition={{ repeat: Infinity, duration: 3.8, ease: "easeInOut", delay: 1.5 }}
+          className="absolute bottom-[25%] right-[5%] text-amber-400/25"
+        >
+          <Award className="w-10 h-10" />
+        </motion.div>
+
+        {/* Doodle 5: Graduation Cap */}
+        <motion.div
+          animate={{ scale: [1, 1.05, 1], rotate: [0, 4, 0] }}
+          transition={{ repeat: Infinity, duration: 6, ease: "easeInOut", delay: 2 }}
+          className="absolute top-[40%] right-[2%] text-indigo-500/15"
+        >
+          <GraduationCap className="w-12 h-12" />
+        </motion.div>
+      </div>
+
+      {/* Main Interactive Student Dashboard Mock */}
+      <div className="w-full flex-grow flex flex-col justify-center gap-4.5 z-10 max-w-sm">
+        
+        {/* 1. Study Task Progress Widget */}
+        <div className="bg-[#121930]/80 border border-slate-800 rounded-2xl p-4 shadow-xl">
+          <div className="text-[10px] text-indigo-400 uppercase tracking-widest font-bold mb-3 flex items-center gap-1.5">
+            <CheckCircle className="w-3.5 h-3.5" />
+            Today's Assignment Checklist
+          </div>
+          
+          <div className="space-y-2.5">
+            {[
+              { id: 0, title: "Quadratic Equations HW 2", points: "+15 XP", sub: "Mathematics" },
+              { id: 1, title: "Cell Structure Practice Lab", points: "+10 XP", sub: "Biology" },
+              { id: 2, title: "Forces and Motion doubts", points: "+20 XP", sub: "Physics" }
+            ].map(task => {
+              const isActive = activeTask === task.id;
+              const isCompleted = activeTask > task.id;
+              
+              return (
+                <div 
+                  key={task.id} 
+                  className={`p-3 rounded-xl border transition-all duration-300 flex items-center justify-between ${
+                    isActive 
+                      ? "bg-indigo-500/10 border-indigo-500/40 shadow-[0_4px_12px_rgba(99,102,241,0.08)]"
+                      : "bg-[#090d1a]/40 border-slate-900/60"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`w-5 h-5 rounded-full border flex items-center justify-center transition-all ${
+                      isCompleted 
+                        ? "bg-emerald-500 border-emerald-500 text-white text-xs font-bold" 
+                        : isActive 
+                          ? "border-indigo-400 text-indigo-400 text-[10px]" 
+                          : "border-slate-800 text-transparent"
+                    }`}>
+                      {isCompleted ? "✓" : isActive ? "●" : ""}
+                    </div>
+                    <div>
+                      <h5 className={`text-[11px] font-semibold font-sans leading-none ${isCompleted ? "line-through text-slate-500" : "text-slate-200"}`}>
+                        {task.title}
+                      </h5>
+                      <span className="text-[9px] text-slate-500 block mt-1 font-sans">{task.sub}</span>
+                    </div>
+                  </div>
+                  <span className={`text-[9px] font-bold font-mono px-2 py-0.5 rounded ${
+                    isCompleted 
+                      ? "bg-slate-800 text-slate-500" 
+                      : isActive 
+                        ? "bg-indigo-500/20 text-indigo-300" 
+                        : "bg-slate-900 text-slate-600"
+                  }`}>
+                    {task.points}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* 2. Interactive Study Tutor Conversation simulation */}
+        <div className="bg-[#121930]/80 border border-slate-800 rounded-2xl p-4 shadow-xl flex flex-col gap-3">
+          <div className="text-[10px] text-purple-400 uppercase tracking-widest font-bold flex items-center gap-1.5 border-b border-slate-800/60 pb-2">
+            <Brain className="w-3.5 h-3.5" />
+            AI Study Tutor Chatbot
+          </div>
+
+          <div className="space-y-3">
+            {/* Student message */}
+            <div className="flex items-end gap-2 max-w-[85%] self-start text-left">
+              <div className="w-6 h-6 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-[10px] font-bold text-slate-350 flex-shrink-0">S</div>
+              <div className="bg-[#090d1a]/80 border border-slate-850 rounded-2xl rounded-bl-none p-2.5 text-[10.5px] leading-relaxed text-slate-300 font-sans">
+                Tutor, I'm stuck on why cells need mitochondria. Help? 
+              </div>
+            </div>
+
+            {/* AI message */}
+            <div className="flex items-start gap-2 max-w-[90%] ml-auto flex-row-reverse text-left">
+              <div className="w-6 h-6 rounded-full bg-purple-500/20 border border-purple-500/30 flex items-center justify-center text-[10px] font-bold text-purple-400 flex-shrink-0">AI</div>
+              <div className="bg-purple-500/10 border border-purple-500/25 rounded-2xl rounded-br-none p-2.5 text-[10.5px] leading-relaxed text-slate-200 font-sans relative">
+                <div className="absolute -top-1 -left-1 text-[8px] text-purple-300">✨</div>
+                Think of mitochondria as the cell's **power plant**. They turn nutrients into **ATP** (energy) so the cell can work! ⚡
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  );
+}
+
 export default function AuthLayout({ children, title, subtitle, portalType, onBack, backLabel = 'Change role' }: AuthLayoutProps) {
   const [activeTab, setActiveTab] = useState<TabType>('ai-gen');
   const [autoplay, setAutoplay] = useState(true);
@@ -391,15 +546,15 @@ export default function AuthLayout({ children, title, subtitle, portalType, onBa
   const currentTestimonial = testimonials[activeTab];
 
   return (
-    <div className="min-h-screen w-full flex bg-[#F7F9FC] text-slate-800 font-sans overflow-hidden relative">
+    <div className={`min-h-screen w-full flex bg-[#F7F9FC] text-slate-800 font-sans overflow-hidden relative ${portalType === 'student' ? 'flex-row-reverse' : ''}`}>
       
       {/* LEFT SIDE PANEL - Desktop Only (Interactive Workspace Showcase) */}
-      <div className="hidden lg:flex relative lg:w-[48%] xl:w-[50%] h-screen flex-col justify-between p-12 overflow-hidden bg-[#070b19] text-slate-100 z-10 select-none border-r border-slate-900">
+      <div className={`hidden lg:flex relative lg:w-[48%] xl:w-[50%] h-screen flex-col justify-between p-12 overflow-hidden bg-[#070b19] text-slate-100 z-10 select-none border-slate-900 ${portalType === 'student' ? 'border-l' : 'border-r'}`}>
         
         {/* Neon Ambient Background Blur Orbs inside Left Column */}
         <div className="absolute inset-0 z-0">
-          <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-orange-600/[0.08] blur-[100px] pointer-events-none" />
-          <div className="absolute bottom-[-15%] right-[-10%] w-[600px] h-[600px] rounded-full bg-[#10375C]/[0.15] blur-[120px] pointer-events-none" />
+          <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-indigo-600/[0.08] blur-[100px] pointer-events-none" />
+          <div className="absolute bottom-[-15%] right-[-10%] w-[600px] h-[600px] rounded-full bg-purple-650/[0.15] blur-[120px] pointer-events-none" />
           <div className="absolute top-[30%] right-[-20%] w-[400px] h-[400px] rounded-full bg-indigo-500/[0.05] blur-[90px] pointer-events-none" />
           
           <div className="absolute inset-0 opacity-[0.25] pointer-events-none mix-blend-overlay">
@@ -440,128 +595,183 @@ export default function AuthLayout({ children, title, subtitle, portalType, onBa
           </div>
         </div>
 
-        {/* Core Showcase Area */}
-        <div className="relative z-10 w-full max-w-lg my-auto pt-4 flex flex-col gap-6">
-          
-          {/* Title and description */}
-          <div>
-            <span className="text-[10px] uppercase tracking-wider text-orange-400 font-bold flex items-center gap-1.5 mb-2">
-              <Sparkles className="w-3.5 h-3.5 text-orange-400" />
-              Live Workspace Demonstration
-            </span>
-            <h2 className="text-3xl font-extrabold tracking-tight text-white leading-tight">
-              Assessments, Grading & Insights
-            </h2>
-            <p className="text-slate-400 text-xs mt-2 leading-relaxed">
-              Explore how classPlus supercharges educator workflows. Watch the live mock dashboard update in real time or select a tab to explore options.
-            </p>
-          </div>
-
-          {/* Interactive Navigation Tabs */}
-          <div className="flex gap-1 p-1 bg-[#0c1125] border border-slate-850 rounded-2xl">
-            {(['ai-gen', 'grading', 'analytics'] as const).map(tab => (
-              <button
-                key={tab}
-                onClick={() => handleTabClick(tab)}
-                className={`flex-1 py-2 rounded-xl text-[10.5px] font-bold transition-all relative flex items-center justify-center gap-1.5 ${
-                  activeTab === tab 
-                    ? 'text-white' 
-                    : 'text-slate-550 hover:text-slate-300'
-                }`}
-              >
-                {activeTab === tab && (
-                  <motion.div 
-                    layoutId="activeTabIndicator"
-                    className="absolute inset-0 bg-[#121932] border border-slate-800 rounded-xl"
-                    transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-                  />
-                )}
-                <span className="relative z-10">
-                  {tab === 'ai-gen' && 'AI Generator'}
-                  {tab === 'grading' && 'Auto Grading'}
-                  {tab === 'analytics' && 'Performance insights'}
+        {portalType === 'student' ? (
+          <>
+            {/* Core Student Showcase Area */}
+            <div className="relative z-10 w-full max-w-lg my-auto pt-4 flex flex-col gap-6">
+              
+              {/* Title and description */}
+              <div>
+                <span className="text-[10px] uppercase tracking-wider text-indigo-400 font-bold flex items-center gap-1.5 mb-2">
+                  <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
+                  Interactive Student Hub
                 </span>
-              </button>
-            ))}
-          </div>
-
-          {/* Simulated Screen Body Container */}
-          <div className="w-full aspect-[4/3] relative z-10 flex-shrink-0" style={{ minHeight: '260px' }}>
-            <AnimatePresence mode="wait">
-              {activeTab === 'ai-gen' && (
-                <motion.div 
-                  key="ai-gen"
-                  initial={{ opacity: 0, scale: 0.98 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.98 }}
-                  transition={{ duration: 0.3 }}
-                  className="w-full h-full"
-                >
-                  <AIGenSimulator />
-                </motion.div>
-              )}
-              {activeTab === 'grading' && (
-                <motion.div 
-                  key="grading"
-                  initial={{ opacity: 0, scale: 0.98 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.98 }}
-                  transition={{ duration: 0.3 }}
-                  className="w-full h-full"
-                >
-                  <GradingSimulator />
-                </motion.div>
-              )}
-              {activeTab === 'analytics' && (
-                <motion.div 
-                  key="analytics"
-                  initial={{ opacity: 0, scale: 0.98 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.98 }}
-                  transition={{ duration: 0.3 }}
-                  className="w-full h-full"
-                >
-                  <AnalyticsSimulator />
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-
-        </div>
-
-        {/* Testimonial Box */}
-        <div className="relative z-10 w-full max-w-lg mt-auto pt-6 border-t border-slate-900">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeTab}
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              transition={{ duration: 0.4 }}
-              className="backdrop-blur-xl bg-[#0e1428]/45 border border-slate-850 shadow-[0_8px_30px_rgb(0,0,0,0.3)] rounded-2xl p-4.5 flex flex-col gap-2.5"
-            >
-              <div className="flex text-amber-500 gap-0.5">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Star key={i} className="w-3.5 h-3.5 fill-current" />
-                ))}
+                <h2 className="text-3xl font-extrabold tracking-tight text-white leading-tight">
+                  Learn. Practice. Excel.
+                </h2>
+                <p className="text-slate-400 text-xs mt-2 leading-relaxed">
+                  Tackle classroom assignments, review homework lessons, and get instant guidance from your personal AI study partner.
+                </p>
               </div>
-              <p className="text-[11px] italic text-slate-300 leading-relaxed font-medium">
-                &quot;{currentTestimonial.quote}&quot;
-              </p>
-              <div className="flex items-center gap-3">
-                <img 
-                  src={currentTestimonial.avatar} 
-                  alt="Educator avatar" 
-                  className="w-8 h-8 rounded-full object-cover border border-slate-800 shadow-sm"
-                />
-                <div>
-                  <h4 className="text-[10.5px] font-bold text-white leading-none">{currentTestimonial.author}</h4>
-                  <p className="text-[9px] text-slate-500 font-semibold mt-1 leading-none">{currentTestimonial.role}</p>
+
+              {/* Student animations display container */}
+              <div className="w-full aspect-[4/3] relative z-10 flex-shrink-0" style={{ minHeight: '300px' }}>
+                <StudentDoodleShowcase />
+              </div>
+
+            </div>
+
+            {/* Student Testimonial Box */}
+            <div className="relative z-10 w-full max-w-lg mt-auto pt-6 border-t border-slate-900">
+              <div className="backdrop-blur-xl bg-indigo-950/20 border border-slate-850 shadow-[0_8px_30px_rgb(0,0,0,0.3)] rounded-2xl p-4.5 flex flex-col gap-2.5">
+                <div className="flex text-amber-500 gap-0.5">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Star key={i} className="w-3.5 h-3.5 fill-current" />
+                  ))}
+                </div>
+                <p className="text-[11px] italic text-slate-300 leading-relaxed font-medium">
+                  &quot;I love using the AI tutor for homework! It doesn't just give the answers; it explains the steps with hints so I actually understand how to solve it.&quot;
+                </p>
+                <div className="flex items-center gap-3">
+                  <img 
+                    src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&auto=format&fit=crop&q=80" 
+                    alt="Student avatar" 
+                    className="w-8 h-8 rounded-full object-cover border border-slate-800 shadow-sm"
+                  />
+                  <div>
+                    <h4 className="text-[10.5px] font-bold text-white leading-none">Aarav Sharma</h4>
+                    <p className="text-[9px] text-slate-500 font-semibold mt-1 leading-none">Grade 10 Student @ Oakridge Global</p>
+                  </div>
                 </div>
               </div>
-            </motion.div>
-          </AnimatePresence>
-        </div>
+            </div>
+          </>
+        ) : (
+          <>
+            {/* Core Educator Showcase Area */}
+            <div className="relative z-10 w-full max-w-lg my-auto pt-4 flex flex-col gap-6">
+              
+              {/* Title and description */}
+              <div>
+                <span className="text-[10px] uppercase tracking-wider text-orange-400 font-bold flex items-center gap-1.5 mb-2">
+                  <Sparkles className="w-3.5 h-3.5 text-orange-400" />
+                  Live Workspace Demonstration
+                </span>
+                <h2 className="text-3xl font-extrabold tracking-tight text-white leading-tight">
+                  Assessments, Grading & Insights
+                </h2>
+                <p className="text-slate-400 text-xs mt-2 leading-relaxed">
+                  Explore how classPlus supercharges educator workflows. Watch the live mock dashboard update in real time or select a tab to explore options.
+                </p>
+              </div>
+
+              {/* Interactive Navigation Tabs */}
+              <div className="flex gap-1 p-1 bg-[#0c1125] border border-slate-850 rounded-2xl">
+                {(['ai-gen', 'grading', 'analytics'] as const).map(tab => (
+                  <button
+                    key={tab}
+                    onClick={() => handleTabClick(tab)}
+                    className={`flex-1 py-2 rounded-xl text-[10.5px] font-bold transition-all relative flex items-center justify-center gap-1.5 ${
+                      activeTab === tab 
+                        ? 'text-white' 
+                        : 'text-slate-550 hover:text-slate-300'
+                    }`}
+                  >
+                    {activeTab === tab && (
+                      <motion.div 
+                        layoutId="activeTabIndicator"
+                        className="absolute inset-0 bg-[#121932] border border-slate-800 rounded-xl"
+                        transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                      />
+                    )}
+                    <span className="relative z-10">
+                      {tab === 'ai-gen' && 'AI Generator'}
+                      {tab === 'grading' && 'Auto Grading'}
+                      {tab === 'analytics' && 'Performance insights'}
+                    </span>
+                  </button>
+                ))}
+              </div>
+
+              {/* Simulated Screen Body Container */}
+              <div className="w-full aspect-[4/3] relative z-10 flex-shrink-0" style={{ minHeight: '260px' }}>
+                <AnimatePresence mode="wait">
+                  {activeTab === 'ai-gen' && (
+                    <motion.div 
+                      key="ai-gen"
+                      initial={{ opacity: 0, scale: 0.98 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.98 }}
+                      transition={{ duration: 0.3 }}
+                      className="w-full h-full"
+                    >
+                      <AIGenSimulator />
+                    </motion.div>
+                  )}
+                  {activeTab === 'grading' && (
+                    <motion.div 
+                      key="grading"
+                      initial={{ opacity: 0, scale: 0.98 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.98 }}
+                      transition={{ duration: 0.3 }}
+                      className="w-full h-full"
+                    >
+                      <GradingSimulator />
+                    </motion.div>
+                  )}
+                  {activeTab === 'analytics' && (
+                    <motion.div 
+                      key="analytics"
+                      initial={{ opacity: 0, scale: 0.98 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.98 }}
+                      transition={{ duration: 0.3 }}
+                      className="w-full h-full"
+                    >
+                      <AnalyticsSimulator />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+            </div>
+
+            {/* Testimonial Box */}
+            <div className="relative z-10 w-full max-w-lg mt-auto pt-6 border-t border-slate-900">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeTab}
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -15 }}
+                  transition={{ duration: 0.4 }}
+                  className="backdrop-blur-xl bg-[#0e1428]/45 border border-slate-850 shadow-[0_8px_30px_rgb(0,0,0,0.3)] rounded-2xl p-4.5 flex flex-col gap-2.5"
+                >
+                  <div className="flex text-amber-500 gap-0.5">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <Star key={i} className="w-3.5 h-3.5 fill-current" />
+                    ))}
+                  </div>
+                  <p className="text-[11px] italic text-slate-300 leading-relaxed font-medium">
+                    &quot;{currentTestimonial.quote}&quot;
+                  </p>
+                  <div className="flex items-center gap-3">
+                    <img 
+                      src={currentTestimonial.avatar} 
+                      alt="Educator avatar" 
+                      className="w-8 h-8 rounded-full object-cover border border-slate-800 shadow-sm"
+                    />
+                    <div>
+                      <h4 className="text-[10.5px] font-bold text-white leading-none">{currentTestimonial.author}</h4>
+                      <p className="text-[9px] text-slate-500 font-semibold mt-1 leading-none">{currentTestimonial.role}</p>
+                    </div>
+                  </div>
+                </motion.div>
+              </AnimatePresence>
+            </div>
+          </>
+        )}
 
       </div>
 
@@ -592,14 +802,14 @@ export default function AuthLayout({ children, title, subtitle, portalType, onBa
         <div className="relative w-full max-w-xl flex flex-col items-center justify-center py-10 z-10">
           
           {/* Subtle colored glow backing */}
-          <div className="absolute w-[80%] h-[80%] -z-10 rounded-full bg-gradient-to-tr from-orange-500/5 to-[#10375C]/5 blur-[70px] pointer-events-none opacity-80" />
+          <div className={`absolute w-[80%] h-[80%] -z-10 rounded-full blur-[70px] pointer-events-none opacity-80 ${portalType === 'student' ? 'bg-gradient-to-tr from-indigo-500/5 to-purple-500/5' : 'bg-gradient-to-tr from-orange-500/5 to-[#10375C]/5'}`} />
 
           {/* Form Header Info (Educator / School Portal Info) */}
           <div className="w-full text-center mb-4 select-none">
             <div className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-slate-200/60 bg-slate-50 text-[10px] font-bold text-slate-500 mb-3.5">
-              <Sparkle className="w-3 h-3 text-[#10375C] fill-[#10375C]/20" />
+              <Sparkle className={`w-3 h-3 ${portalType === 'student' ? 'text-indigo-500 fill-indigo-500/20' : 'text-[#10375C] fill-[#10375C]/20'}`} />
               <span>
-                {portalType === 'teacher' ? '🎓 Teacher & School Portal' : portalType === 'student' ? '📚 Student Portal' : 'Official Educator & school Portal'}
+                {portalType === 'teacher' ? '🎓 Teacher & School Portal' : portalType === 'student' ? '📚 Student Portal' : '✨ Choose Your Workspace'}
               </span>
             </div>
             <h1 className="text-2xl font-black text-slate-900 tracking-tight leading-none">

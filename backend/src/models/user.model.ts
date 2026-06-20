@@ -6,17 +6,24 @@ export interface IUser extends Document {
   firstName?: string;
   lastName?: string;
   imageUrl?: string;
-  role?: string;
+  role?: string; // e.g. 'Admin' or 'Teacher' or custom title
+  institutionId?: mongoose.Types.ObjectId;
   schoolName?: string;
   schoolBranch?: string;
   schoolCode?: string;
   aiModel?: string;
   aiStrictNCERT?: boolean;
+  aiIgnoreHandwriting?: boolean;
+  aiStrictSpelling?: boolean;
+  aiPartialFormulas?: boolean;
+  aiLatePenalty?: number;
+  aiCustomDirectives?: string[];
   aiCreativity?: number;
   plan?: string;
   planStatus?: string;
   creditsUsed?: number;
   creditsLimit?: number;
+  adminPassword?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -28,17 +35,24 @@ const UserSchema = new Schema(
     firstName: { type: String },
     lastName: { type: String },
     imageUrl: { type: String },
-    role: { type: String, default: 'Senior Science Teacher' },
-    schoolName: { type: String, default: 'Delhi Public School' },
-    schoolBranch: { type: String, default: 'Bokaro Steel City, Sector-4' },
-    schoolCode: { type: String, default: 'CBSE-3430015' },
+    role: { type: String, default: 'Teacher' },
+    institutionId: { type: Schema.Types.ObjectId, ref: 'Institution' },
+    schoolName: { type: String, default: 'Personal Workspace' },
+    schoolBranch: { type: String, default: 'Independent' },
+    schoolCode: { type: String, default: 'IND-WORKSPACE' },
     aiModel: { type: String, default: 'gemini-1.5-flash' },
     aiStrictNCERT: { type: Boolean, default: true },
+    aiIgnoreHandwriting: { type: Boolean, default: true },
+    aiStrictSpelling: { type: Boolean, default: false },
+    aiPartialFormulas: { type: Boolean, default: true },
+    aiLatePenalty: { type: Number, default: 10 },
+    aiCustomDirectives: [{ type: String, default: [] }],
     aiCreativity: { type: Number, default: 0.2 },
     plan: { type: String, default: 'Free Trial' },
     planStatus: { type: String, default: 'active' },
     creditsUsed: { type: Number, default: 0 },
     creditsLimit: { type: Number, default: 10 },
+    adminPassword: { type: String },
   },
   { timestamps: true }
 );

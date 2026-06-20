@@ -1,12 +1,21 @@
 // src/lib/studentApi.ts
-// No-auth API client for the student portal
+// JWT-authenticated API client for the student portal
+import { useStudentStore } from '@/store/studentStore';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
 
 async function studentFetch(url: string, options: RequestInit = {}): Promise<Response> {
+  const token = useStudentStore.getState().token;
+  const headers = new Headers(options.headers);
+  if (!(options.body instanceof FormData) && !headers.has('Content-Type')) {
+    headers.set('Content-Type', 'application/json');
+  }
+  if (token) {
+    headers.set('Authorization', `Bearer ${token}`);
+  }
   return fetch(url, {
     ...options,
-    headers: { 'Content-Type': 'application/json', ...options.headers },
+    headers,
   });
 }
 
@@ -21,6 +30,7 @@ export interface StudentLoginResponse {
     classCode: string;
   }[];
   assignments: StudentAssignmentItem[];
+  token: string;
 }
 
 export interface StudentAssignmentItem {
@@ -51,10 +61,21 @@ export interface VerifyStudentResponse {
   message: string;
 }
 
+export interface Announcement {
+  _id: string;
+  groupId: string;
+  teacherId: string;
+  teacherName: string;
+  title: string;
+  content: string;
+  attachments?: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
 export async function verifyStudentSession(email: string): Promise<VerifyStudentResponse> {
-  const res = await fetch(`${BASE_URL}/student/login/verify`, {
+  const res = await studentFetch(`${BASE_URL}/student/login/verify`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email }),
   });
   if (!res.ok) {
@@ -65,7 +86,7 @@ export async function verifyStudentSession(email: string): Promise<VerifyStudent
 }
 
 export async function getStudentSession(email: string): Promise<StudentLoginResponse> {
-  const res = await fetch(`${BASE_URL}/student/session?email=${encodeURIComponent(email)}`);
+  const res = await studentFetch(`${BASE_URL}/student/session`);
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.error || 'Failed to fetch student session');
@@ -79,9 +100,8 @@ export async function studentRegister(
   email: string,
   passcode: string
 ): Promise<StudentLoginResponse> {
-  const res = await fetch(`${BASE_URL}/student/register`, {
+  const res = await studentFetch(`${BASE_URL}/student/register`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ classCode, studentName, email, passcode }),
   });
   if (!res.ok) {
@@ -95,9 +115,8 @@ export async function studentLogin(
   email: string,
   passcode: string
 ): Promise<StudentLoginResponse> {
-  const res = await fetch(`${BASE_URL}/student/login`, {
+  const res = await studentFetch(`${BASE_URL}/student/login`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, passcode }),
   });
   if (!res.ok) {
@@ -112,10 +131,9 @@ export async function joinClassGroup(
   classCode: string,
   studentName: string
 ): Promise<StudentLoginResponse> {
-  const res = await fetch(`${BASE_URL}/student/join-class`, {
+  const res = await studentFetch(`${BASE_URL}/student/join-class`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, classCode, studentName }),
+    body: JSON.stringify({ classCode }),
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
@@ -123,7 +141,6 @@ export async function joinClassGroup(
   }
   return res.json();
 }
-
 
 export interface StudentAssignmentDetail {
   assignedId: string;
@@ -154,7 +171,7 @@ export interface StudentAssignmentDetail {
 }
 
 export async function getStudentAssignment(assignedId: string, studentName: string): Promise<StudentAssignmentDetail> {
-  const res = await fetch(`${BASE_URL}/student/assignment/${assignedId}?studentName=${encodeURIComponent(studentName)}`);
+  const res = await studentFetch(`${BASE_URL}/student/assignment/${assignedId}`);
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.error || 'Failed to load assignment');
@@ -167,10 +184,9 @@ export async function submitAnswers(
   studentName: string,
   answers: { questionId: string; answer: string }[]
 ): Promise<{ submissionId: string; totalScore: number; totalMarks: number; percentage: number }> {
-  const res = await fetch(`${BASE_URL}/student/submit/${assignedId}`, {
+  const res = await studentFetch(`${BASE_URL}/student/submit/${assignedId}`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ studentName, answers }),
+    body: JSON.stringify({ answers }),
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
@@ -181,9 +197,8 @@ export async function submitAnswers(
 
 export async function uploadPaper(assignedId: string, studentName: string, file: File): Promise<{ fileUrl: string }> {
   const formData = new FormData();
-  formData.append('studentName', studentName);
   formData.append('paper', file);
-  const res = await fetch(`${BASE_URL}/student/upload/${assignedId}`, {
+  const res = await studentFetch(`${BASE_URL}/student/upload/${assignedId}`, {
     method: 'POST',
     body: formData,
   });
@@ -203,6 +218,7 @@ export interface StudentResults {
   totalScore: number;
   totalMarks: number;
   percentage: number;
+  status?: string;
   submittedAt: string;
   answers: {
     questionId: string;
@@ -219,7 +235,7 @@ export interface StudentResults {
 }
 
 export async function getStudentResults(assignedId: string, studentName: string): Promise<StudentResults> {
-  const res = await fetch(`${BASE_URL}/student/results/${assignedId}?studentName=${encodeURIComponent(studentName)}`);
+  const res = await studentFetch(`${BASE_URL}/student/results/${assignedId}`);
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.error || 'Failed to load results');
@@ -233,9 +249,8 @@ export async function tutorChat(
   subject?: string,
   grade?: string
 ): Promise<{ reply: string }> {
-  const res = await fetch(`${BASE_URL}/student/tutor/chat`, {
+  const res = await studentFetch(`${BASE_URL}/student/tutor/chat`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ message, history, subject, grade }),
   });
   if (!res.ok) throw new Error('AI tutor unavailable');
@@ -290,10 +305,16 @@ export async function generatePracticeQuiz(params: {
   numQuestions?: number;
   type?: string;
 }): Promise<PracticeQuiz> {
-  const res = await fetch(`${BASE_URL}/student/practice/generate`, {
+  const res = await studentFetch(`${BASE_URL}/student/practice/generate`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(params),
+    body: JSON.stringify({
+      classCode: params.classCode,
+      subject: params.subject,
+      grade: params.grade,
+      topic: params.topic,
+      numQuestions: params.numQuestions,
+      type: params.type,
+    }),
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
@@ -312,9 +333,8 @@ export async function submitPracticeQuiz(
   feedback: string;
   answers: GradedPracticeAnswer[];
 }> {
-  const res = await fetch(`${BASE_URL}/student/practice/submit/${practiceId}`, {
+  const res = await studentFetch(`${BASE_URL}/student/practice/submit/${practiceId}`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ answers }),
   });
   if (!res.ok) {
@@ -325,9 +345,7 @@ export async function submitPracticeQuiz(
 }
 
 export async function getPracticeHistory(studentEmail: string): Promise<PracticeQuiz[]> {
-  const res = await fetch(
-    `${BASE_URL}/student/practice/history?studentEmail=${encodeURIComponent(studentEmail)}`
-  );
+  const res = await studentFetch(`${BASE_URL}/student/practice/history`);
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.error || 'Failed to retrieve practice history');
@@ -356,14 +374,87 @@ export async function exploreSyllabus(params: {
   subject: string;
   topic: string;
 }): Promise<SyllabusExplorerResponse> {
-  const res = await fetch(`${BASE_URL}/student/syllabus/explore`, {
+  const res = await studentFetch(`${BASE_URL}/student/syllabus/explore`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(params),
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.error || 'Failed to explore syllabus');
+  }
+  return res.json();
+}
+
+export async function getGroupAnnouncements(groupId: string): Promise<Announcement[]> {
+  const res = await studentFetch(`${BASE_URL}/announcements/group/${groupId}`);
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || 'Failed to retrieve announcements');
+  }
+  return res.json();
+}
+
+// ==========================================
+// Spaced Repetition Review Queue Endpoints
+// ==========================================
+
+export interface ReviewItem {
+  _id: string;
+  studentId: string;
+  conceptTag: string;
+  sourceQuestionId?: string;
+  easeFactor: number;
+  interval: number;
+  repetitions: number;
+  nextReviewDate: string;
+  createdAt: string;
+}
+
+export async function studentGetDueReviews(): Promise<ReviewItem[]> {
+  const res = await studentFetch(`${BASE_URL}/student/reviews/due`);
+  if (!res.ok) throw new Error('Failed to fetch due reviews');
+  return res.json();
+}
+
+export async function studentGenerateReviewQuestion(reviewId: string): Promise<{
+  reviewId: string;
+  conceptTag: string;
+  question: {
+    text: string;
+    type: 'mcq' | 'short' | 'truefalse' | 'fillblank';
+    options?: string[];
+    correctAnswer?: string;
+    explanation: string;
+  };
+}> {
+  const res = await studentFetch(`${BASE_URL}/student/reviews/${reviewId}/generate`, {
+    method: 'POST',
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || 'Failed to generate review question');
+  }
+  return res.json();
+}
+
+export async function studentSubmitReview(
+  reviewId: string,
+  answer: string,
+  question: any
+): Promise<{
+  isCorrect: boolean;
+  correctAnswer: string;
+  explanation: string;
+  aiFeedback: string;
+  nextReviewDate: string;
+}> {
+  const res = await studentFetch(`${BASE_URL}/student/reviews/${reviewId}/submit`, {
+    method: 'POST',
+    body: JSON.stringify({ answer, question }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || 'Failed to submit review');
   }
   return res.json();
 }

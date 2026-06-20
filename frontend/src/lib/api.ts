@@ -247,6 +247,11 @@ export interface UserProfile {
   schoolCode?: string;
   aiModel?: string;
   aiStrictNCERT?: boolean;
+  aiIgnoreHandwriting?: boolean;
+  aiStrictSpelling?: boolean;
+  aiPartialFormulas?: boolean;
+  aiLatePenalty?: number;
+  aiCustomDirectives?: string[];
   aiCreativity?: number;
   plan?: string;
   planStatus?: string;
@@ -498,3 +503,476 @@ export async function getDetailedStudentReport(email: string): Promise<DetailedS
   if (!res.ok) throw new Error('Failed to fetch detailed student report');
   return res.json();
 }
+
+// ── Admin API Methods ─────────────────────────────────────────────────────────
+
+export interface AdminStats {
+  schoolName: string;
+  branch?: string;
+  schoolCode?: string;
+  board?: string;
+  planStatus: string;
+  creditsLimit: number;
+  creditsUsed: number;
+  teachersCount: number;
+  groupsCount: number;
+  studentsCount: number;
+}
+
+export interface AdminTeacher {
+  _id: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  role: string;
+  creditsLimit: number;
+  creditsUsed: number;
+  createdAt: string;
+}
+
+export interface AdminAuditLog {
+  _id: string;
+  actorId: string;
+  actorModel: string;
+  actorName: string;
+  action: string;
+  details: any;
+  ipAddress?: string;
+  userAgent?: string;
+  createdAt: string;
+}
+
+export async function adminFetch(url: string, options: RequestInit = {}): Promise<Response> {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('classplus_admin_token') || '' : '';
+  const headers = {
+    ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+    ...options.headers,
+  };
+  return fetch(url, {
+    ...options,
+    headers,
+  });
+}
+
+export async function getAdminStats(): Promise<AdminStats> {
+  const res = await adminFetch(`${BASE_URL}/admin/stats`);
+  if (!res.ok) {
+    if (res.status === 401 || res.status === 403) throw new Error('FORBIDDEN');
+    throw new Error('Failed to fetch admin stats');
+  }
+  return res.json();
+}
+
+export async function listAdminTeachers(): Promise<AdminTeacher[]> {
+  const res = await adminFetch(`${BASE_URL}/admin/teachers`);
+  if (!res.ok) {
+    if (res.status === 401 || res.status === 403) throw new Error('FORBIDDEN');
+    throw new Error('Failed to fetch teachers');
+  }
+  return res.json();
+}
+
+export async function addAdminTeacher(data: { email: string; firstName?: string; lastName?: string }): Promise<AdminTeacher> {
+  const res = await adminFetch(`${BASE_URL}/admin/teachers`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    if (res.status === 401 || res.status === 403) throw new Error('FORBIDDEN');
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || 'Failed to add teacher');
+  }
+  return res.json();
+}
+
+export async function listAdminGroups(): Promise<Group[]> {
+  const res = await adminFetch(`${BASE_URL}/admin/groups`);
+  if (!res.ok) {
+    if (res.status === 401 || res.status === 403) throw new Error('FORBIDDEN');
+    throw new Error('Failed to fetch school groups');
+  }
+  return res.json();
+}
+
+export async function getAdminAuditLogs(): Promise<AdminAuditLog[]> {
+  const res = await adminFetch(`${BASE_URL}/admin/audit-logs`);
+  if (!res.ok) {
+    if (res.status === 401 || res.status === 403) throw new Error('FORBIDDEN');
+    throw new Error('Failed to fetch audit logs');
+  }
+  return res.json();
+}
+
+export async function loginAdminUser(data: {
+  email: string;
+  password: string;
+}): Promise<{ message: string; token: string; user: any }> {
+  const res = await fetch(`${BASE_URL}/admin/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || 'Failed to login admin');
+  }
+  return res.json();
+}
+
+export async function claimAdminRole(data: {
+  setupToken: string;
+  email: string;
+  password: string;
+  firstName?: string;
+  lastName?: string;
+}): Promise<{ message: string; token: string; role: string; institutionId: string; user: any }> {
+  const res = await fetch(`${BASE_URL}/admin/claim`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || 'Failed to claim Admin role');
+  }
+  return res.json();
+}
+
+export async function registerAdminSchool(data: {
+  name: string;
+  branch?: string;
+  board?: string;
+  address?: string;
+  schoolCode?: string;
+  email: string;
+  password: string;
+  firstName?: string;
+  lastName?: string;
+}): Promise<{ message: string; token: string; role: string; institutionId: string; user: any }> {
+  const res = await fetch(`${BASE_URL}/admin/register-school`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || 'Failed to register school');
+  }
+  return res.json();
+}
+
+/**
+ * Helper to fetch Super Admin endpoints using x-superadmin-token
+ */
+export async function superAdminFetch(url: string, options: RequestInit = {}): Promise<Response> {
+  const secretKey = typeof window !== 'undefined' ? localStorage.getItem('classplus_superadmin_secret') || '' : '';
+  const headers = {
+    'Content-Type': 'application/json',
+    'x-superadmin-token': secretKey,
+    ...options.headers,
+  };
+  return fetch(url, {
+    ...options,
+    headers,
+  });
+}
+
+export interface SuperAdminInstitution {
+  _id: string;
+  name: string;
+  address?: string;
+  board?: string;
+  branch?: string;
+  schoolCode?: string;
+  creditsLimit: number;
+  creditsUsed: number;
+  planStatus: string;
+  teachersCount: number;
+  adminsCount: number;
+  admins: string[];
+  createdAt: string;
+}
+
+export interface SuperAdminPaginatedInstitutions {
+  docs: SuperAdminInstitution[];
+  totalDocs: number;
+  limit: number;
+  page: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+  stats?: {
+    globalCount: number;
+    totalCreditsLimit: number;
+    totalCreditsUsed: number;
+  };
+}
+
+export interface SuperAdminInstitutionDetail {
+  institution: SuperAdminInstitution;
+  teachers: any[];
+  admins: any[];
+  groups: any[];
+  students: any[];
+  auditLogs: any[];
+}
+
+export async function superAdminListInstitutions(
+  page?: number,
+  limit?: number,
+  search?: string
+): Promise<SuperAdminPaginatedInstitutions> {
+  const params = new URLSearchParams();
+  if (page) params.append('page', page.toString());
+  if (limit) params.append('limit', limit.toString());
+  if (search) params.append('search', search);
+
+  const queryString = params.toString() ? `?${params.toString()}` : '';
+  const res = await superAdminFetch(`${BASE_URL}/superadmin/institutions${queryString}`);
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || 'Failed to fetch institutions list');
+  }
+  return res.json();
+}
+
+export async function superAdminCreateInstitution(data: Partial<SuperAdminInstitution> & {
+  adminEmail?: string;
+  adminPassword?: string;
+  adminFirstName?: string;
+  adminLastName?: string;
+}): Promise<SuperAdminInstitution> {
+  const res = await superAdminFetch(`${BASE_URL}/superadmin/institutions`, {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || 'Failed to create institution');
+  }
+  return res.json();
+}
+
+export async function superAdminUpdateInstitution(id: string, data: Partial<SuperAdminInstitution>): Promise<SuperAdminInstitution> {
+  const res = await superAdminFetch(`${BASE_URL}/superadmin/institutions/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || 'Failed to update institution');
+  }
+  return res.json();
+}
+
+export async function superAdminDeleteInstitution(id: string): Promise<{ message: string }> {
+  const res = await superAdminFetch(`${BASE_URL}/superadmin/institutions/${id}`, {
+    method: 'DELETE',
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || 'Failed to delete institution');
+  }
+  return res.json();
+}
+
+export async function superAdminGetInstitutionDetail(id: string): Promise<SuperAdminInstitutionDetail> {
+  const res = await superAdminFetch(`${BASE_URL}/superadmin/institutions/${id}/detail`);
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || 'Failed to fetch institution details');
+  }
+  return res.json();
+}
+
+export async function superAdminCreateAdmin(id: string, data: any): Promise<any> {
+  const res = await superAdminFetch(`${BASE_URL}/superadmin/institutions/${id}/admins`, {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || 'Failed to create admin account');
+  }
+  return res.json();
+}
+
+export async function superAdminDeleteAdmin(id: string, adminId: string): Promise<any> {
+  const res = await superAdminFetch(`${BASE_URL}/superadmin/institutions/${id}/admins/${adminId}`, {
+    method: 'DELETE',
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || 'Failed to delete admin account');
+  }
+  return res.json();
+}
+
+
+// ── Announcements API ────────────────────────────────────────────────────────
+
+export interface Announcement {
+  _id: string;
+  groupId: string;
+  teacherId: string;
+  teacherName: string;
+  title: string;
+  content: string;
+  attachments?: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export async function listAnnouncements(groupId: string): Promise<Announcement[]> {
+  const res = await authFetch(`${BASE_URL}/announcements/group/${groupId}`);
+  if (!res.ok) throw new Error('Failed to fetch announcements');
+  return res.json();
+}
+
+export async function createAnnouncement(data: {
+  groupId: string;
+  title: string;
+  content: string;
+  attachments?: string[];
+}): Promise<Announcement> {
+  const res = await authFetch(`${BASE_URL}/announcements`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || 'Failed to create announcement');
+  }
+  return res.json();
+}
+
+export async function deleteAnnouncement(id: string): Promise<void> {
+  const res = await authFetch(`${BASE_URL}/announcements/${id}`, {
+    method: 'DELETE',
+  });
+  if (!res.ok) throw new Error('Failed to delete announcement');
+}
+
+// ==========================================
+// Parent Portal Endpoints
+// ==========================================
+
+export async function parentLinkChild(inviteCode: string, relationship = 'Guardian'): Promise<any> {
+  const res = await authFetch(`${BASE_URL}/parent/link`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ inviteCode, relationship }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || 'Failed to link child');
+  }
+  return res.json();
+}
+
+export async function parentGetChildren(): Promise<any[]> {
+  const res = await authFetch(`${BASE_URL}/parent/children`);
+  if (!res.ok) throw new Error('Failed to fetch linked children');
+  return res.json();
+}
+
+export async function parentGetDashboard(studentId: string): Promise<any> {
+  const res = await authFetch(`${BASE_URL}/parent/children/${studentId}/dashboard`);
+  if (!res.ok) throw new Error('Failed to fetch child dashboard details');
+  return res.json();
+}
+
+export async function generateParentInvite(groupId: string, studentId: string): Promise<{ inviteCode: string }> {
+  const res = await authFetch(`${BASE_URL}/groups/${groupId}/students/${studentId}/parent-invite`, {
+    method: 'POST',
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || 'Failed to generate parent invite code');
+  }
+  return res.json();
+}
+
+// ==========================================
+// Item Bank Endpoints
+// ==========================================
+
+export async function saveToBank(questionData: any): Promise<any> {
+  const res = await authFetch(`${BASE_URL}/bank`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(questionData),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || 'Failed to save question to Item Bank');
+  }
+  return res.json();
+}
+
+export async function listBankQuestions(filters: any = {}): Promise<any[]> {
+  const params = new URLSearchParams();
+  Object.keys(filters).forEach(key => {
+    if (filters[key] !== undefined && filters[key] !== null) {
+      params.append(key, filters[key]);
+    }
+  });
+
+  const queryString = params.toString();
+  const url = `${BASE_URL}/bank${queryString ? `?${queryString}` : ''}`;
+  
+  const res = await authFetch(url);
+  if (!res.ok) throw new Error('Failed to fetch bank questions');
+  return res.json();
+}
+
+export async function deleteFromBank(id: string): Promise<void> {
+  const res = await authFetch(`${BASE_URL}/bank/${id}`, {
+    method: 'DELETE',
+  });
+  if (!res.ok) throw new Error('Failed to delete question from Item Bank');
+}
+
+export async function getGroupRoster(groupId: string): Promise<any[]> {
+  const res = await authFetch(`${BASE_URL}/groups/${groupId}/roster`);
+  if (!res.ok) throw new Error('Failed to fetch group roster');
+  return res.json();
+}
+
+export interface SyllabusExploreResult {
+  aligned: boolean;
+  alignmentScore: number;
+  chapterName: string;
+  curriculumContext: string;
+  keyConcepts: string[];
+  learningObjectives: string[];
+  quickStudyNotes: string;
+  boardExamQuestions: {
+    id: string;
+    question: string;
+    marks: number;
+    modelAnswer: string;
+  }[];
+}
+
+export async function exploreSyllabus(
+  grade: string,
+  subject: string,
+  topic: string
+): Promise<SyllabusExploreResult> {
+  const res = await authFetch(`${BASE_URL}/templates/syllabus/explore`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ grade, subject, topic }),
+  });
+  if (!res.ok) throw new Error('Failed to explore syllabus');
+  return res.json();
+}
+
+

@@ -1,362 +1,55 @@
-classPlus / ClassPilot Project Overview
-======================================
+. Teacher & Workspace Portal
+Accessible under the main teacher layout, this dashboard allows educators to manage their classes, generate AI assessments, and grade submissions.
 
-Project summary
----------------
-classPlus, also called ClassPilot in existing documentation, is an AI-powered assessment and classroom workspace for teachers and students. Teachers can create curriculum-aligned assignments, manage class groups, assign assessments, grade submissions, inspect analytics, and export or store learning materials. Students can join classes, view assigned work, submit answers, upload handwritten sheets, generate AI practice quizzes, review scores, and use an AI tutor experience.
+AI Assessment Creator (/create & /home):
+NCERT/CBSE Alignment: Toggle alignment with NCERT syllabi to create compliant study sheets.
+AI Parameter Tuning: Adjust model selection, creativity values, and strictness rules.
+Dynamic Assessment Composer: Enter subject, grade, chapter topic, and customize the question type mix (MCQs, Short answers, descriptive Long answers, True/False, Fill-in-the-blanks).
+Real-time Processing: Integrates with a background BullMQ worker queues to monitor paper generation status.
+Classroom Roster & Groups Management (/groups):
+Roster Administration: Add and remove students from the class roster.
+Class Enrollment Codes: Generate 6-digit alphanumeric codes (e.g. 721A4A) for students to register and join groups.
+Secure Student Passcodes: View registered student logins and perform temporary 4-digit security PIN resets.
+Evaluation Rubric Management: Switch and configure specific grading guidelines per class.
+Class Announcements (/groups - New Announcements Tab):
+Teacher Announce Feed: Post announcements with dynamic timestamps.
+Chronological Feed & Deletion: View, sort, and delete announcements.
+Instant Propagation: Announce objects immediately sync and update in the student portal feed.
+Grading Suite & Student Submissions:
+AI Auto-Grading: Short-answers and descriptive answers are graded by the AI, showing marks awarded and conceptual suggestions.
+Manual Grade Adjustment: Teachers can overwrite AI marks, toggle correction states, and save comments.
+Offline Paper Uploads: Allows teachers to scan/upload handwritten student answers (PDF/JPG) for manual and digital review.
+Analytics Dashboard (/home):
+AI Credits Meter: SVG circular gauge showing current plan usage and quota consumption limits.
+Audit logs & Timeline Notifications: Track events chronological order.
+Billing & Plans (/billing):
+Upgrade workspace accounts dynamically across Pro Teacher and School Enterprise plans.
+🎓 2. Student Portal (/student/dashboard)
+A student-facing workspace designed for exam submission, AI-guided tutoring, and self-evaluation.
 
-Technology stack
-----------------
-Frontend:
-- Next.js 14 App Router
-- React 18
-- TypeScript
-- Tailwind CSS
-- Framer Motion
-- Zustand for client state
-- Clerk for teacher authentication
-- Lucide React icons
-
-Backend:
-- Node.js
-- Express
-- TypeScript
-- MongoDB with Mongoose
-- Redis and BullMQ for background assignment generation jobs
-- WebSocket server for live job updates
-- Groq API for AI generation and grading
-- PDFKit, pdf-parse, and mammoth for document parsing/export workflows
-- Clerk Express middleware for authenticated teacher API routes
-
-Main folders
-------------
-backend/src:
-- app.ts: Express app setup, middleware, and API route mounting.
-- server.ts: HTTP and WebSocket server entry point.
-- config: MongoDB, Redis, and environment setup.
-- controllers: Route handlers for assignments, groups, library, notifications, users, students, assigned work, rubrics, templates, and reports.
-- models: Mongoose schemas for assignments, groups, students, submissions, practice quizzes, notifications, libraries, templates, and users.
-- routes: Express route definitions.
-- services: AI, parser, and PDF service logic.
-- queues and workers: BullMQ assignment generation queue and worker.
-- websocket: WebSocket status broadcasting.
-
-frontend/src:
-- app: Next.js App Router pages.
-- components/layout: App shell, sidebar, top bar, mobile bottom nav, notifications, and auth layout.
-- components/create: Assessment builder UI.
-- components/assignments: Assignment cards, grid, context menu, and empty state.
-- components/result: Generated exam/result rendering.
-- components/shared: Reusable UI primitives such as badges, buttons, logo, progress, toast, and steppers.
-- lib: Teacher API client, student API client, validators, and utilities.
-- store: Zustand stores for assignments, jobs, notifications, profile, templates, forms, toasts, and student session.
-- types: TypeScript data types.
-
-Teacher workspace features
---------------------------
-Dashboard:
-- Shows teacher overview.
-- Loads assignments and profile data.
-- Provides quick-start assessment templates.
-- Shows active and pending assessment counts.
-- Links into create and assessment workflows.
-
-Classrooms / Groups:
-- Teachers create class groups with name, grade, subject, rubric, and roster students.
-- Each group has a class code for student joining.
-- Teachers can add, edit, and delete groups.
-- Teachers can assign completed assessments to groups.
-- Teachers can inspect group submissions.
-- Teachers can manually grade or update submissions.
-- Teachers can upload a student paper into a submission flow.
-
-Assessments:
-- Lists generated assignments.
-- Shows assignment status.
-- Supports viewing completed results.
-- Supports deletion/regeneration workflows through the API.
-- Connects to assignment creation and result pages.
-
-Assessment Builder:
-- Collects title, subject, grade, due date, instructions, and question blueprint.
-- Supports question types such as MCQ, short answer, long answer, true/false, and fill in the blank.
-- Accepts PDF or document input as source material.
-- Sends multipart form data to the backend.
-- Creates a queued generation job and navigates to progress/status.
-
-Progress Center:
-- Tracks background assignment generation by job ID.
-- Uses WebSocket updates to reflect processing progress.
-- Routes to the generated result when complete.
-
-Generated Result View:
-- Displays generated exam/worksheet content.
-- Shows question sections, marks, answer keys, and student-facing paper structure.
-- Supports PDF export from backend.
-
-Library:
-- Stores uploaded documents and exported/generated resources.
-- Supports folders and library item deletion.
-- Enforces file upload handling through backend routes.
-
-AI Toolkit:
-- Workspace area for curriculum and teacher support utilities.
-- Connected in navigation and command menu.
-
-Settings and Billing:
-- Settings page stores school/profile details.
-- Billing page exists in the workspace navigation.
-- Profile data feeds the teacher shell and school branding.
-
-Notifications:
-- Backend stores teacher notifications.
-- Frontend shows unread count and notification panel.
-- Supports mark-read, mark-all-read, delete, and clear-all API actions.
-
-Student Reports feature
------------------------
-Purpose:
-Student Reports is a teacher analytics dashboard inside the teacher workspace. It aggregates real data from class groups, registered students, assigned homework submissions, AI practice quizzes, topic performance, score growth, and AI feedback.
-
-Navigation:
-- Sidebar item: Student Reports, path /reports.
-- Mobile drawer item: Student Reports, path /reports.
-- Top bar breadcrumb: Workspace / Student Reports.
-- Command menu action: Go to Student Reports.
-
-Backend files:
-- backend/src/controllers/report.controller.ts
-- backend/src/routes/report.routes.ts
-- backend/src/app.ts mounts /api/reports
-
-Backend endpoints:
-- GET /api/reports/students
-  Returns registered students associated with the authenticated teacher's groups.
-  Includes student name, email, registered status, enrolled groups, assignments assigned, assignments completed, average homework score, practice quiz count, and average practice score.
-
-- GET /api/reports/student/:email
-  Returns a detailed analytics report for one registered student by email.
-  Enforces teacher ownership by checking the student's credential group IDs against the authenticated teacher's groups.
-  Includes group enrollments, weak topics, strong topics, chronological score timeline, struggle notes, homework logs, and practice logs.
-
-Student Reports aggregation rules:
-- Registered students come from StudentCredential records linked to the teacher's group IDs.
-- Homework completion is based on StudentSubmission records for assignments assigned to that student's groups.
-- Homework average is total earned marks divided by total possible marks for submitted work.
-- Practice count and average are based on submitted StudentPractice records for the student email.
-- Assignment topic accuracy uses assignment question conceptTag values.
-- Practice topic accuracy uses StudentPractice.topic and total score.
-- Weak topics are below 65 percent.
-- Strong topics are 65 percent and above.
-- Growth timeline combines homework submissions and practice quiz submissions in chronological order.
-- Struggle notes include incorrect homework answer AI feedback and low-scoring practice feedback.
-
-Student Reports frontend:
-- frontend/src/app/(workspace)/reports/page.tsx
-- Fetches summaries with listStudentReports().
-- Fetches detail reports with getDetailedStudentReport(email).
-- Provides search by student name, email, group, grade, or subject.
-- Shows summary metric tiles for registered students, homework average, practice average, and completed grades.
-- Shows student scorecards with groups, completion, homework average, and practice count.
-- Opens a detailed report modal/panel when a student is clicked.
-- The detail overlay is rendered through a document.body portal with z-index 10000 so the top bar cannot overlap it.
-- Uses a pure SVG growth line chart with hover tooltips.
-- Shows weak and strong topic matrices with progress bars and score colors.
-- Shows AI struggle notes.
-- Shows tabs for homework logs and practice logs.
-
-Student-facing features
------------------------
-Student login/session:
-- Students enter or restore session details using student store state.
-- Students can join class groups by class code and roster name.
-- Student sessions persist through Zustand storage.
-
-Student dashboard:
-- Shows assigned work.
-- Shows practice lab.
-- Shows syllabus/learning resources.
-- Shows tutor entry points.
-
-Student assignments:
-- Students can view assigned assessment details.
-- Students can answer questions.
-- Students can submit answers for grading.
-- Students can upload handwritten papers where supported.
-- Students can view results and detailed answer feedback.
-
+Home Dashboard:
+Greetings & Streaks Banner: Dynamic time greetings and daily study streak counters (e.g., 🔥 5-day streak).
+Consolidated Notifications: Alerts on upcoming deadlines, overdue tasks, and achievements.
+Live Announcements Feed: Lists all announcements posted by their class teachers.
+Interactive Exam Room (/student/assignment/[id]):
+Secure Assessment Interface: Hides answers and correction keys during test sessions.
+Timing Controls: Displays active timers and due date progress gauges.
+Description & Descriptive Inputs: Save and submit descriptive answers.
 AI Practice Lab:
-- Students generate practice quizzes by subject, grade, topic, number of questions, and type.
-- Backend saves generated practice quizzes.
-- Students submit answers.
-- Backend grades objective answers directly and short answers with AI.
-- Backend stores score, total marks, feedback, answers, and submittedAt.
-- Practice history is available by student email.
+Custom Test Generator: Students can generate unlimited custom tests on any NCERT topic.
+Instant AI Feedback: Submitting practice quizzes generates step-by-step corrections and conceptual explanations.
+Practice History: Tracks performance score logs and review sheets.
+AI Study Tutor Chatbot:
+A student-friendly tutor aligned with the CBSE/NCERT syllabus.
+Provides simplified answers, relatable analogies, and step-by-step problem-solving.
+NCERT Syllabus Explorer:
+Explore curriculum chapters, learning objectives, key concepts, study notes, and practice past board exam questions with mock ideal answers.
+Performance Progress Tracker:
+Analyzes average percentages, grade cards (e.g. A+), and highlights strong vs. weak academic concepts.
+🛡️ 3. Institution Admin & Super Admin Portals
+Enterprise features to manage school branches and monitor usage.
 
-AI Tutor:
-- Student-facing AI study companion page exists.
-- Provides a conversational help experience for study support.
-
-Database models
----------------
-Assignment:
-- Stores generated teacher assessments.
-- Includes title, subject, grade, due date, question rows, total marks, optional file/PDF URLs, generation status, job ID, generated result, user ID, and timestamps.
-- Generated result contains sections, questions, answer key, school metadata, and total marks.
-
-AssignedAssignment:
-- Links an Assignment to a Group.
-- Stores due date, hints setting, duration, misconception analysis, hint logs, user ID, and timestamps.
-
-Group:
-- Stores teacher class group name, grade, subject, students, rubric, class code, user ID, and timestamps.
-
-StudentCredential:
-- Stores registered student name, unique email, group IDs, hashed passcode, and timestamps.
-
-StudentSubmission:
-- Stores answers for a student and assigned assignment.
-- Includes total score, total marks, start/submission timestamps, auto-submit flag, timer job ID, and per-answer AI feedback.
-
-StudentPractice:
-- Stores student-generated AI practice quizzes.
-- Includes student email, student name, class code, subject, grade, topic, questions, graded answers, score, total marks, feedback, submittedAt, and timestamps.
-
-LibraryItem:
-- Stores library folders and uploaded/exported resources.
-
-Notification:
-- Stores teacher activity notifications and read/delete state.
-
-Template:
-- Stores reusable assignment/template settings.
-
-User:
-- Stores Clerk-linked teacher profile and plan/settings data.
-
-Authentication and permissions
-------------------------------
-- Teacher workspace routes use Clerk authentication.
-- Backend teacher routes generally use requireAuth() and syncUserMiddleware.
-- If Clerk environment keys are missing in development, backend injects a mock user ID of user_tester.
-- Student-facing routes are separate under /api/student and do not use the teacher auth middleware.
-- Report endpoints are teacher-protected and filter all data by teacher-owned group IDs.
-
-API client
-----------
-frontend/src/lib/api.ts:
-- Stores a global Clerk token.
-- Waits for Clerk token before teacher API requests.
-- Provides teacher API functions for assignments, library, notifications, profile/settings, rubrics, templates, groups, assigned assignments, submissions, and reports.
-
-frontend/src/lib/studentApi.ts:
-- Provides student-facing API functions for session, assignments, submissions, uploads, practice generation, practice submission, and practice history.
-
-Background job flow
--------------------
-- Teacher creates assignment in frontend.
-- Backend stores an assignment with pending/processing status.
-- Backend enqueues a BullMQ job.
-- Worker parses uploaded source material if present.
-- Worker calls Groq with structured prompts.
-- Worker updates Assignment result and status.
-- WebSocket pushes status updates to the frontend.
-- Frontend status page reacts to job progress and routes to result when done.
-
-Design system and UI behavior
------------------------------
-- The teacher workspace uses a glass-style shell with sidebar, top bar, mobile drawer, and bottom mobile nav.
-- Framer Motion handles page and modal transitions.
-- Tailwind classes define responsive layouts.
-- Lucide icons are used for controls and navigation.
-- Mobile layout uses a single scrollable main content area inside AppShell.
-- The Student Reports detail modal is portaled above the shell chrome to avoid top bar overlap.
-
-Important local routes
-----------------------
-Teacher routes:
-- /home
-- /groups
-- /assignments
-- /reports
-- /toolkit
-- /library
-- /create
-- /result/[assignmentId]
-- /status/[jobId]
-- /settings
-- /billing
-
-Public/marketing routes:
-- /
-- /features
-- /pricing
-- /contact
-- /ai-assistant
-- /assignments-suite
-- /analytics
-- /sign-in
-- /sign-up
-
-Student routes:
-- /student
-- /student/dashboard
-- /student/assignment/[id]
-- /student/results/[id]
-- /student/upload/[id]
-- /student/tutor
-
-Environment variables
----------------------
-Backend:
-- PORT
-- MONGODB_URI
-- REDIS_URL
-- GROQ_API_KEY
-- Clerk keys if real teacher authentication is enabled
-
-Frontend:
-- NEXT_PUBLIC_API_URL
-- NEXT_PUBLIC_WS_URL
-- NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
-- CLERK_SECRET_KEY
-- NEXT_PUBLIC_CLERK_SIGN_IN_URL
-- NEXT_PUBLIC_CLERK_SIGN_UP_URL
-- NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL
-- NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL
-
-Common commands
----------------
-Backend:
-- cd backend
-- npm install
-- npm run dev
-- npx tsc --noEmit
-- npm run build
-- npm start
-
-Frontend:
-- cd frontend
-- npm install
-- npm run dev
-- npx tsc --noEmit
-- npm run build
-- npm start
-
-Verification notes from Student Reports implementation
-------------------------------------------------------
-- backend npx tsc --noEmit passed.
-- frontend npx tsc --noEmit passed.
-- frontend npm run build compiled successfully, then failed during Next page-data collection for an existing workspace route such as /assignments. The new /reports route was emitted in the app manifest. This appears to be a pre-existing Next build/page collection issue rather than a Student Reports type or compilation issue.
-- Starting local dev servers from the sandbox was blocked by environment/network permissions: backend could not connect to Redis/MongoDB from the sandbox, and frontend could not bind to port 3000 due EPERM.
-
-Current Student Reports behavior to verify manually
----------------------------------------------------
-1. Start MongoDB, Redis, backend, and frontend in a normal local terminal.
-2. Login as a teacher.
-3. Open /reports or click Student Reports in the sidebar.
-4. Confirm registered class students load.
-5. Search by student, group, subject, or grade.
-6. Click a student scorecard.
-7. Confirm the detail modal appears above the top bar.
-8. Confirm growth timeline, weak topics, strong topics, struggle notes, homework logs, and practice logs render from real data.
+Admin Dashboard (/admin):
+Manage teacher invitations, set credit usage quotas, and view audit trail logs of school actions.
+Super Admin Portal (/superadmin):
+Create and manage separate school institutions, allocate base credit balances, and assign school administrators.

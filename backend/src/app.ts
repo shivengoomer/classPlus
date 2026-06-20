@@ -15,6 +15,12 @@ import groupRoutes from './routes/group.routes';
 import assignedRoutes from './routes/assigned.routes';
 import studentRoutes from './routes/student.routes';
 import reportRoutes from './routes/report.routes';
+import adminRoutes from './routes/admin.routes';
+import announcementRoutes from './routes/announcement.routes';
+import superadminRoutes from './routes/superadmin.routes';
+import parentRoutes from './routes/parent.routes';
+import bankRoutes from './routes/bank.routes';
+import reviewRoutes from './routes/review.routes';
 
 const app = express();
 
@@ -26,14 +32,26 @@ app.use(cors({
   origin: true, // Allow all origins dynamically in development
   credentials: true,
 }));
+import { blockParentMutations } from './middlewares/auth.middleware';
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(clerkMiddleware());
+app.use(blockParentMutations);
 
 // health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
 });
+
+// superadmin routes under /api/superadmin
+app.use('/api/superadmin', superadminRoutes);
+
+// admin routes under /api/admin
+app.use('/api/admin', adminRoutes);
+
+// announcement routes under /api/announcements
+app.use('/api/announcements', announcementRoutes);
 
 // assignment routes under /api/assignments
 app.use('/api/assignments', assignmentRoutes);
@@ -61,6 +79,13 @@ app.use('/api/assigned', assignedRoutes);
 
 // student-facing routes (no auth) under /api/student
 app.use('/api/student', studentRoutes);
+app.use('/api/student/reviews', reviewRoutes);
+
+// parent portal routes
+app.use('/api/parent', parentRoutes);
+
+// item bank routes
+app.use('/api/bank', bankRoutes);
 
 // report/analytics routes under /api/reports
 app.use('/api/reports', reportRoutes);

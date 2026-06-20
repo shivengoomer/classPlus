@@ -83,7 +83,7 @@ export default function JobStatusPage() {
             
             <button
               onClick={() => router.push('/create')}
-              className="text-xs font-semibold text-veda-text-secondary hover:text-veda-text-primary py-1.5 transition-colors"
+              className="text-xs font-semibold text-classplus-text-secondary hover:text-classplus-text-primary py-1.5 transition-colors"
             >
               Go Back to Form
             </button>
@@ -93,7 +93,7 @@ export default function JobStatusPage() {
         {/* Done Action Redirect Info */}
         {status === 'done' && (
           <p className="text-xs text-green-600 font-semibold flex items-center gap-1.5 animate-pulse mt-4">
-            <Sparkles className="w-4 h-4 text-veda-orange animate-pulse" />
+            <Sparkles className="w-4 h-4 text-classplus-orange animate-pulse" />
             <span>Redirecting to paper view...</span>
           </p>
         )}

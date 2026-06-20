@@ -97,10 +97,10 @@ export default function ResultPage() {
         // Premium Document Skeleton Loader
         <div className="w-full max-w-4xl mx-auto flex flex-col gap-6">
           {/* Banner Skeleton */}
-          <div className="h-24 bg-veda-dark-banner rounded-2xl w-full animate-pulse" />
+          <div className="h-24 bg-classplus-dark-banner rounded-2xl w-full animate-pulse" />
 
           {/* Exam Paper Card Skeleton */}
-          <div className="bg-white border border-veda-card-border rounded-xl p-8 md:p-12 w-full min-h-[50vh] flex flex-col gap-6 shadow-sm">
+          <div className="bg-white border border-classplus-card-border rounded-xl p-8 md:p-12 w-full min-h-[50vh] flex flex-col gap-6 shadow-sm">
             {/* Centered School Name */}
             <div className="flex flex-col items-center gap-2 mb-4">
               <div className="h-6 bg-gray-200 rounded w-1/2 animate-pulse" />
@@ -128,18 +128,18 @@ export default function ResultPage() {
       ) : error || !assignment ? (
         // Error State
         <div className="w-full max-w-md mx-auto text-center py-12 flex flex-col items-center gap-4">
-          <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center text-veda-orange-red mb-2">
+          <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center text-classplus-orange-red mb-2">
             <FileText className="w-8 h-8" />
           </div>
-          <h3 className="text-lg font-bold text-veda-text-primary">
+          <h3 className="text-lg font-bold text-classplus-text-primary">
             Failed to load assignment
           </h3>
-          <p className="text-sm text-veda-text-secondary leading-relaxed">
+          <p className="text-sm text-classplus-text-secondary leading-relaxed">
             We couldn&apos;t retrieve the details for this assignment. It might have been deleted or there could be a connection issue.
           </p>
           <button
             onClick={() => router.push('/assignments')}
-            className="text-sm font-semibold text-veda-orange flex items-center gap-1 hover:underline"
+            className="text-sm font-semibold text-classplus-orange flex items-center gap-1 hover:underline"
           >
             <span>Back to Assignments</span>
             <ChevronRight className="w-4 h-4" />

@@ -12,8 +12,10 @@ import { StudentSubmission } from '../models/studentSubmission.model';
 import { Assignment } from '../models/assignment.model';
 import { StudentCredential } from '../models/studentCredential.model';
 import { StudentPractice } from '../models/studentPractice.model';
+import { addGradingJob } from '../queues/grading.queue';
 import { env } from '../config/env';
 import { log, logError } from '../utils/logger';
+import { signStudentToken } from '../utils/jwt';
 
 const groq = new Groq({ apiKey: env.GROQ_API_KEY });
 
@@ -48,7 +50,7 @@ export async function verifyStudentSession(req: Request, res: Response) {
 }
 
 // Helper to fetch consolidated student session details (groups + assignments)
-async function fetchStudentSession(credential: any, res: Response) {
+async function fetchStudentSession(credential: any, res: Response, token: string) {
   // Find all groups the student is enrolled in
   const groups = await Group.find({ _id: { $in: credential.groupIds } });
 
@@ -57,12 +59,15 @@ async function fetchStudentSession(credential: any, res: Response) {
     .populate('assignmentId', 'title subject grade totalMarks pdfUrl status')
     .sort({ createdAt: -1 });
 
-  // For each assigned assignment, check if this student has a submission (using their roster name in that group or global name)
+  // For each assigned assignment, check if this student has a submission (using their credential ID or roster name)
   const assignedWithStatus = await Promise.all(
     assigned.map(async (a) => {
       const submission = await StudentSubmission.findOne({
         assignedAssignmentId: a._id,
-        studentName: credential.studentName,
+        $or: [
+          { studentId: credential._id },
+          { studentName: credential.studentName }
+        ]
       }).select('totalScore totalMarks submittedAt autoSubmitted');
 
       return {
@@ -78,6 +83,7 @@ async function fetchStudentSession(credential: any, res: Response) {
   );
 
   return res.json({
+    studentId: credential._id,
     student: credential.studentName,
     email: credential.email,
     groups: groups.map(g => ({
@@ -88,6 +94,7 @@ async function fetchStudentSession(credential: any, res: Response) {
       classCode: g.classCode,
     })),
     assignments: assignedWithStatus,
+    token,
   });
 }
 
@@ -120,17 +127,29 @@ export async function studentRegister(req: Request, res: Response) {
       return res.status(400).json({ error: 'This email is already registered. Please login directly.' });
     }
 
-    const hashed = crypto.createHash('sha256').update(passcode).digest('hex');
+    // Salt PIN using email to prevent rainbow table attacks
+    const salt = normalizedEmail;
+    const hashed = crypto.createHash('sha256').update(passcode + salt).digest('hex');
+    
     const credential = await StudentCredential.create({
       studentName: normalizedName,
       email: normalizedEmail,
       groupIds: [group._id],
       hashedPasscode: hashed,
+      institutionId: group.institutionId,
     });
 
     log(`Student registered: ${normalizedName} (${normalizedEmail}) in group ${group.classCode}`);
 
-    return await fetchStudentSession(credential, res);
+    const token = signStudentToken({
+      studentId: credential._id.toString(),
+      email: credential.email,
+      studentName: credential.studentName,
+      groupIds: [group._id.toString()],
+      role: 'Student',
+    });
+
+    return await fetchStudentSession(credential, res, token);
   } catch (err) {
     logError('studentRegister failed', err);
     return res.status(500).json({ error: 'Registration failed. Please try again.' });
@@ -156,12 +175,30 @@ export async function studentLogin(req: Request, res: Response) {
       return res.status(404).json({ error: 'Account not found. Please register first.' });
     }
 
-    const hashed = crypto.createHash('sha256').update(passcode).digest('hex');
-    if (credential.hashedPasscode !== hashed) {
+    const salt = normalizedEmail;
+    const hashed = crypto.createHash('sha256').update(passcode + salt).digest('hex');
+    const unsalted = crypto.createHash('sha256').update(passcode).digest('hex');
+
+    if (credential.hashedPasscode !== hashed && credential.hashedPasscode !== unsalted) {
       return res.status(401).json({ error: 'Incorrect PIN code. Please try again.' });
     }
 
-    return await fetchStudentSession(credential, res);
+    // Upgrade existing unsalted hashes to salted ones
+    if (credential.hashedPasscode === unsalted) {
+      credential.hashedPasscode = hashed;
+      await credential.save();
+      log(`Upgraded PIN to salted hash for ${normalizedEmail}`);
+    }
+
+    const token = signStudentToken({
+      studentId: credential._id.toString(),
+      email: credential.email,
+      studentName: credential.studentName,
+      groupIds: credential.groupIds.map(id => id.toString()),
+      role: 'Student',
+    });
+
+    return await fetchStudentSession(credential, res, token);
   } catch (err) {
     logError('studentLogin failed', err);
     return res.status(500).json({ error: 'Login failed. Please try again.' });
@@ -169,17 +206,24 @@ export async function studentLogin(req: Request, res: Response) {
 }
 
 // POST /api/student/join-class
-// body: { email, classCode, studentName }
+// body: { classCode }
 // Enrolls student in an additional class group
 export async function joinClassGroup(req: Request, res: Response) {
   try {
-    const { email, classCode, studentName } = req.body;
-    if (!email || !classCode || !studentName) {
-      return res.status(400).json({ error: 'All fields are required.' });
+    const studentPayload = (req as any).student;
+    const { classCode } = req.body;
+    if (!classCode) {
+      return res.status(400).json({ error: 'Class code is required.' });
     }
 
-    const normalizedEmail = email.toLowerCase().trim();
-    const credential = await StudentCredential.findOne({ email: normalizedEmail });
+    let credential;
+    if (studentPayload.studentId) {
+      credential = await StudentCredential.findById(studentPayload.studentId);
+    }
+    if (!credential) {
+      credential = await StudentCredential.findOne({ email: studentPayload.email });
+    }
+
     if (!credential) {
       return res.status(404).json({ error: 'Student account not found.' });
     }
@@ -189,23 +233,33 @@ export async function joinClassGroup(req: Request, res: Response) {
       return res.status(404).json({ error: 'Class code not found. Please verify with your teacher.' });
     }
 
-    const normalizedName = studentName.trim();
-    if (credential.studentName.toLowerCase() !== normalizedName.toLowerCase()) {
-      return res.status(400).json({ error: `Your account name is registered as "${credential.studentName}". To join this class, you must be enrolled in the roster with this name.` });
-    }
-
-    if (!group.students.map(s => s.toLowerCase()).includes(normalizedName.toLowerCase())) {
-      return res.status(403).json({ error: `Student "${normalizedName}" is not enrolled in this class roster. Ask your teacher to add you.` });
+    // Verify student is in this group's roster
+    if (!group.students.map(s => s.toLowerCase()).includes(credential.studentName.toLowerCase())) {
+      return res.status(403).json({ error: `Student "${credential.studentName}" is not enrolled in this class roster. Ask your teacher to add you.` });
     }
 
     const hasGroup = credential.groupIds.some(id => id.toString() === group._id.toString());
     if (!hasGroup) {
       credential.groupIds.push(group._id as any);
+      if (group.institutionId) {
+        credential.institutionId = group.institutionId;
+      }
       await credential.save();
       log(`Student ${credential.studentName} joined new class ${group.classCode}`);
+    } else if (!credential.institutionId && group.institutionId) {
+      credential.institutionId = group.institutionId;
+      await credential.save();
     }
 
-    return await fetchStudentSession(credential, res);
+    const token = signStudentToken({
+      studentId: credential._id.toString(),
+      email: credential.email,
+      studentName: credential.studentName,
+      groupIds: credential.groupIds.map(id => id.toString()),
+      role: 'Student',
+    });
+
+    return await fetchStudentSession(credential, res, token);
   } catch (err) {
     logError('joinClassGroup failed', err);
     return res.status(500).json({ error: 'Failed to join class. Please try again.' });
@@ -213,23 +267,31 @@ export async function joinClassGroup(req: Request, res: Response) {
 }
 
 // GET /api/student/session
-// query: { email }
-// Retrieves student name, groups, and assignments by email without needing passcode verification
+// Retrieves student details using token
 export async function getStudentSession(req: Request, res: Response) {
   try {
-    const { email } = req.query;
-    if (!email) {
-      return res.status(400).json({ error: 'Email is required' });
+    const studentPayload = (req as any).student;
+    let credential;
+    if (studentPayload.studentId) {
+      credential = await StudentCredential.findById(studentPayload.studentId);
     }
-
-    const normalizedEmail = (email as string).toLowerCase().trim();
-    const credential = await StudentCredential.findOne({ email: normalizedEmail });
+    if (!credential) {
+      credential = await StudentCredential.findOne({ email: studentPayload.email });
+    }
 
     if (!credential) {
       return res.status(404).json({ error: 'Account not found' });
     }
 
-    return await fetchStudentSession(credential, res);
+    const token = signStudentToken({
+      studentId: credential._id.toString(),
+      email: credential.email,
+      studentName: credential.studentName,
+      groupIds: credential.groupIds.map(id => id.toString()),
+      role: 'Student',
+    });
+
+    return await fetchStudentSession(credential, res, token);
   } catch (err) {
     logError('getStudentSession failed', err);
     return res.status(500).json({ error: 'Failed to retrieve session details.' });
@@ -242,10 +304,8 @@ export async function getStudentSession(req: Request, res: Response) {
 // Returns questions WITHOUT answer key or correct answers
 export async function getStudentAssignment(req: Request, res: Response) {
   try {
-    const { studentName } = req.query;
-    if (!studentName) {
-      return res.status(400).json({ error: 'studentName query param required' });
-    }
+    const student = (req as any).student;
+    const studentName = student.studentName;
 
     const assigned = await AssignedAssignment.findById(req.params.assignedId)
       .populate<{ assignmentId: any; groupId: any }>('assignmentId groupId');
@@ -254,22 +314,24 @@ export async function getStudentAssignment(req: Request, res: Response) {
       return res.status(404).json({ error: 'Assignment not found' });
     }
 
+    // Verify student is enrolled in this group/class
+    const isEnrolled = student.groupIds.includes(assigned.groupId._id.toString());
+    if (!isEnrolled) {
+      return res.status(403).json({ error: 'Access denied. You are not enrolled in this class.' });
+    }
+
     const assignment: any = assigned.assignmentId;
     if (!assignment?.result) {
       return res.status(400).json({ error: 'Assignment is not yet generated. Please wait.' });
     }
 
-    // Verify student is in this group
-    const group: any = assigned.groupId;
-    const isEnrolled = group.students.map((s: string) => s.toLowerCase()).includes((studentName as string).toLowerCase());
-    if (!isEnrolled) {
-      return res.status(403).json({ error: 'Student not enrolled in this class' });
-    }
-
     // Check for existing submission
     const existingSubmission = await StudentSubmission.findOne({
       assignedAssignmentId: assigned._id,
-      studentName: studentName as string,
+      $or: [
+        ...(student.studentId ? [{ studentId: student.studentId }] : []),
+        { studentName: studentName }
+      ]
     });
 
     if (existingSubmission?.submittedAt) {
@@ -310,15 +372,17 @@ export async function getStudentAssignment(req: Request, res: Response) {
 }
 
 // POST /api/student/submit/:assignedId
-// body: { studentName, answers: [{ questionId, answer }] }
+// body: { answers: [{ questionId, answer }] }
 // AI auto-grades each answer and saves StudentSubmission
 export async function submitStudentAnswers(req: Request, res: Response) {
   try {
-    const { studentName, answers } = req.body;
+    const student = (req as any).student;
+    const studentName = student.studentName;
+    const { answers } = req.body;
     const assignedId = req.params.assignedId;
 
-    if (!studentName || !answers || !Array.isArray(answers)) {
-      return res.status(400).json({ error: 'studentName and answers array are required' });
+    if (!answers || !Array.isArray(answers)) {
+      return res.status(400).json({ error: 'answers array is required' });
     }
 
     const assigned = await AssignedAssignment.findById(assignedId)
@@ -326,13 +390,22 @@ export async function submitStudentAnswers(req: Request, res: Response) {
 
     if (!assigned) return res.status(404).json({ error: 'Assignment not found' });
 
+    // Verify student is enrolled in this group/class
+    const isEnrolled = student.groupIds.includes(assigned.groupId._id.toString());
+    if (!isEnrolled) {
+      return res.status(403).json({ error: 'Access denied. You are not enrolled in this class.' });
+    }
+
     const assignment: any = assigned.assignmentId;
     if (!assignment?.result) return res.status(400).json({ error: 'Assignment not generated yet' });
 
     // Verify student not already submitted
     const existing = await StudentSubmission.findOne({
       assignedAssignmentId: assigned._id,
-      studentName: studentName.trim(),
+      $or: [
+        ...(student.studentId ? [{ studentId: student.studentId }] : []),
+        { studentName: studentName }
+      ]
     });
     if (existing?.submittedAt) {
       return res.status(409).json({ error: 'Already submitted', submissionId: existing._id });
@@ -353,122 +426,135 @@ export async function submitStudentAnswers(req: Request, res: Response) {
 
     const totalMarks = assignment.result.totalMarks || 0;
 
-    // Grade each answer using AI for short/long answers, direct match for MCQ/fillblank/truefalse
-    const gradedAnswers = await Promise.all(
-      answers.map(async (ans: { questionId: string; answer: string }) => {
+    // Check if there are any short or long descriptive questions
+    let hasDescriptiveQuestions = false;
+    for (const ans of answers) {
+      const q = questionMap[ans.questionId];
+      if (q && ['short', 'long'].includes(q.type)) {
+        hasDescriptiveQuestions = true;
+        break;
+      }
+    }
+
+    if (hasDescriptiveQuestions) {
+      // 1. Asynchronous background grading route
+      const initialAnswers = answers.map((ans: { questionId: string; answer: string }) => {
         const question = questionMap[ans.questionId];
-        const correctAnswer = answerKeyMap[ans.questionId] || '';
+        return {
+          questionId: ans.questionId,
+          answer: (ans.answer || '').trim(),
+          isCorrect: false,
+          marks: 0,
+          aiFeedback: question && ['mcq', 'truefalse', 'fillblank'].includes(question.type)
+            ? 'Awaiting grading...'
+            : 'Awaiting AI grading...'
+        };
+      });
 
-        if (!question) {
-          return { questionId: ans.questionId, answer: ans.answer, isCorrect: false, marks: 0, aiFeedback: 'Question not found.' };
-        }
+      let submission = existing;
+      if (!submission) {
+        submission = new StudentSubmission({
+          assignedAssignmentId: assigned._id,
+          studentId: student.studentId || undefined,
+          studentName: studentName.trim(),
+          answers: initialAnswers,
+          totalScore: 0,
+          totalMarks,
+          status: 'grading',
+          submittedAt: new Date(),
+          startedAt: new Date(),
+        });
+      } else {
+        submission.studentId = student.studentId || submission.studentId;
+        submission.studentName = studentName.trim();
+        submission.answers = initialAnswers;
+        submission.totalScore = 0;
+        submission.totalMarks = totalMarks;
+        submission.status = 'grading';
+        submission.submittedAt = new Date();
+      }
+      await submission.save();
 
-        const studentAnswer = (ans.answer || '').trim();
-        const qMarks = question.marks || 1;
+      log(`Submission enqueued for background AI grading: ${submission._id} for student "${studentName}"`);
 
-        // MCQ / True-False / Fill-in-blank: exact match (case-insensitive)
-        if (['mcq', 'truefalse', 'fillblank'].includes(question.type)) {
-          const isCorrect = studentAnswer.toLowerCase() === correctAnswer.toLowerCase();
-          return {
-            questionId: ans.questionId,
-            answer: studentAnswer,
-            isCorrect,
-            marks: isCorrect ? qMarks : 0,
-            aiFeedback: isCorrect
-              ? `✅ Correct! ${correctAnswer}`
-              : `❌ Incorrect. The correct answer was: ${correctAnswer}`,
-          };
-        }
+      // Add to background grading queue
+      await addGradingJob(submission._id.toString());
 
-        // Short/Long answer: use Groq AI to grade and provide feedback
-        if (!studentAnswer) {
-          return {
-            questionId: ans.questionId,
-            answer: '',
-            isCorrect: false,
-            marks: 0,
-            aiFeedback: 'No answer provided.',
-          };
-        }
+      return res.status(202).json({
+        submissionId: submission._id,
+        status: 'grading',
+        totalScore: 0,
+        totalMarks,
+        percentage: 0,
+        message: 'Submission enqueued for background AI grading.'
+      });
+    }
 
-        try {
-          const gradingPrompt = `You are a CBSE/NCERT teacher grading a student answer. Respond ONLY with JSON.
+    // 2. Synchronous grading route (MCQs/True-False/Fill-in-blank only)
+    const gradedAnswers = answers.map((ans: { questionId: string; answer: string }) => {
+      const question = questionMap[ans.questionId];
+      const correctAnswer = answerKeyMap[ans.questionId] || '';
 
-Question: "${question.text}"
-Model Answer: "${correctAnswer}"
-Student Answer: "${studentAnswer}"
-Maximum Marks: ${qMarks}
+      if (!question) {
+        return { questionId: ans.questionId, answer: ans.answer, isCorrect: false, marks: 0, aiFeedback: 'Question not found.' };
+      }
 
-Grade the student answer strictly based on accuracy, completeness, and curriculum alignment.
-Return JSON:
-{
-  "marks": <number between 0 and ${qMarks}>,
-  "isCorrect": <true if marks >= ${Math.ceil(qMarks * 0.5)}>,
-  "feedback": "<2-3 sentence constructive feedback explaining what was right, what was missing, and how to improve>"
-}`;
+      const studentAnswer = (ans.answer || '').trim();
+      const qMarks = question.marks || 1;
 
-          const response = await groq.chat.completions.create({
-            model: 'llama-3.1-8b-instant',
-            messages: [
-              { role: 'system', content: 'You are a strict CBSE/NCERT exam grader. Respond ONLY with valid JSON.' },
-              { role: 'user', content: gradingPrompt },
-            ],
-            temperature: 0.1,
-            max_tokens: 200,
-          });
-
-          const raw = response.choices[0]?.message?.content || '{}';
-          // Extract JSON from potential markdown wrapping
-          const jsonMatch = raw.match(/\{[\s\S]*\}/);
-          const grading = jsonMatch ? JSON.parse(jsonMatch[0]) : { marks: 0, isCorrect: false, feedback: '' };
-
-          return {
-            questionId: ans.questionId,
-            answer: studentAnswer,
-            isCorrect: grading.isCorrect || false,
-            marks: Math.min(Math.max(grading.marks || 0, 0), qMarks),
-            aiFeedback: grading.feedback || 'Answer reviewed.',
-          };
-        } catch (aiErr) {
-          logError('AI grading failed for question ' + ans.questionId, aiErr);
-          // Fallback: keyword-based partial credit
-          const keywords = correctAnswer.toLowerCase().split(/\s+/).filter(w => w.length > 3);
-          const studentWords = studentAnswer.toLowerCase();
-          const matches = keywords.filter(k => studentWords.includes(k)).length;
-          const ratio = keywords.length > 0 ? matches / keywords.length : 0;
-          const marks = Math.round(ratio * qMarks);
-          return {
-            questionId: ans.questionId,
-            answer: studentAnswer,
-            isCorrect: ratio >= 0.5,
-            marks,
-            aiFeedback: `Answer partially reviewed. Consider checking: ${correctAnswer.slice(0, 100)}...`,
-          };
-        }
-      })
-    );
+      const isCorrect = studentAnswer.toLowerCase() === correctAnswer.toLowerCase();
+      return {
+        questionId: ans.questionId,
+        answer: studentAnswer,
+        isCorrect,
+        marks: isCorrect ? qMarks : 0,
+        aiFeedback: isCorrect
+          ? `✅ Correct! ${correctAnswer}`
+          : `❌ Incorrect. The correct answer was: ${correctAnswer}`,
+      };
+    });
 
     const totalScore = gradedAnswers.reduce((sum, a) => sum + (a.marks || 0), 0);
 
-    // Upsert submission
-    const submission = await StudentSubmission.findOneAndUpdate(
-      { assignedAssignmentId: assigned._id, studentName: studentName.trim() },
-      {
-        $set: {
-          answers: gradedAnswers,
-          totalScore,
-          totalMarks,
-          submittedAt: new Date(),
-          startedAt: existing?.startedAt || new Date(),
-        },
-      },
-      { upsert: true, new: true }
-    );
+    let submission = existing;
+    if (!submission) {
+      submission = new StudentSubmission({
+        assignedAssignmentId: assigned._id,
+        studentId: student.studentId || undefined,
+        studentName: studentName.trim(),
+        answers: gradedAnswers,
+        totalScore,
+        totalMarks,
+        status: 'graded',
+        submittedAt: new Date(),
+        startedAt: new Date(),
+      });
+    } else {
+      submission.studentId = student.studentId || submission.studentId;
+      submission.studentName = studentName.trim();
+      submission.answers = gradedAnswers;
+      submission.totalScore = totalScore;
+      submission.totalMarks = totalMarks;
+      submission.status = 'graded';
+      submission.submittedAt = new Date();
+    }
+    await submission.save();
 
-    log(`Submission saved: ${submission._id} for student "${studentName}" — Score: ${totalScore}/${totalMarks}`);
+    log(`Submission saved (Sync MCQ): ${submission._id} for student "${studentName}" — Score: ${totalScore}/${totalMarks}`);
+
+    // Trigger spaced repetition Concept Review check if registered student
+    if (student?.studentId) {
+      try {
+        const { checkAndCreateReviewItems } = require('../services/review.service');
+        await checkAndCreateReviewItems(student.studentId);
+      } catch (revErr) {
+        logError('Failed to trigger spaced repetition on sync submission', revErr);
+      }
+    }
 
     return res.status(201).json({
       submissionId: submission._id,
+      status: 'graded',
       totalScore,
       totalMarks,
       percentage: totalMarks > 0 ? Math.round((totalScore / totalMarks) * 100) : 0,
@@ -483,33 +569,49 @@ Return JSON:
 // Accepts a scanned paper upload (multer) — stores fileUrl on submission
 export async function uploadStudentPaper(req: Request, res: Response) {
   try {
-    const { studentName } = req.body;
+    const student = (req as any).student;
+    const studentName = student.studentName;
     const assignedId = req.params.assignedId;
 
-    if (!studentName) return res.status(400).json({ error: 'studentName is required' });
     if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
 
     const assigned = await AssignedAssignment.findById(assignedId);
     if (!assigned) return res.status(404).json({ error: 'Assignment not found' });
 
+    // Verify student is enrolled in this group/class
+    const isEnrolled = student.groupIds.includes(assigned.groupId.toString());
+    if (!isEnrolled) {
+      return res.status(403).json({ error: 'Access denied. You are not enrolled in this class.' });
+    }
+
     const fileUrl = `/uploads/${req.file.filename}`;
 
-    await StudentSubmission.findOneAndUpdate(
-      { assignedAssignmentId: assigned._id, studentName: studentName.trim() },
-      {
-        $set: {
-          submittedAt: new Date(),
-          startedAt: new Date(),
-          // Store upload path in aiFeedback of first answer as a placeholder
-        },
-        $setOnInsert: {
-          totalScore: 0,
-          totalMarks: 0,
-          answers: [{ questionId: 'upload', answer: fileUrl, isCorrect: false, marks: 0, aiFeedback: 'Paper uploaded. Awaiting teacher review.' }],
-        },
-      },
-      { upsert: true, new: true }
-    );
+    let submission = await StudentSubmission.findOne({
+      assignedAssignmentId: assigned._id,
+      $or: [
+        ...(student.studentId ? [{ studentId: student.studentId }] : []),
+        { studentName: studentName.trim() }
+      ]
+    });
+
+    if (!submission) {
+      submission = new StudentSubmission({
+        assignedAssignmentId: assigned._id,
+        studentId: student.studentId || undefined,
+        studentName: studentName.trim(),
+        submittedAt: new Date(),
+        startedAt: new Date(),
+        totalScore: 0,
+        totalMarks: 0,
+        answers: [{ questionId: 'upload', answer: fileUrl, isCorrect: false, marks: 0, aiFeedback: 'Paper uploaded. Awaiting teacher review.' }],
+      });
+    } else {
+      submission.studentId = student.studentId || submission.studentId;
+      submission.studentName = studentName.trim();
+      submission.submittedAt = new Date();
+      submission.answers = [{ questionId: 'upload', answer: fileUrl, isCorrect: false, marks: 0, aiFeedback: 'Paper uploaded. Awaiting teacher review.' }];
+    }
+    await submission.save();
 
     log(`Paper uploaded for student "${studentName}": ${req.file.filename}`);
     return res.json({ message: 'Paper uploaded successfully', fileUrl });
@@ -519,17 +621,19 @@ export async function uploadStudentPaper(req: Request, res: Response) {
   }
 }
 
-// GET /api/student/results/:assignedId?studentName=
+// GET /api/student/results/:assignedId
 export async function getStudentResults(req: Request, res: Response) {
   try {
-    const { studentName } = req.query;
+    const student = (req as any).student;
+    const studentName = student.studentName;
     const assignedId = req.params.assignedId;
-
-    if (!studentName) return res.status(400).json({ error: 'studentName query param required' });
 
     const submission = await StudentSubmission.findOne({
       assignedAssignmentId: assignedId,
-      studentName: studentName as string,
+      $or: [
+        ...(student.studentId ? [{ studentId: student.studentId }] : []),
+        { studentName: studentName }
+      ]
     });
 
     if (!submission) {
@@ -542,6 +646,22 @@ export async function getStudentResults(req: Request, res: Response) {
     if (!assigned) return res.status(404).json({ error: 'Assignment not found' });
 
     const assignment: any = assigned.assignmentId;
+
+    if (submission.status === 'grading') {
+      return res.json({
+        submissionId: submission._id,
+        studentName: submission.studentName,
+        assignmentTitle: assignment?.title || '',
+        subject: assignment?.result?.subject || '',
+        grade: assignment?.result?.grade || '',
+        totalScore: 0,
+        totalMarks: submission.totalMarks,
+        percentage: 0,
+        status: 'grading',
+        submittedAt: submission.submittedAt,
+        answers: [],
+      });
+    }
 
     // Build question text map for results display
     const questionTextMap: Record<string, { text: string; marks: number; type: string; conceptTag?: string }> = {};
@@ -580,6 +700,7 @@ export async function getStudentResults(req: Request, res: Response) {
       totalScore: submission.totalScore,
       totalMarks: submission.totalMarks,
       percentage: submission.totalMarks > 0 ? Math.round((submission.totalScore / submission.totalMarks) * 100) : 0,
+      status: submission.status || 'graded',
       submittedAt: submission.submittedAt,
       answers: detailedAnswers,
     });
@@ -633,13 +754,25 @@ Guidelines:
 }
 
 // POST /api/student/practice/generate
-// body: { studentEmail, studentName, classCode, subject, grade, topic, numQuestions, type }
+// body: { classCode, subject, grade, topic, numQuestions, type }
 export async function generatePracticeWorksheet(req: Request, res: Response) {
   try {
-    const { studentEmail, studentName, classCode, subject, grade, topic, numQuestions = 5, type = 'Mixed' } = req.body;
+    const student = (req as any).student;
+    const studentEmail = student.email;
+    const studentName = student.studentName;
+    
+    const { classCode, subject, grade, topic, numQuestions = 5, type = 'Mixed' } = req.body;
 
-    if (!studentEmail || !studentName || !subject || !grade || !topic) {
+    if (!subject || !grade || !topic) {
       return res.status(400).json({ error: 'Missing required parameters' });
+    }
+
+    // Verify student is enrolled in this group/class if classCode is specified
+    if (classCode) {
+      const group = await Group.findOne({ classCode: classCode.toUpperCase().trim() });
+      if (group && !student.groupIds.includes(group._id.toString())) {
+        return res.status(403).json({ error: 'Access denied. You are not enrolled in this class.' });
+      }
     }
 
     log(`Generating practice quiz for student ${studentName} (${studentEmail}): Grade ${grade} ${subject} on "${topic}"`);
@@ -706,6 +839,7 @@ Return a JSON object in EXACTLY the following structure. Do not wrap in markdown
 // body: { answers: [{ questionId, answer }] }
 export async function submitPracticeWorksheet(req: Request, res: Response) {
   try {
+    const student = (req as any).student;
     const { answers } = req.body;
     const { practiceId } = req.params;
 
@@ -850,6 +984,16 @@ Grade the answer. Return JSON:
     practice.submittedAt = new Date();
     await practice.save();
 
+    // Trigger spaced repetition Concept Review check
+    if (student?.studentId) {
+      try {
+        const { checkAndCreateReviewItems } = require('../services/review.service');
+        await checkAndCreateReviewItems(student.studentId);
+      } catch (revErr) {
+        logError('Failed to trigger spaced repetition on practice submission', revErr);
+      }
+    }
+
     return res.json({
       practiceId: practice._id,
       score: totalScore,
@@ -864,16 +1008,14 @@ Grade the answer. Return JSON:
 }
 
 // GET /api/student/practice/history
-// query: { studentEmail }
+// Retrieves practice history for the authenticated student
 export async function getPracticeHistory(req: Request, res: Response) {
   try {
-    const { studentEmail } = req.query;
-    if (!studentEmail) {
-      return res.status(400).json({ error: 'studentEmail required' });
-    }
+    const student = (req as any).student;
+    const studentEmail = student.email;
 
     const history = await StudentPractice.find({
-      studentEmail: (studentEmail as string).toLowerCase().trim(),
+      studentEmail: studentEmail.toLowerCase().trim(),
       submittedAt: { $ne: null },
     }).sort({ submittedAt: -1 });
 

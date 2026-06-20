@@ -18,14 +18,14 @@ export const useAssignmentStore = create<AssignmentState>((set) => {
     setAssignments: (list) => {
       set({ assignments: list });
       if (typeof window !== 'undefined') {
-        localStorage.setItem('veda_assignments', JSON.stringify(list));
+        localStorage.setItem('classplus_assignments', JSON.stringify(list));
       }
     },
     addAssignment: (a) => {
       set((state) => {
         const updated = [...state.assignments, a];
         if (typeof window !== 'undefined') {
-          localStorage.setItem('veda_assignments', JSON.stringify(updated));
+          localStorage.setItem('classplus_assignments', JSON.stringify(updated));
         }
         return { assignments: updated };
       });
@@ -34,7 +34,7 @@ export const useAssignmentStore = create<AssignmentState>((set) => {
       set((state) => {
         const updated = state.assignments.filter((item) => item._id !== id);
         if (typeof window !== 'undefined') {
-          localStorage.setItem('veda_assignments', JSON.stringify(updated));
+          localStorage.setItem('classplus_assignments', JSON.stringify(updated));
         }
         return { 
           assignments: updated,

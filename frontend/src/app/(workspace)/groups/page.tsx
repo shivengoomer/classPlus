@@ -10,14 +10,17 @@ import {
   CheckCircle2, Copy, ClipboardCheck, AlertCircle, Loader2, CalendarDays,
   Brain, Trophy, XCircle, Upload, Edit3, BookOpen, FileText, Check, ChevronUp,
   GraduationCap, Sparkles, Zap, MoreVertical, ArrowRight, ClipboardList,
-  Hash, Star, TrendingUp, Badge, Info, Clock
+  Hash, Star, TrendingUp, Badge, Info, Clock, Megaphone
 } from 'lucide-react';
 import { useFormStore } from '@/store/formStore';
+import { useToastStore } from '@/store/toastStore';
 import {
   listGroups, createGroup, updateGroup, deleteGroup,
   listAssignments, listAssigned, createAssigned, deleteAssigned,
   listSubmissions, updateSubmission,
-  type Group, type AssignedAssignment
+  listAnnouncements, createAnnouncement, deleteAnnouncement,
+  getGroupRoster, generateParentInvite,
+  type Group, type AssignedAssignment, type Announcement
 } from '@/lib/api';
 
 const RUBRICS = [
@@ -46,16 +49,26 @@ function getSubjectStyle(subject: string) {
   return SUBJECT_COLORS[subject] || { bg: 'bg-slate-50', text: 'text-slate-700', border: 'border-slate-200', dot: 'bg-slate-500' };
 }
 
+function formatEventTime(dateStr: string) {
+  try {
+    const d = new Date(dateStr);
+    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) + ' at ' + d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+  } catch (err) {
+    return dateStr;
+  }
+}
+
 export default function GroupsPage() {
   const router = useRouter();
   const { setSubject, setGrade, setTitle, setInstructions } = useFormStore();
+  const { addToast } = useToastStore();
 
   const [groups, setGroups] = useState<Group[]>([]);
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [activeDetailTab, setActiveDetailTab] = useState<'overview' | 'students' | 'assessments' | 'actions'>('overview');
+  const [activeDetailTab, setActiveDetailTab] = useState<'overview' | 'students' | 'assessments' | 'announcements' | 'actions'>('overview');
 
   // Create Group Modal
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -84,6 +97,14 @@ export default function GroupsPage() {
   // Copy class code
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
+  // Announcements
+  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const [announcementsLoading, setAnnouncementsLoading] = useState(false);
+  const [showComposeAnnouncement, setShowComposeAnnouncement] = useState(false);
+  const [composeTitle, setComposeTitle] = useState('');
+  const [composeContent, setComposeContent] = useState('');
+  const [postingAnnouncement, setPostingAnnouncement] = useState(false);
+
   // Phase 5 States
   const [allAssigned, setAllAssigned] = useState<AssignedAssignment[]>([]);
   const [assignedLoading, setAssignedLoading] = useState(false);
@@ -96,6 +117,48 @@ export default function GroupsPage() {
   const [gradingTotalScore, setGradingTotalScore] = useState<number | null>(null);
   const [savingGrade, setSavingGrade] = useState(false);
   const [uploadingPaper, setUploadingPaper] = useState(false);
+
+  // Roster credentials and Parent Code States
+  const [roster, setRoster] = useState<any[]>([]);
+  const [rosterLoading, setRosterLoading] = useState(false);
+  const [parentCodes, setParentCodes] = useState<Record<string, string>>({});
+  const [generatingParentCode, setGeneratingParentCode] = useState<Record<string, boolean>>({});
+
+  const fetchRosterData = useCallback(async (groupId: string) => {
+    setRosterLoading(true);
+    try {
+      const data = await getGroupRoster(groupId);
+      setRoster(data);
+    } catch (err) {
+      console.error('Failed to fetch roster details:', err);
+    } finally {
+      setRosterLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (selectedGroup) {
+      fetchRosterData(selectedGroup._id);
+    } else {
+      setRoster([]);
+    }
+  }, [selectedGroup, fetchRosterData]);
+
+  const handleGenerateParentCode = async (studentId: string, studentName: string) => {
+    if (!selectedGroup) return;
+    setGeneratingParentCode(prev => ({ ...prev, [studentId]: true }));
+    try {
+      const res = await generateParentInvite(selectedGroup._id, studentId);
+      setParentCodes(prev => ({ ...prev, [studentId]: res.inviteCode }));
+      addToast(`Generated Parent Code for ${studentName}: ${res.inviteCode}`, 'success');
+      fetchRosterData(selectedGroup._id);
+    } catch (err: any) {
+      addToast(err.message || 'Failed to generate invite code', 'error');
+    } finally {
+      setGeneratingParentCode(prev => ({ ...prev, [studentId]: false }));
+    }
+  };
+
 
   const fetchGroups = useCallback(async () => {
     setLoading(true);
@@ -125,10 +188,28 @@ export default function GroupsPage() {
     }
   }, []);
 
+  const fetchGroupAnnouncements = useCallback(async (groupId: string) => {
+    setAnnouncementsLoading(true);
+    try {
+      const data = await listAnnouncements(groupId);
+      setAnnouncements(data);
+    } catch (err) {
+      console.error('Failed to load announcements', err);
+    } finally {
+      setAnnouncementsLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     fetchGroups();
     fetchAssigned();
   }, [fetchGroups, fetchAssigned]);
+
+  useEffect(() => {
+    if (selectedGroup && activeDetailTab === 'announcements') {
+      fetchGroupAnnouncements(selectedGroup._id);
+    }
+  }, [selectedGroup, activeDetailTab, fetchGroupAnnouncements]);
 
   const fetchSubmissions = async (assignedId: string) => {
     setSubmissionsLoading(true);
@@ -240,6 +321,39 @@ export default function GroupsPage() {
     }
   };
 
+  const handlePostAnnouncement = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedGroup || !composeTitle.trim() || !composeContent.trim()) return;
+    setPostingAnnouncement(true);
+    try {
+      await createAnnouncement({
+        groupId: selectedGroup._id,
+        title: composeTitle.trim(),
+        content: composeContent.trim(),
+      });
+      setComposeTitle('');
+      setComposeContent('');
+      setShowComposeAnnouncement(false);
+      fetchGroupAnnouncements(selectedGroup._id);
+    } catch (err: any) {
+      alert(err.message || 'Failed to post announcement.');
+    } finally {
+      setPostingAnnouncement(false);
+    }
+  };
+
+  const handleDeleteAnnouncement = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this announcement?')) return;
+    try {
+      await deleteAnnouncement(id);
+      if (selectedGroup) {
+        fetchGroupAnnouncements(selectedGroup._id);
+      }
+    } catch (err: any) {
+      alert(err.message || 'Failed to delete announcement.');
+    }
+  };
+
   const handleUnassign = async (id: string) => {
     if (!confirm('Unassign this assessment? Students will lose access.')) return;
     try {
@@ -295,6 +409,7 @@ export default function GroupsPage() {
       setGroups(prev => prev.map(g => g._id === result._id ? result : g));
       setSelectedGroup(result);
       setNewStudentName('');
+      fetchRosterData(selectedGroup._id);
     } catch {}
   };
 
@@ -305,6 +420,7 @@ export default function GroupsPage() {
       const result = await updateGroup(selectedGroup._id, { students: updated });
       setGroups(prev => prev.map(g => g._id === result._id ? result : g));
       setSelectedGroup(result);
+      fetchRosterData(selectedGroup._id);
     } catch {}
   };
 
@@ -592,7 +708,7 @@ export default function GroupsPage() {
 
                     {/* Tab Bar */}
                     <div className="flex items-center gap-0.5">
-                      {([ 'overview', 'students', 'assessments', 'actions'] as const).map(tab => (
+                      {([ 'overview', 'students', 'assessments', 'announcements', 'actions'] as const).map(tab => (
                         <button
                           key={tab}
                           onClick={() => setActiveDetailTab(tab)}
@@ -764,7 +880,11 @@ export default function GroupsPage() {
 
                           {/* Student List */}
                           <div className="flex flex-col gap-1">
-                            {selectedGroup.students.length === 0 ? (
+                            {rosterLoading ? (
+                              <div className="flex justify-center py-8">
+                                <Loader2 className="w-5 h-5 animate-spin text-slate-400" />
+                              </div>
+                            ) : roster.length === 0 ? (
                               <div className="flex flex-col items-center justify-center py-10 gap-2 text-center">
                                 <div className="w-10 h-10 rounded-2xl bg-slate-100 flex items-center justify-center">
                                   <User className="w-5 h-5 text-slate-400" />
@@ -772,28 +892,59 @@ export default function GroupsPage() {
                                 <p className="text-xs text-slate-500 font-medium">No students yet. Add some above.</p>
                               </div>
                             ) : (
-                              selectedGroup.students.map((s, idx) => (
-                                <motion.div
-                                  key={idx}
-                                  initial={{ opacity: 0, x: -8 }}
-                                  animate={{ opacity: 1, x: 0 }}
-                                  transition={{ delay: idx * 0.02 }}
-                                  className="flex items-center justify-between py-2.5 px-3 rounded-xl hover:bg-slate-50 group transition-colors"
-                                >
-                                  <div className="flex items-center gap-2.5">
-                                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-slate-200 to-slate-100 flex items-center justify-center text-[10px] font-black text-slate-600 flex-shrink-0 border border-slate-200/60">
-                                      {s.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase()}
-                                    </div>
-                                    <span className="text-xs font-semibold text-slate-800">{s}</span>
-                                  </div>
-                                  <button
-                                    onClick={() => handleRemoveStudent(s)}
-                                    className="opacity-0 group-hover:opacity-100 p-1 text-slate-400 hover:text-red-500 transition-all rounded-lg hover:bg-red-50"
+                              roster.map((s, idx) => {
+                                const initials = s.name.split(' ').map((w: string) => w[0]).slice(0, 2).join('').toUpperCase();
+                                const isGen = generatingParentCode[s.studentId];
+                                const code = parentCodes[s.studentId];
+                                return (
+                                  <motion.div
+                                    key={idx}
+                                    initial={{ opacity: 0, x: -8 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: idx * 0.02 }}
+                                    className="flex items-center justify-between py-2.5 px-3 rounded-xl hover:bg-slate-50 group transition-colors border border-transparent hover:border-slate-100"
                                   >
-                                    <X className="w-3.5 h-3.5" />
-                                  </button>
-                                </motion.div>
-                              ))
+                                    <div className="flex items-center gap-2.5 min-w-0">
+                                      <div className="w-7 h-7 rounded-full bg-gradient-to-br from-slate-200 to-slate-100 flex items-center justify-center text-[10px] font-black text-slate-600 flex-shrink-0 border border-slate-200/60">
+                                        {initials}
+                                      </div>
+                                      <div className="flex flex-col min-w-0">
+                                        <span className="text-xs font-semibold text-slate-800 truncate">{s.name}</span>
+                                        {s.isRegistered ? (
+                                          <span className="text-[9px] text-emerald-500 font-bold">Registered ({s.email})</span>
+                                        ) : (
+                                          <span className="text-[9px] text-slate-400 font-semibold">Not registered</span>
+                                        )}
+                                      </div>
+                                    </div>
+                                    
+                                    <div className="flex items-center gap-2">
+                                      {s.isRegistered && (
+                                        code ? (
+                                          <span className="text-[10px] font-mono font-black bg-indigo-50 text-[#4F46E5] border border-indigo-150/40 px-2 py-0.5 rounded-lg select-all">
+                                            Parent Code: {code}
+                                          </span>
+                                        ) : (
+                                          <button
+                                            onClick={() => handleGenerateParentCode(s.studentId, s.name)}
+                                            disabled={isGen}
+                                            className="opacity-0 group-hover:opacity-100 text-[10px] font-bold text-[#10375C] hover:underline flex items-center gap-1 border-0 bg-transparent cursor-pointer"
+                                          >
+                                            {isGen ? <Loader2 className="w-3 h-3 animate-spin" /> : <Copy className="w-3 h-3" />}
+                                            <span>Generate Parent Code</span>
+                                          </button>
+                                        )
+                                      )}
+                                      <button
+                                        onClick={() => handleRemoveStudent(s.name)}
+                                        className="opacity-0 group-hover:opacity-150 p-1 text-slate-400 hover:text-red-500 transition-all rounded-lg hover:bg-red-50 cursor-pointer border-0 bg-transparent"
+                                      >
+                                        <X className="w-3.5 h-3.5" />
+                                      </button>
+                                    </div>
+                                  </motion.div>
+                                );
+                              })
                             )}
                           </div>
                         </motion.div>
@@ -894,6 +1045,118 @@ export default function GroupsPage() {
                                   </div>
                                 );
                               })}
+                            </div>
+                          )}
+                        </motion.div>
+                      )}
+
+                      {/* ANNOUNCEMENTS TAB */}
+                      {activeDetailTab === 'announcements' && (
+                        <motion.div
+                          key="announcements"
+                          initial={{ opacity: 0, y: 6 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0 }}
+                          className="p-5 flex flex-col gap-4"
+                        >
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <h3 className="text-sm font-black text-slate-900">Class Announcements</h3>
+                              <p className="text-xs text-slate-500">Post announcements to the student feed</p>
+                            </div>
+                            <button
+                              onClick={() => setShowComposeAnnouncement(!showComposeAnnouncement)}
+                              className="flex items-center gap-1.5 text-xs font-bold text-white bg-[#10375C] hover:bg-[#0d2f4f] px-3 py-2 rounded-xl transition-colors cursor-pointer border-0 shadow-sm"
+                            >
+                              {showComposeAnnouncement ? 'Close Form' : 'Compose Announcement'}
+                            </button>
+                          </div>
+
+                          {/* Expandable Compose Card */}
+                          <AnimatePresence>
+                            {showComposeAnnouncement && (
+                              <motion.form
+                                onSubmit={handlePostAnnouncement}
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: 'auto' }}
+                                exit={{ opacity: 0, height: 0 }}
+                                className="bg-slate-50 border border-slate-200 rounded-xl p-4 flex flex-col gap-3 overflow-hidden"
+                              >
+                                <div>
+                                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Title</label>
+                                  <input
+                                    type="text"
+                                    value={composeTitle}
+                                    onChange={e => setComposeTitle(e.target.value)}
+                                    placeholder="e.g. Bring scientific calculators tomorrow"
+                                    className="w-full text-xs border border-slate-200 rounded-lg px-3 py-2 outline-none focus:border-[#10375C]/50 bg-white font-sans text-slate-800"
+                                    required
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Content</label>
+                                  <textarea
+                                    value={composeContent}
+                                    onChange={e => setComposeContent(e.target.value)}
+                                    placeholder="Write your announcement message here..."
+                                    rows={3}
+                                    className="w-full text-xs border border-slate-200 rounded-lg px-3 py-2 outline-none focus:border-[#10375C]/50 bg-white font-sans text-slate-800 resize-none"
+                                    required
+                                  />
+                                </div>
+                                <div className="flex justify-end">
+                                  <button
+                                    type="submit"
+                                    disabled={postingAnnouncement || !composeTitle.trim() || !composeContent.trim()}
+                                    className="bg-[#10375C] hover:bg-[#0d2f4f] disabled:bg-slate-350 text-white text-xs font-bold px-4 py-2 rounded-xl transition-colors flex items-center gap-1.5 cursor-pointer border-0 shadow-sm shadow-[#10375C]/10"
+                                  >
+                                    {postingAnnouncement ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3 text-amber-250 fill-amber-250 animate-pulse" />}
+                                    <span>Post Announcement</span>
+                                  </button>
+                                </div>
+                              </motion.form>
+                            )}
+                          </AnimatePresence>
+
+                          {/* Announcements List Feed */}
+                          {announcementsLoading ? (
+                            <div className="flex justify-center py-8">
+                              <Loader2 className="w-5 h-5 animate-spin text-slate-400" />
+                            </div>
+                          ) : announcements.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center py-12 gap-3 text-center">
+                              <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center">
+                                <Megaphone className="w-6 h-6 text-slate-400" />
+                              </div>
+                              <div>
+                                <p className="text-sm font-bold text-slate-600">No announcements posted</p>
+                                <p className="text-xs text-slate-400 mt-0.5">Click Compose to post your first announcement</p>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="flex flex-col gap-3">
+                              {announcements.map((ann) => (
+                                <div key={ann._id} className="bg-slate-50 border border-slate-200/70 rounded-xl p-4 flex flex-col gap-2 relative group">
+                                  <div className="flex justify-between items-start">
+                                    <div className="min-w-0 pr-6">
+                                      <h4 className="text-xs font-black text-slate-800 leading-snug">{ann.title}</h4>
+                                      <p className="text-[9px] text-slate-400 font-bold mt-0.5">
+                                        Posted by {ann.teacherName} · {formatEventTime(ann.createdAt)}
+                                      </p>
+                                    </div>
+                                    <button
+                                      onClick={() => handleDeleteAnnouncement(ann._id)}
+                                      className="absolute right-3 top-3 opacity-0 group-hover:opacity-100 p-1 text-slate-400 hover:text-red-500 transition-all rounded-lg hover:bg-red-50 cursor-pointer border-0 bg-transparent"
+                                      title="Delete Announcement"
+                                    >
+                                      <Trash2 className="w-3.5 h-3.5" />
+                                    </button>
+                                  </div>
+                                  <p className="text-xs text-slate-600 leading-relaxed whitespace-pre-line font-medium mt-1">
+                                    {ann.content}
+                                  </p>
+                                </div>
+                              ))}
                             </div>
                           )}
                         </motion.div>
@@ -1208,8 +1471,20 @@ export default function GroupsPage() {
                             : 'bg-white border-slate-200/80 text-slate-700 hover:bg-slate-100/50'
                         }`}
                       >
-                        <div className="min-w-0">
-                          <p className="text-xs font-bold truncate">{studentName}</p>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-1.5 min-w-0">
+                            <span className="text-xs font-bold truncate">{studentName}</span>
+                            {hasSubmitted && sub.similarityScore !== undefined && sub.similarityScore >= 0.8 && (
+                              <span
+                                title={`High similarity flagged (${Math.round(sub.similarityScore * 100)}%)`}
+                                className={`text-[9px] font-extrabold px-1.5 py-0.5 rounded-full flex-shrink-0 flex items-center gap-0.5 ${
+                                  isSelected ? 'bg-red-500/50 text-white border border-red-400' : 'bg-red-50 text-red-600 border border-red-100'
+                                }`}
+                              >
+                                ⚠️ {Math.round(sub.similarityScore * 100)}%
+                              </span>
+                            )}
+                          </div>
                           {hasSubmitted ? (
                             <p className={`text-[10px] font-semibold mt-0.5 ${isSelected ? 'text-indigo-200' : 'text-slate-400'}`}>
                               {new Date(sub.submittedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
@@ -1256,6 +1531,20 @@ export default function GroupsPage() {
                         <span className="text-xs font-bold text-slate-400">/ {selectedStudentSubmission.totalMarks}</span>
                       </div>
                     </div>
+
+                    {selectedStudentSubmission.similarityScore !== undefined && selectedStudentSubmission.similarityScore >= 0.8 && (
+                      <div className="bg-red-50 border-b border-red-100 px-5 py-3.5 flex items-start gap-3">
+                        <span className="text-sm flex-shrink-0 mt-0.5">⚠️</span>
+                        <div className="min-w-0">
+                          <h5 className="text-xs font-bold text-red-800">
+                            Potential Plagiarism / Copying Detected ({Math.round(selectedStudentSubmission.similarityScore * 100)}% Similarity)
+                          </h5>
+                          <p className="text-[10px] text-red-600 mt-0.5 leading-relaxed">
+                            This submission shares a high similarity score with other submissions in this group. Please review descriptive answers carefully.
+                          </p>
+                        </div>
+                      </div>
+                    )}
 
                     <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6">
                       {selectedStudentSubmission.answers?.length === 1 && selectedStudentSubmission.answers[0].questionId === 'upload' ? (

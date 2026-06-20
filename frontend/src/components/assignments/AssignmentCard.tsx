@@ -92,7 +92,7 @@ export function AssignmentCard({ assignment }: AssignmentCardProps) {
           </h4>
           
           <div className="flex items-center gap-2 mt-0.5">
-            <span className="text-[11px] font-bold text-veda-orange bg-orange-50 px-2 py-0.5 rounded-[6px]">
+            <span className="text-[11px] font-bold text-classplus-orange bg-orange-50 px-2 py-0.5 rounded-[6px]">
               {assignment.subject}
             </span>
             <span className="text-[11px] font-semibold text-gray-500">
@@ -101,7 +101,7 @@ export function AssignmentCard({ assignment }: AssignmentCardProps) {
             {assignment.status !== 'done' && (
               <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider ${
                 assignment.status === 'failed' 
-                  ? 'bg-red-50 text-veda-orange-red' 
+                  ? 'bg-red-50 text-classplus-orange-red' 
                   : 'bg-yellow-50 text-yellow-600 animate-pulse'
               }`}>
                 {assignment.status}

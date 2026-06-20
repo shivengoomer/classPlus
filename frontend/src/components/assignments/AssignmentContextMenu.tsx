@@ -36,7 +36,7 @@ export function AssignmentContextMenu({ onView, onDelete }: AssignmentContextMen
           e.stopPropagation();
           setIsOpen(!isOpen);
         }}
-        className="p-1.5 rounded-full hover:bg-gray-100 transition-colors text-veda-text-secondary hover:text-veda-text-primary"
+        className="p-1.5 rounded-full hover:bg-gray-100 transition-colors text-classplus-text-secondary hover:text-classplus-text-primary"
       >
         <MoreVertical className="w-5 h-5" />
       </button>

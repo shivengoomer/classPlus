@@ -87,6 +87,7 @@ export interface IAssignment extends Document {
   jobId?: string;
   result?: any;
   userId?: string;
+  institutionId?: mongoose.Types.ObjectId;
   parentAssignmentId?: string; // links difficulty variant to original
   createdAt: Date;
   updatedAt: Date;
@@ -112,6 +113,7 @@ const AssignmentSchema = new Schema(
     jobId: { type: String },
     result: ResultSchema,
     userId: { type: String },
+    institutionId: { type: Schema.Types.ObjectId, ref: 'Institution', index: true },
     parentAssignmentId: { type: String }, // links difficulty variant to original
   },
   {
